@@ -180,8 +180,8 @@ public class Main {
 
 
             ClassFinder classFinder = new ClassFinder();
-            for (Class<?> clazz : classFinder.findClasses("com.jaoafa.mymaid4.command")) {
-                if (!clazz.getName().startsWith("com.jaoafa.mymaid4.command.Cmd_")) {
+            for (Class<?> clazz : classFinder.findClasses("com.jaoafa.javajaotan2.command")) {
+                if (!clazz.getName().startsWith("com.jaoafa.javajaotan2.command.Cmd_")) {
                     continue;
                 }
                 if (clazz.getEnclosingClass() != null) {
@@ -190,7 +190,7 @@ public class Main {
                 if (clazz.getName().contains("$")) {
                     continue;
                 }
-                String commandName = clazz.getName().substring("com.jaoafa.mymaid4.command.Cmd_".length())
+                String commandName = clazz.getName().substring("com.jaoafa.javajaotan2.command.Cmd_".length())
                     .toLowerCase();
 
                 try {
@@ -226,8 +226,8 @@ public class Main {
     static void registerEvent(JDABuilder jdaBuilder) {
         try {
             ClassFinder classFinder = new ClassFinder();
-            for (Class<?> clazz : classFinder.findClasses("com.jaoafa.mymaid4.event")) {
-                if (!clazz.getName().startsWith("com.jaoafa.mymaid4.event.Event_")) {
+            for (Class<?> clazz : classFinder.findClasses("com.jaoafa.javajaotan2.event")) {
+                if (!clazz.getName().startsWith("com.jaoafa.javajaotan2.event.Event_")) {
                     continue;
                 }
                 if (clazz.getEnclosingClass() != null) {
@@ -236,7 +236,7 @@ public class Main {
                 if (clazz.getName().contains("$")) {
                     continue;
                 }
-                String eventName = clazz.getName().substring("com.jaoafa.mymaid4.event.Event_".length());
+                String eventName = clazz.getName().substring("com.jaoafa.javajaotan2.event.Event_".length());
                 Constructor<?> construct = clazz.getConstructor();
                 Object instance = construct.newInstance();
                 if (!(instance instanceof ListenerAdapter)) {

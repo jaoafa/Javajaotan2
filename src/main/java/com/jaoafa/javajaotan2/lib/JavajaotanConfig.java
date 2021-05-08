@@ -43,7 +43,7 @@ public class JavajaotanConfig {
 
             // - 設定項目の取得
             token = config.getString("token");
-            guild_id = config.getLong("guild_id");
+            guild_id = config.optLong("guild_id", 597378876556967936L);
 
             // -- データベース関連
             if (config.has("main_database")) {

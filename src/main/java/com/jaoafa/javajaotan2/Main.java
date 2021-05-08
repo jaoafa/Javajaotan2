@@ -22,7 +22,10 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.jda.JDAPrivateSender;
 import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.*;
+import com.jaoafa.javajaotan2.lib.ClassFinder;
+import com.jaoafa.javajaotan2.lib.CommandPremise;
+import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.JavajaotanConfig;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,11 +33,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -49,11 +54,16 @@ public class Main {
     public static void main(String[] args) {
         logger = Logger.getLogger("Javajaotan2");
 
-        isDevelopMode = new File("this-server-is-development").exists() ||
-            (args[0].equalsIgnoreCase("develop") && JavajaotanLibrary.isLong(args[1]));
+        isDevelopMode = new File("../build.json").exists();
         if (isDevelopMode) {
-            logger.warning("開発(ベータ)モードで動作しています。ユーザーID「" + args[1] + "」のユーザーの行動のみ反応します。");
-            developUserId = Long.parseLong(args[1]);
+            try {
+                String json = String.join("\n", Files.readAllLines(new File("../build.json").toPath()));
+                JSONObject config = new JSONObject(json);
+                logger.warning("開発(ベータ)モードで動作しています。ユーザー「" + config.getString("builder") + "」の行動のみ反応します。");
+                developUserId = Long.parseLong(config.getString("builderId"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         try {

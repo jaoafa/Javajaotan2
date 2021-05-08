@@ -21,10 +21,7 @@ import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.ClassFinder;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import com.jaoafa.javajaotan2.lib.JavajaotanConfig;
+import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -61,6 +58,21 @@ public class Main {
                 JSONObject config = new JSONObject(json);
                 logger.warn("開発(ベータ)モードで動作しています。ユーザー「" + config.getString("builder") + "」の行動のみ反応します。");
                 developUserId = Long.parseLong(config.getString("builderId"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (new File("this-server-is-development").exists()) {
+            isDevelopMode = true;
+            try {
+                String json = String.join("\n", Files.readAllLines(new File("config.json").toPath()));
+                JSONObject config = new JSONObject(json);
+                if (!config.has("guild_id")) {
+                    logger.error("コンフィグに guild_id が定義されていません。対象とするサーバIDを指定してください");
+                    System.exit(1);
+                    return;
+                }
+                logger.warn("開発(ベータ)モードで動作しています。サーバID「" + config.getString("guild_id") + "」での行動のみ反応します。");
+                developUserId = Long.parseLong(config.getString("guild_id"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -248,6 +260,34 @@ public class Main {
             }
         } catch (ClassNotFoundException | IOException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             getLogger().error("イベントの登録に失敗しました。");
+            e.printStackTrace();
+        }
+    }
+
+    void defineChannelsAndRoles() {
+        if (!new File("defines.json").exists()) {
+            return;
+        }
+        getLogger().info("定義ファイル defines.json が見つかったため、チャンネル・ロールIDを上書きします。");
+        try {
+            String definesJson = String.join("\n", Files.readAllLines(new File("defines.json").toPath()));
+            JSONObject defines = new JSONObject(definesJson);
+            JSONObject channels = defines.getJSONObject("channels");
+            for (Channels channel : Channels.values()) {
+                if (!channels.has(channel.name())) {
+                    continue;
+                }
+                channel.setChannelId(channels.getLong(channel.name()));
+            }
+
+            JSONObject roles = defines.getJSONObject("roles");
+            for (Roles role : Roles.values()) {
+                if (!roles.has(role.name())) {
+                    continue;
+                }
+                role.setRoleId(roles.getLong(role.name()));
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

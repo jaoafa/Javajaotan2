@@ -72,12 +72,12 @@ public class JavajaotanConfig {
                 String dbname = main_database.getString("database");
 
                 try {
-                    JavajaotanData.setMainMySQLDBManager(new MySQLDBManager(hostname, port, username, password, dbname));
+                    JavajaotanData.setZkrhatMySQLDBManager(new MySQLDBManager(hostname, port, username, password, dbname));
                 } catch (ClassNotFoundException e) {
-                    logger.warn("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
+                    logger.warn("ZakuroHat データベース設定の初期化に失敗したため(ClassNotFoundException)、ZakuroHat データベースを使用する機能は使用できません。");
                 }
             } else {
-                logger.warn("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
+                logger.warn("ZakuroHat データベースへの接続設定が定義されていないため、ZakuroHat データベースを使用する機能は使用できません。");
             }
         } catch (IOException e) {
             logger.warn("コンフィグファイル config.json を読み取れませんでした: " + e.getMessage());

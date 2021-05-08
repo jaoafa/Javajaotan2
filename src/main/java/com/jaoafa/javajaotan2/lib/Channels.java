@@ -15,12 +15,12 @@ import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.Nullable;
 
-public class Channels {
-    public static Channels general = new Channels(597419057251090443L);
+public enum Channels {
+    general(597419057251090443L);
 
     private long channel_id;
 
-    private Channels(long channel_id) {
+    Channels(long channel_id) {
         this.channel_id = channel_id;
     }
 

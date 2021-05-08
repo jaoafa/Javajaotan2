@@ -1,0 +1,39 @@
+/*
+ * jaoLicense
+ *
+ * Copyright (c) 2021 jao Minecraft Server
+ *
+ * The following license applies to this project: jaoLicense
+ *
+ * Japanese: https://github.com/jaoafa/jao-Minecraft-Server/blob/master/jaoLICENSE.md
+ * English: https://github.com/jaoafa/jao-Minecraft-Server/blob/master/jaoLICENSE-en.md
+ */
+
+package com.jaoafa.javajaotan2.lib;
+
+import com.jaoafa.javajaotan2.Main;
+import net.dv8tion.jda.api.entities.TextChannel;
+import org.jetbrains.annotations.Nullable;
+
+public class Channels {
+    public static Channels general = new Channels(597419057251090443L);
+
+    private long channel_id;
+
+    private Channels(long channel_id) {
+        this.channel_id = channel_id;
+    }
+
+    public long getChannelId() {
+        return channel_id;
+    }
+
+    public void setChannelId(long channel_id) {
+        this.channel_id = channel_id;
+    }
+
+    @Nullable
+    public TextChannel getChannel() {
+        return Main.getJDA().getTextChannelById(channel_id);
+    }
+}

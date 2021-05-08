@@ -1,0 +1,108 @@
+/*
+ * jaoLicense
+ *
+ * Copyright (c) 2021 jao Minecraft Server
+ *
+ * The following license applies to this project: jaoLicense
+ *
+ * Japanese: https://github.com/jaoafa/jao-Minecraft-Server/blob/master/jaoLICENSE.md
+ * English: https://github.com/jaoafa/jao-Minecraft-Server/blob/master/jaoLICENSE-en.md
+ */
+
+package com.jaoafa.javajaotan2.lib;
+
+import com.jaoafa.javajaotan2.Main;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.logging.Logger;
+
+public class JavajaotanConfig {
+    Logger logger;
+    String token;
+    long guild_id;
+
+    public JavajaotanConfig() throws RuntimeException {
+        logger = Main.getLogger();
+
+        File file = new File("config.json"); // カレントディレクトリの config.json をコンフィグファイルとして定義します
+        if (!file.exists()) {
+            logger.warning("コンフィグファイル config.json が見つかりません。");
+            throw new RuntimeException();
+        }
+
+        try {
+            String json = String.join("\n", Files.readAllLines(file.toPath()));
+            JSONObject config = new JSONObject(json);
+
+            // - 必須項目の定義（ない場合、RuntimeExceptionが発生して進まない）
+            requiredConfig(config, "token");
+
+            // - 設定項目の取得
+            token = config.getString("token");
+            guild_id = config.getLong("guild_id");
+
+            // -- データベース関連
+            if (config.has("main_database")) {
+                JSONObject main_database = config.getJSONObject("main_database");
+                String hostname = main_database.getString("hostname");
+                int port = main_database.getInt("port");
+                String username = main_database.getString("username");
+                String password = main_database.getString("password");
+                String dbname = main_database.getString("database");
+
+                try {
+                    JavajaotanData.setMainMySQLDBManager(new MySQLDBManager(hostname, port, username, password, dbname));
+                } catch (ClassNotFoundException e) {
+                    logger.warning("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
+                }
+            } else {
+                logger.warning("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
+            }
+
+            if (config.has("zakurohat_database")) {
+                JSONObject main_database = config.getJSONObject("main_database");
+                String hostname = main_database.getString("hostname");
+                int port = main_database.getInt("port");
+                String username = main_database.getString("username");
+                String password = main_database.getString("password");
+                String dbname = main_database.getString("database");
+
+                try {
+                    JavajaotanData.setMainMySQLDBManager(new MySQLDBManager(hostname, port, username, password, dbname));
+                } catch (ClassNotFoundException e) {
+                    logger.warning("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
+                }
+            } else {
+                logger.warning("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
+            }
+        } catch (IOException e) {
+            logger.warning("コンフィグファイル config.json を読み取れませんでした: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException();
+        } catch (JSONException e) {
+            logger.warning("コンフィグファイル config.json の JSON 形式が正しくありません: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    void requiredConfig(JSONObject config, String key) throws RuntimeException {
+        if (config.has(key)) {
+            return;
+        }
+        logger.warning(String.format("コンフィグファイル config.json で必須であるキーが見つかりません: %s", key));
+        throw new RuntimeException();
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public long getGuildId() {
+        return guild_id;
+    }
+}

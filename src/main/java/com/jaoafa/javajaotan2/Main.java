@@ -20,7 +20,6 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.jda.JDAGuildSender;
-import cloud.commandframework.jda.JDAPrivateSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.ClassFinder;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
@@ -34,6 +33,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 public class Main {
     static boolean isDevelopMode = false;
@@ -52,14 +52,14 @@ public class Main {
     static JDA jda;
 
     public static void main(String[] args) {
-        logger = Logger.getLogger("Javajaotan2");
+        logger = LoggerFactory.getLogger("Javajaotan2");
 
         isDevelopMode = new File("../build.json").exists();
         if (isDevelopMode) {
             try {
                 String json = String.join("\n", Files.readAllLines(new File("../build.json").toPath()));
                 JSONObject config = new JSONObject(json);
-                logger.warning("開発(ベータ)モードで動作しています。ユーザー「" + config.getString("builder") + "」の行動のみ反応します。");
+                logger.warn("開発(ベータ)モードで動作しています。ユーザー「" + config.getString("builder") + "」の行動のみ反応します。");
                 developUserId = Long.parseLong(config.getString("builderId"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -129,30 +129,22 @@ public class Main {
                 sender -> {
                     MessageReceivedEvent event = sender.getEvent().orElse(null);
 
-                    if (sender instanceof JDAPrivateSender) {
-                        JDAPrivateSender jdaPrivateSender = (JDAPrivateSender) sender;
-                        return new JDAPrivateSender(event, jdaPrivateSender.getUser(), jdaPrivateSender.getPrivateChannel());
-                    }
-
                     if (sender instanceof JDAGuildSender) {
                         JDAGuildSender jdaGuildSender = (JDAGuildSender) sender;
                         return new JDAGuildSender(event, jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
                     }
-                    throw new UnsupportedOperationException();
+
+                    return null;
                 },
                 user -> {
                     MessageReceivedEvent event = user.getEvent().orElse(null);
-                    if (user instanceof JDAPrivateSender) {
-                        JDAPrivateSender privateUser = (JDAPrivateSender) user;
-                        return new JDAPrivateSender(event, privateUser.getUser(), privateUser.getPrivateChannel());
-                    }
 
                     if (user instanceof JDAGuildSender) {
                         JDAGuildSender guildUser = (JDAGuildSender) user;
                         return new JDAGuildSender(event, guildUser.getMember(), guildUser.getTextChannel());
                     }
 
-                    throw new UnsupportedOperationException();
+                    return null;
                 }
             );
 
@@ -255,12 +247,12 @@ public class Main {
                 getLogger().info(String.format("%s: イベントの登録に成功しました。", eventName));
             }
         } catch (ClassNotFoundException | IOException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            getLogger().warning("イベントの登録に失敗しました。");
+            getLogger().error("イベントの登録に失敗しました。");
             e.printStackTrace();
         }
     }
 
-    public static Logger getLogger() {
+    public static org.slf4j.Logger getLogger() {
         return logger;
     }
 

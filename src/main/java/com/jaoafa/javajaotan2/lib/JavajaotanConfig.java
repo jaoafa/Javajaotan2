@@ -14,11 +14,11 @@ package com.jaoafa.javajaotan2.lib;
 import com.jaoafa.javajaotan2.Main;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.logging.Logger;
 
 public class JavajaotanConfig {
     Logger logger;
@@ -30,7 +30,7 @@ public class JavajaotanConfig {
 
         File file = new File("config.json"); // カレントディレクトリの config.json をコンフィグファイルとして定義します
         if (!file.exists()) {
-            logger.warning("コンフィグファイル config.json が見つかりません。");
+            logger.error("コンフィグファイル config.json が見つかりません。");
             throw new RuntimeException();
         }
 
@@ -57,10 +57,10 @@ public class JavajaotanConfig {
                 try {
                     JavajaotanData.setMainMySQLDBManager(new MySQLDBManager(hostname, port, username, password, dbname));
                 } catch (ClassNotFoundException e) {
-                    logger.warning("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
+                    logger.warn("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
                 }
             } else {
-                logger.warning("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
+                logger.warn("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
             }
 
             if (config.has("zakurohat_database")) {
@@ -74,17 +74,17 @@ public class JavajaotanConfig {
                 try {
                     JavajaotanData.setMainMySQLDBManager(new MySQLDBManager(hostname, port, username, password, dbname));
                 } catch (ClassNotFoundException e) {
-                    logger.warning("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
+                    logger.warn("jaoMain データベース設定の初期化に失敗したため(ClassNotFoundException)、jaoMain データベースを使用する機能は使用できません。");
                 }
             } else {
-                logger.warning("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
+                logger.warn("jaoMain データベースへの接続設定が定義されていないため、jaoMain データベースを使用する機能は使用できません。");
             }
         } catch (IOException e) {
-            logger.warning("コンフィグファイル config.json を読み取れませんでした: " + e.getMessage());
+            logger.warn("コンフィグファイル config.json を読み取れませんでした: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException();
         } catch (JSONException e) {
-            logger.warning("コンフィグファイル config.json の JSON 形式が正しくありません: " + e.getMessage());
+            logger.warn("コンフィグファイル config.json の JSON 形式が正しくありません: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException();
         }
@@ -94,7 +94,7 @@ public class JavajaotanConfig {
         if (config.has(key)) {
             return;
         }
-        logger.warning(String.format("コンフィグファイル config.json で必須であるキーが見つかりません: %s", key));
+        logger.warn(String.format("コンフィグファイル config.json で必須であるキーが見つかりません: %s", key));
         throw new RuntimeException();
     }
 

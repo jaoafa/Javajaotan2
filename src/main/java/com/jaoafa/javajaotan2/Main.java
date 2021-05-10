@@ -112,7 +112,9 @@ public class Main {
 
         registerCommand(jda);
 
-        new HTTPServer().start();
+        if (!isDevelopMode) {
+            new HTTPServer().start();
+        }
     }
 
     static void registerCommand(JDA jda) {

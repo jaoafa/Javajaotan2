@@ -13,6 +13,9 @@ package com.jaoafa.javajaotan2;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandComponent;
+import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
@@ -29,6 +32,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Main {
     static boolean isDevelopMode = false;
@@ -47,6 +52,7 @@ public class Main {
     static Logger logger;
     static JavajaotanConfig config;
     static JDA jda;
+    static JSONArray commands;
 
     public static void main(String[] args) {
         logger = LoggerFactory.getLogger("Javajaotan2");
@@ -102,10 +108,14 @@ public class Main {
             return;
         }
 
-        commandRegister(jda);
+        defineChannelsAndRoles();
+
+        registerCommand(jda);
+
+        new HTTPServer().start();
     }
 
-    static void commandRegister(JDA jda) {
+    static void registerCommand(JDA jda) {
         try {
             final JDA4CommandManager<JDACommandSender> manager = new JDA4CommandManager<>(
                 jda,
@@ -190,7 +200,7 @@ public class Main {
                 }
             });
 
-
+            commands = new JSONArray();
             ClassFinder classFinder = new ClassFinder();
             for (Class<?> clazz : classFinder.findClasses("com.jaoafa.javajaotan2.command")) {
                 if (!clazz.getName().startsWith("com.jaoafa.javajaotan2.command.Cmd_")) {
@@ -221,10 +231,58 @@ public class Main {
                             JavajaotanCommand.permRoles(cmdPremise.details().getAllowRoles())
                         );
                     }
-                    cmdPremise.register(builder).getCommands().forEach(manager::command);
-                    System.out.println(commandName + " register successful");
+                    JSONArray subcommands = new JSONArray();
+                    cmdPremise.register(builder).getCommands().forEach(cmd -> {
+                        try {
+                            manager.command(cmd);
+                            JSONObject subcommand = new JSONObject();
+                            subcommand.put("meta", cmd.getCommandMeta().getAllValues());
+                            subcommand.put("senderType", cmd.getSenderType().isPresent() ?
+                                cmd.getSenderType().get().getName() : null);
+                            subcommand.put("toString", cmd.toString());
+
+                            final Iterator<CommandComponent<JDACommandSender>> iterator = cmd.getComponents().iterator();
+                            JSONArray args = new JSONArray();
+                            cmd.getArguments().forEach(arg -> {
+                                JSONObject obj = new JSONObject();
+                                obj.put("name", arg.getName());
+                                if (arg instanceof StaticArgument) {
+                                    obj.put("alias", ((StaticArgument<?>) arg).getAlternativeAliases());
+                                }
+                                obj.put("isRequired", arg.isRequired());
+                                obj.put("defaultValue", arg.getDefaultValue());
+                                obj.put("defaultDescription", arg.getDefaultDescription());
+                                obj.put("class", arg.getClass().getName());
+
+                                if (iterator.hasNext()) {
+                                    final CommandComponent<JDACommandSender> component = iterator.next();
+                                    if (!component.getArgumentDescription().isEmpty()) {
+                                        obj.put("description", component.getArgumentDescription().getDescription());
+                                    }
+                                }
+                                args.put(obj);
+                            });
+                            subcommand.put("arguments", args);
+                            subcommands.put(subcommand);
+                        } catch (AmbiguousNodeException e) {
+                            getLogger().warn(String.format("%s: コマンドの登録に失敗したため、このコマンドは使用できません: AmbiguousNodeException", cmd.toString()));
+                            getLogger().warn("このエラーは、コマンドフレームワークがコマンドの引数を見分けられないエラーによるものです。literalを追加して固有なコマンドと見なせるように修正してください。");
+                        }
+                    });
+
+                    JSONObject details = new JSONObject();
+                    details.put("class", instance.getClass().getName());
+                    details.put("name", commandName);
+                    details.put("command", cmdPremise.details().getName());
+                    details.put("description", cmdPremise.details().getDescription());
+                    details.put("alias", cmdPremise.details().getAliases());
+                    details.put("permissions", JavajaotanCommand.permRoles(cmdPremise.details().getAllowRoles()));
+                    details.put("subcommands", subcommands);
+                    commands.put(details);
+
+                    getLogger().info(String.format("%s: コマンドの登録に成功しました。", commandName));
                 } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    System.out.println(commandName + " register failed");
+                    getLogger().warn(String.format("%s: コマンドの登録に失敗しました。", commandName));
                     e.printStackTrace();
                 }
             }
@@ -264,7 +322,7 @@ public class Main {
         }
     }
 
-    void defineChannelsAndRoles() {
+    static void defineChannelsAndRoles() {
         if (!new File("defines.json").exists()) {
             return;
         }
@@ -310,5 +368,9 @@ public class Main {
 
     public static long getDevelopUserId() {
         return developUserId;
+    }
+
+    public static JSONArray getCommands() {
+        return commands;
     }
 }

@@ -53,9 +53,9 @@ public class Cmd_Alpha implements CommandPremise {
 
     private void oreAlpha(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
         //ユーザーアルファ
-        String[] oreArray = context.getOrDefault("OreArray",null);
+        String[] oreArray = context.getOrDefault("OreArray", null);
         boolean isRandom = false;
-        if (oreArray != null){
+        if (oreArray != null) {
             List<String> oreRandomOperationArray = new ArrayList<>(Arrays.asList(oreArray));
             //randomがあったら削除&booleanに記録
             isRandom = oreRandomOperationArray.remove("random");
@@ -63,8 +63,8 @@ public class Cmd_Alpha implements CommandPremise {
         }
 
         //ユーザーアルファに不足分のデフォルトアルファを補足
-        String[] oreMergedArray = getMargedArray(oreArray,new String[]{"アルファ","ふぁぼら","エゴサ","人気","クソアルファ","エビフィレオ"});
-        message.reply(getOreAlpha(oreMergedArray,isRandom)).queue();
+        String[] oreMergedArray = getMargedArray(oreArray, new String[]{"アルファ", "ふぁぼら", "エゴサ", "人気", "クソアルファ", "エビフィレオ"});
+        message.reply(getOreAlpha(oreMergedArray, isRandom)).queue();
     }
 
     private String getOreAlpha(String[] oreArray, boolean isRandom) {
@@ -72,15 +72,15 @@ public class Cmd_Alpha implements CommandPremise {
         if (isRandom) Collections.shuffle(Arrays.asList(oreArray));
         return String.format(
             "オ、オオwwwwwwwwオレ%swwwwwwww最近めっちょ%sれてんねんオレwwwwwwww%sとかかけるとめっちょ%sやねんwwwwァァァァァァァwww%sを見下しながら食べる%sは一段とウメェなァァァァwwwwwwww",
-            oreArray[0],oreArray[1],oreArray[2],oreArray[3],oreArray[4],oreArray[5]
+            oreArray[0], oreArray[1], oreArray[2], oreArray[3], oreArray[4], oreArray[5]
         );
     }
 
-    private String[] getMargedArray(String[] oreArray, String[] oreDefaultArray){
+    private String[] getMargedArray(String[] oreArray, String[] oreDefaultArray) {
         if (oreArray == null) return oreDefaultArray;
         int replaceCount = 0;
         for (String oreStr : oreArray) {
-            if (replaceCount>6) break;
+            if (replaceCount > 6) break;
             oreDefaultArray[replaceCount] = oreStr;
             replaceCount++;
         }

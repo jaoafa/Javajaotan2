@@ -191,10 +191,7 @@ public class Main {
                 }
             });
 
-            manager.registerExceptionHandler(Exception.class, (c, e) -> {
-                if (e instanceof NoSuchCommandException || e instanceof InvalidSyntaxException || e instanceof NoPermissionException) {
-                    return;
-                }
+            manager.registerExceptionHandler(CommandExecutionException.class, (c, e) -> {
                 if (c.getEvent().isPresent()) {
                     c.getEvent().get().getMessage().reply(MessageFormat.format("コマンドの実行に失敗しました: {0} ({1})",
                         e.getMessage(),

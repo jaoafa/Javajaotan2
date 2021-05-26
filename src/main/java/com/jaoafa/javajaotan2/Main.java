@@ -15,6 +15,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -191,10 +192,7 @@ public class Main {
                 }
             });
 
-            manager.registerExceptionHandler(Exception.class, (c, e) -> {
-                if (e instanceof NoSuchCommandException || e instanceof InvalidSyntaxException || e instanceof NoPermissionException) {
-                    return;
-                }
+            manager.registerExceptionHandler(CommandExecutionException.class, (c, e) -> {
                 if (c.getEvent().isPresent()) {
                     c.getEvent().get().getMessage().reply(MessageFormat.format("コマンドの実行に失敗しました: {0} ({1})",
                         e.getMessage(),

@@ -15,6 +15,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;

@@ -52,20 +52,23 @@ public class Cmd_Alpha implements CommandPremise {
     }
 
     private void oreAlpha(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        //ユーザーアルファ
         String[] oreArray = context.getOrDefault("OreArray",null);
         boolean isRandom = false;
         if (oreArray != null){
             List<String> oreRandomOperationArray = new ArrayList<>(Arrays.asList(oreArray));
+            //randomがあったら削除&booleanに記録
             isRandom = oreRandomOperationArray.remove("random");
             oreArray = oreRandomOperationArray.toArray(new String[0]);
         }
 
-        String[] oreDefaultArray = new String[]{"アルファ","ふぁぼら","エゴサ","人気","クソアルファ","エビフィレオ"};
-        String[] oreMergedArray = getMargedArray(oreArray,oreDefaultArray);
+        //ユーザーアルファに不足分のデフォルトアルファを補足
+        String[] oreMergedArray = getMargedArray(oreArray,new String[]{"アルファ","ふぁぼら","エゴサ","人気","クソアルファ","エビフィレオ"});
         message.reply(getOreAlpha(oreMergedArray,isRandom)).queue();
     }
 
     private String getOreAlpha(String[] oreArray, boolean isRandom) {
+        //randomだったらシャッフル
         if (isRandom) Collections.shuffle(Arrays.asList(oreArray));
         return String.format(
             "オ、オオwwwwwwwwオレ%swwwwwwww最近めっちょ%sれてんねんオレwwwwwwww%sとかかけるとめっちょ%sやねんwwwwァァァァァァァwww%sを見下しながら食べる%sは一段とウメェなァァァァwwwwwwww",

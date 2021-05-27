@@ -80,7 +80,7 @@ public class Cmd_Alpha implements CommandPremise {
         if (oreArray == null) return oreDefaultArray;
         int replaceCount = 0;
         for (String oreStr : oreArray) {
-            if (replaceCount > 6) break;
+            if (replaceCount > 5) break;
             oreDefaultArray[replaceCount] = oreStr;
             replaceCount++;
         }

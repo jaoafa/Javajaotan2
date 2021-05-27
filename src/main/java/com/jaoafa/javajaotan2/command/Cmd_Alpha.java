@@ -34,9 +34,7 @@ public class Cmd_Alpha implements CommandPremise {
     public JavajaotanCommand.Detail details() {
         return new JavajaotanCommand.Detail(
             "alpha",
-            Collections.emptyList(),
-            "アルファになったオレをします。",
-            Collections.emptyList()
+            "アルファになったオレをします。"
         );
     }
 

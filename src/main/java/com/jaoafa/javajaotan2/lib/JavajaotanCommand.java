@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 public class JavajaotanCommand {
     public static String permRoles(List<Roles> roles) {
+        if(roles == null) return null;
         return roles.stream()
             .map(Roles::getRoleId)
             .map(Object::toString).collect(Collectors.joining("|"));

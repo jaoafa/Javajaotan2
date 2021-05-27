@@ -48,8 +48,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class Main {
-    static boolean isDevelopMode = false;
+    static boolean isUserDevelopMode = false;
+    static boolean isGuildDevelopMode = false;
     static long developUserId;
+    static long developGuildId;
     static Logger logger;
     static JavajaotanConfig config;
     static JDA jda;
@@ -58,8 +60,8 @@ public class Main {
     public static void main(String[] args) {
         logger = LoggerFactory.getLogger("Javajaotan2");
 
-        isDevelopMode = new File("../build.json").exists();
-        if (isDevelopMode) {
+        isUserDevelopMode = new File("../build.json").exists();
+        if (isUserDevelopMode) {
             try {
                 String json = String.join("\n", Files.readAllLines(new File("../build.json").toPath()));
                 JSONObject config = new JSONObject(json);
@@ -69,7 +71,7 @@ public class Main {
                 e.printStackTrace();
             }
         } else if (new File("this-server-is-development").exists()) {
-            isDevelopMode = true;
+            isGuildDevelopMode = true;
             try {
                 String json = String.join("\n", Files.readAllLines(new File("config.json").toPath()));
                 JSONObject config = new JSONObject(json);
@@ -79,7 +81,7 @@ public class Main {
                     return;
                 }
                 logger.warn("開発(ベータ)モードで動作しています。サーバID「" + config.getString("guild_id") + "」での行動のみ反応します。");
-                developUserId = Long.parseLong(config.getString("guild_id"));
+                developGuildId = Long.parseLong(config.getString("guild_id"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -113,7 +115,7 @@ public class Main {
 
         registerCommand(jda);
 
-        if (!isDevelopMode) {
+        if (!isUserDevelopMode && !isGuildDevelopMode) {
             new HTTPServer().start();
         }
     }
@@ -124,12 +126,13 @@ public class Main {
                 jda,
                 message -> "/",
                 (sender, perm) -> {
+                    logger.info("Check permission: " + perm);
                     MessageReceivedEvent event = sender.getEvent().orElse(null);
-                    if (isDevelopMode) {
+                    if (isUserDevelopMode) {
                         if (event == null) {
                             return false;
                         }
-                        if (getDevelopUserId() != event.getMessage().getIdLong()) {
+                        if (developUserId != event.getMessage().getIdLong()) {
                             return false;
                         }
                     }
@@ -173,27 +176,41 @@ public class Main {
                 }
             );
 
-            manager.registerExceptionHandler(NoSuchCommandException.class, (c, e) -> {
-            }); // コマンドがなくてもなにもしない
+            manager.registerExceptionHandler(NoSuchCommandException.class, (c, e) ->
+                logger.info("NoSuchCommandException: " + e.getSuppliedCommand() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")")
+            );
 
             manager.registerExceptionHandler(InvalidSyntaxException.class,
                 (c, e) -> {
+                    logger.info("InvalidSyntaxException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
                     if (c.getEvent().isPresent()) {
+                        if(isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()){
+                            return;
+                        }
                         c.getEvent().get().getMessage().reply(String.format("コマンドの構文が不正です。正しい構文: `%s`", e.getCorrectSyntax())).queue();
                     }
                 });
 
             manager.registerExceptionHandler(NoPermissionException.class, (c, e) -> {
-                if (isDevelopMode && getDevelopUserId() != c.getUser().getIdLong()) {
+                logger.info("NoPermissionException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
+                if (isUserDevelopMode && developUserId != c.getUser().getIdLong()) {
                     return;
                 }
                 if (c.getEvent().isPresent()) {
+                    if(isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()){
+                        return;
+                    }
                     c.getEvent().get().getMessage().reply("コマンドを使用する権限がありません。").queue();
                 }
             });
 
             manager.registerExceptionHandler(CommandExecutionException.class, (c, e) -> {
+                logger.info("CommandExecutionException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
+                e.printStackTrace();
                 if (c.getEvent().isPresent()) {
+                    if(isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()){
+                        return;
+                    }
                     c.getEvent().get().getMessage().reply(MessageFormat.format("コマンドの実行に失敗しました: {0} ({1})",
                         e.getMessage(),
                         e.getClass().getName())).queue();
@@ -363,11 +380,15 @@ public class Main {
     }
 
     public static boolean isDevelopMode() {
-        return isDevelopMode;
+        return isUserDevelopMode || isGuildDevelopMode;
     }
 
-    public static long getDevelopUserId() {
-        return developUserId;
+    public static boolean isUserDevelopMode() {
+        return isUserDevelopMode;
+    }
+
+    public static boolean isGuildDevelopMode() {
+        return isGuildDevelopMode;
     }
 
     public static JSONArray getCommands() {

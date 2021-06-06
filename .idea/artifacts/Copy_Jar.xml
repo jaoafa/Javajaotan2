@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="Copy Jar">
+    <output-path>$PROJECT_DIR$/run</output-path>
+    <root id="root">
+      <element id="file-copy" path="$PROJECT_DIR$/target/Javajaotan2-jar-with-dependencies.jar" />
+    </root>
+  </artifact>
+</component>

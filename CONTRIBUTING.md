@@ -7,7 +7,7 @@
 開発に関する環境情報です。
 
 - IDE: IntelliJ IDEA (お勧め)
-- Language: Java (8)
+- Language: Java 11
 - Package Manager: Maven
 
 Eclipse などでも開発できますが、開発のサポートは IntelliJ IDEA のみ対応します。

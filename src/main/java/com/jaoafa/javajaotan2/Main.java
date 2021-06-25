@@ -56,6 +56,7 @@ public class Main {
     static JavajaotanConfig config;
     static JDA jda;
     static JSONArray commands;
+    static WatchEmojis watchEmojis;
 
     public static void main(String[] args) {
         logger = LoggerFactory.getLogger("Javajaotan2");
@@ -114,6 +115,8 @@ public class Main {
         defineChannelsAndRoles();
 
         registerCommand(jda);
+
+        watchEmojis = new WatchEmojis();
 
         if (!isUserDevelopMode && !isGuildDevelopMode) {
             new HTTPServer().start();
@@ -393,5 +396,9 @@ public class Main {
 
     public static JSONArray getCommands() {
         return commands;
+    }
+
+    public static WatchEmojis getWatchEmojis() {
+        return watchEmojis;
     }
 }

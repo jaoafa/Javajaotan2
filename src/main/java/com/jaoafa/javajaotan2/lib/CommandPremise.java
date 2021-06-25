@@ -41,7 +41,7 @@ public interface CommandPremise {
      */
     default void execute(CommandContext<JDACommandSender> context, CmdFunction handler) {
         MessageChannel channel = context.getSender().getChannel();
-        if (!context.getSender().getEvent().isPresent()) {
+        if (context.getSender().getEvent().isEmpty()) {
             channel.sendMessage("メッセージデータを取得できなかったため、処理に失敗しました。").queue();
             return;
         }

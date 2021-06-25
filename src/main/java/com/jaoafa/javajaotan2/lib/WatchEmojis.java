@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.lib;
 
+import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -108,19 +109,22 @@ public class WatchEmojis {
             return list_message_ids;
         }
 
-        public void clearListMessageIds(){
+        public void clearListMessageIds() {
             list_message_ids.clear();
+            Main.getWatchEmojis().save();
         }
 
-        public void addListMessage(Message message){
+        public void addListMessage(Message message) {
             list_message_ids.add(message.getIdLong());
+            Main.getWatchEmojis().save();
         }
 
         public JSONObject asJSONObject() {
             return new JSONObject()
                 .put("guild_id", guild_id)
                 .put("log_channel_id", log_channel_id)
-                .put("list_channel_id", list_channel_id);
+                .put("list_channel_id", list_channel_id)
+                .put("list_message_ids", list_message_ids);
         }
     }
 }

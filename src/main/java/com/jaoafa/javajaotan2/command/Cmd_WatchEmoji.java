@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Cmd_WatchEmoji implements CommandPremise {
@@ -58,6 +59,11 @@ public class Cmd_WatchEmoji implements CommandPremise {
                 .meta(CommandMeta.DESCRIPTION, "サーバを絵文字監視対象から削除します。")
                 .literal("remove", "del", "delete")
                 .handler(context -> execute(context, this::removeWatch))
+                .build(),
+            builder
+                .meta(CommandMeta.DESCRIPTION, "絵文字一覧を再生成します。")
+                .literal("regenerate")
+                .handler(context -> execute(context, this::regenerate))
                 .build()
         );
     }
@@ -110,12 +116,27 @@ public class Cmd_WatchEmoji implements CommandPremise {
     }
 
     private void removeWatch(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (!member.hasPermission(Permission.ADMINISTRATOR)){
+        if (!member.hasPermission(Permission.ADMINISTRATOR)) {
             message.reply("このコマンドを実行するには、サーバの管理者権限を持っている必要があります。").queue();
         }
         WatchEmojis watchEmojis = Main.getWatchEmojis();
+        if (watchEmojis.getEmojiGuild(guild).isEmpty()) {
+            message.reply("このサーバは絵文字監視対象ではありません。").queue();
+            return;
+        }
         watchEmojis.removeGuild(guild);
 
         message.reply(String.format("このサーバ「%s」を絵文字監視対象から削除しました。", guild.getName())).queue();
+    }
+
+    private void regenerate(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        WatchEmojis watchEmojis = Main.getWatchEmojis();
+        Optional<WatchEmojis.EmojiGuild> emojiGuildOpt = watchEmojis.getEmojiGuild(guild);
+        if (emojiGuildOpt.isEmpty()) {
+            message.reply("このサーバは絵文字監視対象ではありません。").queue();
+            return;
+        }
+        emojiGuildOpt.get().generateEmojiList(Main.getJDA());
+        message.reply("絵文字一覧を再生成しています…").queue();
     }
 }

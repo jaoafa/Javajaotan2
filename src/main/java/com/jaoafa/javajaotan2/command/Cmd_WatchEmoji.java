@@ -21,10 +21,7 @@ import com.jaoafa.javajaotan2.lib.CommandPremise;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
 import com.jaoafa.javajaotan2.lib.WatchEmojis;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -66,11 +63,43 @@ public class Cmd_WatchEmoji implements CommandPremise {
     }
 
     private void addWatch(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (!member.hasPermission(Permission.ADMINISTRATOR)){
+        if (!member.hasPermission(Permission.ADMINISTRATOR)) {
             message.reply("このコマンドを実行するには、サーバの管理者権限を持っている必要があります。").queue();
+            return;
+        }
+        Member selfMember = guild.getMember(Main.getJDA().getSelfUser());
+        if (selfMember == null) {
+            message.reply("Botユーザーのサーバメンバー情報を取得できませんでした。").queue();
+            return;
+        }
+        if (!selfMember.hasPermission(Permission.VIEW_AUDIT_LOGS)) {
+            message.reply("このコマンドを実行するには、jaotanがサーバの監査ログ閲覧権限を持っている必要があります。").queue();
+            return;
         }
         MessageChannel log_channel = context.get("log_channel");
         MessageChannel list_channel = context.get("list_channel");
+
+        GuildChannel log_guild_channel = guild.getGuildChannelById(log_channel.getIdLong());
+        if (log_guild_channel == null) {
+            message.reply("ログチャンネルの情報を取得できませんでした。このサーバにあるチャンネルを指定していますか？").queue();
+            return;
+        }
+        GuildChannel list_guild_channel = guild.getGuildChannelById(list_channel.getIdLong());
+        if (list_guild_channel == null) {
+            message.reply("リストチャンネルの情報を取得できませんでした。このサーバにあるチャンネルを指定していますか？").queue();
+            return;
+        }
+
+        if (!selfMember.hasPermission(log_guild_channel, Permission.MESSAGE_WRITE)) {
+            message.reply("このコマンドを実行するには、jaotanがログチャンネルへの書き込み権限を持っている必要があります。").queue();
+            return;
+        }
+
+        if (!selfMember.hasPermission(list_guild_channel, Permission.MESSAGE_WRITE)) {
+            message.reply("このコマンドを実行するには、jaotanがリストチャンネルへの書き込み権限を持っている必要があります。").queue();
+            return;
+        }
+
         WatchEmojis watchEmojis = Main.getWatchEmojis();
         watchEmojis.addGuild(guild, log_channel, list_channel);
 

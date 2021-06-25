@@ -12,7 +12,6 @@
 package com.jaoafa.javajaotan2.command;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.jda.parsers.ChannelArgument;
@@ -28,10 +27,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class Cmd_WatchEmoji implements CommandPremise {

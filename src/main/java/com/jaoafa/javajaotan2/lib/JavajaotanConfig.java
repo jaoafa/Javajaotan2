@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class JavajaotanConfig {
-    Logger logger;
+    final Logger logger;
     String token;
     long guild_id;
 

@@ -23,9 +23,4 @@ import org.jetbrains.annotations.NotNull;
 public interface CmdFunction {
     void execute(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context);
 
-    class NullCommandExecutionHandler implements CmdFunction {
-        @Override
-        public void execute(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        }
-    }
 }

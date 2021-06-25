@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WatchEmojis {
-    File file;
+    final File file;
     List<EmojiGuild> guilds = new ArrayList<>();
 
     public WatchEmojis() {
@@ -80,10 +80,10 @@ public class WatchEmojis {
     }
 
     public static class EmojiGuild {
-        long guild_id;
-        long log_channel_id;
-        long list_channel_id;
-        List<Long> list_message_ids;
+        final long guild_id;
+        final long log_channel_id;
+        final long list_channel_id;
+        final List<Long> list_message_ids;
 
         public EmojiGuild(long guild_id, long log_channel_id, long list_channel_id, List<Long> list_message_ids) {
             this.guild_id = guild_id;

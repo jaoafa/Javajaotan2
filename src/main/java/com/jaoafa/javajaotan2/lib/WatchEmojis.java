@@ -12,9 +12,9 @@
 package com.jaoafa.javajaotan2.lib;
 
 import com.jaoafa.javajaotan2.Main;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,9 +22,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WatchEmojis {
@@ -119,12 +117,78 @@ public class WatchEmojis {
             Main.getWatchEmojis().save();
         }
 
+        public void generateEmojiList(JDA jda) {
+            long list_channel_id = this.getListChannelId();
+            List<Long> list_message_ids = this.getListMessageIds();
+            TextChannel channel = jda.getTextChannelById(list_channel_id);
+            Guild guild = jda.getGuildById(this.getGuildId());
+            if (guild == null || channel == null) {
+                return;
+            }
+            List<String> emoji_list = getEmojiList(guild);
+            List<String> split_emojis = split1900chars(emoji_list);
+
+            List<Message> list_messages = list_message_ids.stream().map(s -> getMessage(channel, s)).collect(Collectors.toList());
+            if (list_messages.stream().anyMatch(Objects::isNull)) {
+                list_messages.forEach(m -> m.delete().queue()); // 一つでもメッセージが存在しなかったら、すべてのメッセージを削除する
+                list_messages.clear();
+                this.clearListMessageIds();
+            }
+
+            for (int i = 0; i < split_emojis.size(); i++) {
+                String emoji_list_str = split_emojis.get(i);
+                if (i >= list_messages.size()) {
+                    // メッセージ作成
+                    channel.sendMessage(emoji_list_str).queue(this::addListMessage, Throwable::printStackTrace);
+                } else {
+                    // 既存メッセージ利用
+                    Message message = list_messages.get(i);
+                    message.editMessage(emoji_list_str).queue();
+                }
+            }
+        }
+
         public JSONObject asJSONObject() {
             return new JSONObject()
                 .put("guild_id", guild_id)
                 .put("log_channel_id", log_channel_id)
                 .put("list_channel_id", list_channel_id)
                 .put("list_message_ids", list_message_ids);
+        }
+
+        private Message getMessage(TextChannel channel, long message_id) {
+            try {
+                return channel.retrieveMessageById(message_id).complete();
+            } catch (ErrorResponseException e) {
+                return null;
+            }
+        }
+
+        private List<String> getEmojiList(Guild guild) {
+            return guild
+                .getEmotes()
+                .stream()
+                .sorted(Comparator.comparing(Emote::getName))
+                .map(e -> String.format("%s = `:%s:`", e.getAsMention(), e.getName()))
+                .collect(Collectors.toList());
+        }
+
+        private List<String> split1900chars(List<String> strList) {
+            List<String> split = new ArrayList<>();
+            StringBuilder builder = new StringBuilder();
+            for (String str : strList) {
+                if (builder.length() + str.length() > 1900) {
+                    // この項目を入れると1900文字を超えてしまう
+                    split.add(builder.toString().trim());
+                    builder = new StringBuilder();
+                }
+                builder.append(str);
+                builder.append("\n");
+            }
+            if (builder.length() != 0) {
+                split.add(builder.toString().trim());
+            }
+            return split;
         }
     }
 }

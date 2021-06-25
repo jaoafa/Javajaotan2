@@ -21,16 +21,12 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.emote.EmoteAddedEvent;
 import net.dv8tion.jda.api.events.emote.EmoteRemovedEvent;
 import net.dv8tion.jda.api.events.emote.update.EmoteUpdateNameEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Event_WatchEmojis extends ListenerAdapter {
     @Override
@@ -60,7 +56,7 @@ public class Event_WatchEmojis extends ListenerAdapter {
             .build();
         log_channel.sendMessageEmbeds(embed).queue();
 
-        generateEmojiList(jda, emojiGuild);
+        emojiGuild.generateEmojiList(jda);
     }
 
     @Override
@@ -101,7 +97,7 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
         log_channel.sendMessageEmbeds(embed.build()).queue();
 
-        generateEmojiList(jda, emojiGuild);
+        emojiGuild.generateEmojiList(jda);
     }
 
     @Override
@@ -142,71 +138,6 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
         log_channel.sendMessageEmbeds(embed.build()).queue();
 
-        generateEmojiList(jda, emojiGuild);
-    }
-
-    private void generateEmojiList(JDA jda, WatchEmojis.EmojiGuild emojiGuild) {
-        long list_channel_id = emojiGuild.getListChannelId();
-        List<Long> list_message_ids = emojiGuild.getListMessageIds();
-        TextChannel channel = jda.getTextChannelById(list_channel_id);
-        Guild guild = jda.getGuildById(emojiGuild.getGuildId());
-        if (guild == null || channel == null) {
-            return;
-        }
-        List<String> emoji_list = getEmojiList(guild);
-        List<String> split_emojis = split1900chars(emoji_list);
-
-        List<Message> list_messages = list_message_ids.stream().map(s -> getMessage(channel, s)).collect(Collectors.toList());
-        if (list_messages.stream().anyMatch(Objects::isNull)) {
-            list_messages.forEach(m -> m.delete().queue()); // 一つでもメッセージが存在しなかったら、すべてのメッセージを削除する
-            list_messages.clear();
-            emojiGuild.clearListMessageIds();
-        }
-
-        for (int i = 0; i < split_emojis.size(); i++) {
-            String emoji_list_str = split_emojis.get(i);
-            if (i >= list_messages.size()) {
-                // メッセージ作成
-                channel.sendMessage(emoji_list_str).queue(emojiGuild::addListMessage, Throwable::printStackTrace);
-            } else {
-                // 既存メッセージ利用
-                Message message = list_messages.get(i);
-                message.editMessage(emoji_list_str).queue();
-            }
-        }
-    }
-
-    private Message getMessage(TextChannel channel, long message_id) {
-        try {
-            return channel.retrieveMessageById(message_id).complete();
-        } catch (ErrorResponseException e) {
-            return null;
-        }
-    }
-
-    private List<String> getEmojiList(Guild guild) {
-        return guild
-            .getEmotes()
-            .stream()
-            .map(e -> String.format("%s = `:%s:`", e.getAsMention(), e.getName()))
-            .collect(Collectors.toList());
-    }
-
-    private List<String> split1900chars(List<String> strList) {
-        List<String> split = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
-        for (String str : strList) {
-            if (builder.length() + str.length() > 1900) {
-                // この項目を入れると1900文字を超えてしまう
-                split.add(builder.toString().trim());
-                builder = new StringBuilder();
-            }
-            builder.append(str);
-            builder.append("\n");
-        }
-        if(builder.length() != 0){
-            split.add(builder.toString().trim());
-        }
-        return split;
+        emojiGuild.generateEmojiList(jda);
     }
 }

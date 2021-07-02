@@ -90,7 +90,9 @@ public class Cmd_GenText implements CommandPremise {
     }
 
     private String getSource(@NotNull CommandContext<JDACommandSender> context) {
-        if (!context.contains("count")) {
+        if (context.contains("count")) {
+            return context.get("sourceOrGenCount");
+        } else if (!JavajaotanLibrary.isInt(context.get("sourceOrGenCount"))) {
             return context.get("sourceOrGenCount");
         } else {
             return "default";

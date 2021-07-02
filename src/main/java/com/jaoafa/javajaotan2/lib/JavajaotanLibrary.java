@@ -16,6 +16,22 @@ import java.util.Date;
 
 public class JavajaotanLibrary {
     /**
+     * 文字列がInteger値に変換可能かどうか調べます
+     *
+     * @param str 調べる文字列
+     *
+     * @return Integer値に変換可能かどうか
+     */
+    public static boolean isInt(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
      * 文字列がLong値に変換可能かどうか調べます
      *
      * @param str 調べる文字列

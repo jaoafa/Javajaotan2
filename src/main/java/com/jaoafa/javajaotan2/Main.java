@@ -15,11 +15,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
-import cloud.commandframework.exceptions.CommandExecutionException;
-import cloud.commandframework.exceptions.AmbiguousNodeException;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoPermissionException;
-import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.exceptions.*;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDACommandSender;
@@ -39,13 +35,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class Main {
     static boolean isUserDevelopMode = false;
@@ -113,6 +114,7 @@ public class Main {
         }
 
         defineChannelsAndRoles();
+        copyExternalScripts();
 
         registerCommand(jda);
 
@@ -364,6 +366,41 @@ public class Main {
                     continue;
                 }
                 role.setRoleId(roles.getLong(role.name()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void copyExternalScripts() {
+        String srcDirName = "external_scripts";
+        File destDir = new File("external_scripts/");
+
+        final File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+
+        if (!jarFile.isFile()) {
+            logger.warn("仕様によりexternal_scriptsディレクトリをコピーできません。ビルドしてから実行すると、external_scriptsを使用する機能を利用できます。");
+            return;
+        }
+        try (JarFile jar = new JarFile(jarFile)) {
+            for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); ) {
+                JarEntry entry = entries.nextElement();
+                if (entry.getName().startsWith(srcDirName + "/") && !entry.isDirectory()) {
+                    File dest = new File(destDir, entry.getName().substring(srcDirName.length() + 1));
+                    File parent = dest.getParentFile();
+                    if (parent != null) {
+                        //noinspection ResultOfMethodCallIgnored
+                        parent.mkdirs();
+                    }
+                    logger.info("[external_scripts] Copy " + entry.getName().substring(srcDirName.length() + 1));
+                    try (FileOutputStream out = new FileOutputStream(dest); InputStream in = jar.getInputStream(entry)) {
+                        byte[] buffer = new byte[8 * 1024];
+                        int s;
+                        while ((s = in.read(buffer)) > 0) {
+                            out.write(buffer, 0, s);
+                        }
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

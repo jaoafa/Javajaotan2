@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 countFailed += 1  # リトライしてダメだったらやめとく
                 continue
 
-        if sentence in texts:
+        if ''.join(sentence.split()) in texts:
             countDuplicated += 1
             continue
 

@@ -73,13 +73,12 @@ public class Cmd_GenText implements CommandPremise {
     }
 
     private void generateSourceCount(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String sourceOrGenCount = context.get("sourceOrGenCount");
-        if (!JavajaotanLibrary.isInt(sourceOrGenCount) && !context.contains("count")) {
-            message.reply("生成数は1以上の整数にしてください。").queue();
-            return;
-        }
         String source = getSource(context);
         int count = getCount(context);
+        if (count <= 0) {
+            message.reply("生成数は1以上の整数を指定してください。").queue();
+            return;
+        }
 
         message.reply(String.format("生成中です…しばらくお待ちください。(ソース: %s / 生成数: %d)", source, count)).queue(
             msg -> generate(msg, source, count),
@@ -101,6 +100,8 @@ public class Cmd_GenText implements CommandPremise {
     private int getCount(@NotNull CommandContext<JDACommandSender> context) {
         if (context.contains("count")) {
             return context.get("count");
+        } else if (!JavajaotanLibrary.isInt(context.get("sourceOrGenCount"))) {
+            return 1;
         } else {
             return Integer.parseInt(context.get("sourceOrGenCount"));
         }

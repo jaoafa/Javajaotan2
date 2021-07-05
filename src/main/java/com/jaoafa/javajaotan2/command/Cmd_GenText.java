@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class Cmd_GenText implements CommandPremise {
@@ -115,7 +116,12 @@ public class Cmd_GenText implements CommandPremise {
             return;
         }
         try {
-            String output = getRunCommand("python3", "external_scripts/gentext/main.py", "--source", source, "--count", String.valueOf(generateCount));
+            String output = getRunCommand("python3",
+                "external_scripts/gentext/main.py",
+                "--source",
+                source.toLowerCase(Locale.ROOT),
+                "--count",
+                String.valueOf(generateCount));
             if (output == null) {
                 reply.editMessage("Error: プロセス割り込みなどの理由で、正常に実行できませんでした。").queue();
                 return;

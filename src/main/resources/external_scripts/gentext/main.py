@@ -42,10 +42,14 @@ if __name__ == '__main__':
     for i in range(generate_count):
         sentence = text_model.make_sentence()
         if sentence is None:  # リトライ
-            sentence = text_model.make_sentence()
-            if sentence is None:
-                countFailed += 1  # リトライしてダメだったらやめとく
-                continue
+            if generate_count == 1:
+                while sentence is None:
+                    sentence = text_model.make_sentence()
+            else:
+                sentence = text_model.make_sentence()
+                if sentence is None:
+                    countFailed += 1  # リトライしてダメだったらやめとく
+                    continue
 
         if ''.join(sentence.split()) in texts:
             countDuplicated += 1

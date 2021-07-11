@@ -73,6 +73,6 @@ if __name__ == '__main__':
         print("※" + str(countFailed) + "回、生成に失敗しました。")
 
     if countDuplicated > 0:
-        print("※" + str(countFailed) + "回、被りました。")
+        print("※" + str(countDuplicated) + "回、被りました。")
 
     print("```")

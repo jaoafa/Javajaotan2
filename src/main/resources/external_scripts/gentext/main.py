@@ -40,13 +40,13 @@ if __name__ == '__main__':
     countFailed = 0
     countDuplicated = 0
     for i in range(generate_count):
-        sentence = text_model.make_sentence()
+        sentence = text_model.make_short_sentence(140)
         if sentence is None:  # リトライ
             if generate_count == 1:
                 while sentence is None:
-                    sentence = text_model.make_sentence()
+                    sentence = text_model.make_short_sentence(140)
             else:
-                sentence = text_model.make_sentence()
+                sentence = text_model.make_short_sentence(140)
                 if sentence is None:
                     countFailed += 1  # リトライしてダメだったらやめとく
                     continue

@@ -92,8 +92,7 @@ if __name__ == '__main__':
     else:
         print("\n".join(texts)[:1900])
 
-    if len("\n".join(texts)) >= 1900 or countFailed > 0 or countDuplicated > 0:
-        print("")
+    print("")
 
     if len("\n".join(texts)) >= 1900:
         print("※Discordの文字数制限回避のため、一部の結果が削られています。")

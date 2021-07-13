@@ -84,6 +84,8 @@ if __name__ == '__main__':
     countFailed = len(list(filter(lambda x: x is None, texts)))
     countDuplicated = len(list(set(filter(lambda x: x is not None, texts)))) - len(list(filter(lambda x: x is not None, texts)))
 
+    texts = set(filter(lambda x: x is not None, texts))
+
     print("```")
     if len("\n".join(texts)) <= 1900:
         print("\n".join(texts))

@@ -140,7 +140,10 @@ public class Cmd_GenText implements CommandPremise {
             builder.command(command);
             builder.redirectErrorStream(true);
             p = builder.start();
-            p.waitFor(30, TimeUnit.SECONDS);
+            boolean bool = p.waitFor(30, TimeUnit.SECONDS);
+            if (!bool) {
+                return null;
+            }
         } catch (InterruptedException e) {
             return null;
         }

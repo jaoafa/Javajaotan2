@@ -123,7 +123,7 @@ public class Cmd_GenText implements CommandPremise {
                 "--count",
                 String.valueOf(generateCount));
             if (output == null) {
-                reply.editMessage("Error: プロセス割り込みなどの理由で、正常に実行できませんでした。").queue();
+                reply.editMessage("Error: タイムアウト(3分) または プロセス割り込みなどの理由で、正常に実行できませんでした。").queue();
                 return;
             }
             reply.editMessage(output).queue();
@@ -140,7 +140,7 @@ public class Cmd_GenText implements CommandPremise {
             builder.command(command);
             builder.redirectErrorStream(true);
             p = builder.start();
-            boolean bool = p.waitFor(30, TimeUnit.SECONDS);
+            boolean bool = p.waitFor(3, TimeUnit.MINUTES);
             if (!bool) {
                 return null;
             }

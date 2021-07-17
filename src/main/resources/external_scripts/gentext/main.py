@@ -70,9 +70,9 @@ if __name__ == '__main__':
 
     if generate_count == 1:
         if args.long_generate:
-            texts = [text_model.make_sentence()]
+            texts = ["".join(text_model.make_sentence().split())]
         else:
-            texts = [text_model.make_short_sentence(140)]
+            texts = ["".join(text_model.make_short_sentence(140).split())]
     else:
         with ProcessPoolExecutor() as executor:
             futures = []

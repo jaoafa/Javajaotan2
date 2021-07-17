@@ -69,10 +69,13 @@ if __name__ == '__main__':
         text_model = markovify.NewlineText.from_json(f.read())
 
     if generate_count == 1:
-        if args.long_generate:
-            texts = ["".join(text_model.make_sentence().split())]
-        else:
-            texts = ["".join(text_model.make_short_sentence(140).split())]
+        text = None
+        while text is None:
+            if args.long_generate:
+                text = text_model.make_sentence()
+            else:
+                text = text_model.make_short_sentence(140)
+        texts = ["".join(text.split())]
     else:
         with ProcessPoolExecutor() as executor:
             futures = []

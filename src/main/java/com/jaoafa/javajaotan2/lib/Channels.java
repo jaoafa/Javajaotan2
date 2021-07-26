@@ -16,7 +16,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.Nullable;
 
 public enum Channels {
-    general(597419057251090443L);
+    general(597419057251090443L),
+    jaotan(597423444501463040L);
 
     private long channel_id;
 

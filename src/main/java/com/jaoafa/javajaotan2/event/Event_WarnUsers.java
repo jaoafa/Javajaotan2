@@ -49,9 +49,10 @@ public class Event_WarnUsers extends ListenerAdapter {
             EmbedBuilder builder = new EmbedBuilder()
                 .setColor(Color.RED)
                 .setTitle(user.getAsTag() + " は警告対象者です")
-                .setAuthor(user.getAsTag(), "", user.getAvatarUrl())
+                .setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl())
                 .setDescription("理由: " + object.getString(user.getId()))
-                .setTimestamp(Instant.now());
+                .setTimestamp(Instant.now())
+                .setFooter("Javajaotan2 WarnUsers");
             channel.sendMessageEmbeds(builder.build()).queue();
         } catch (IOException e) {
             e.printStackTrace();

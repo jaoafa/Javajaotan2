@@ -88,6 +88,7 @@ public class Task_PermSync implements Job {
 
         /**
          * Guildからロールを取得します
+         *
          * @param guild 対象Guild
          */
         public static void setGuildAndRole(Guild guild) {
@@ -99,7 +100,9 @@ public class Task_PermSync implements Job {
 
         /**
          * 名前からロールを取得します
+         *
          * @param name ロールの名前
+         *
          * @return 取得したロール
          */
         public static Roles get(String name) {

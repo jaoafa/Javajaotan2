@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -204,23 +206,23 @@ public class Task_PermSync implements Job {
         long joinDays = ChronoUnit.DAYS.between(joinedTime, now);
         logger.info("joinMinutes(Days): %s days (%s minutes)".formatted(joinDays, joinMinutes));
 
-        if (!isMailVerified && !isNeedSupport && joinMinutes >= 10) {
+        boolean doReturn = false;
+        BiFunction<String, String, Boolean> doKick = (title, description) -> {
+            kickDiscord(member, title, description, Color.PINK);
+            return true;
+        };
+
+        if (!isMailVerified && !isNeedSupport && joinMinutes >= 10)
             // 参加してから10分以内に発言のないユーザーをキックする
-            kickDiscord(member, "MailVerifiedキック", "10分以上発言がなかったため、キックしました。", Color.PINK);
-            return;
-        }
-
-        if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && joinDays >= 7) {
+            doReturn = doKick.apply("MailVerifiedキック", "10分以上発言がなかったため、キックしました。");
+        else if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && joinDays >= 7)
             // 参加してから1週間以内にlink・サブアカウント登録・サポートへの問い合わせがない場合はキックする
-            kickDiscord(member, "1weekキック", "1週間(7日)以上link・サブアカウント登録・サポートへの問い合わせがなかったため、キックしました。", Color.PINK);
-            return;
-        }
-
-        if (!isMinecraftConnected && !isSubAccount && isNeedSupport && joinDays >= 21) {
+            doReturn = doKick.apply("1weekキック", "1週間(7日)以上link・サブアカウント登録・サポートへの問い合わせがなかったため、キックしました。");
+        else if (!isMinecraftConnected && !isSubAccount && isNeedSupport && joinDays >= 21)
             // 参加してから3週間後にサポート問い合わせのみの場合はキックする
-            kickDiscord(member, "3weeksキック (NeedSupport)", "3週間(21日)以上link・サブアカウント登録がなかったため、キックしました。", Color.PINK);
-            return;
-        }
+            doReturn = doKick.apply("3weeksキック (NeedSupport)", "3週間(21日)以上link・サブアカウント登録がなかったため、キックしました。");
+
+        if (doReturn) return;
 
         SubAccount subAccount = new SubAccount(member);
 
@@ -239,23 +241,25 @@ public class Task_PermSync implements Job {
                 .filter(c -> c.disid().equals(subAccount.getMainAccount().getUser().getId()))
                 .findFirst()
                 .orElse(null);
-            if (subMdc == null) {
-                notifyConnection(member, "SubAccount役職剥奪", "メインアカウントの情報が取得できなかったため、剥奪しました。", Color.YELLOW);
+
+            //description,isSubAccount
+            Function<String, Boolean> doSubAccountRemove = description -> {
+                notifyConnection(member, "SubAccount役職剥奪", description, Color.YELLOW);
                 if (!dryRun) {
                     subAccount.removeMainAccount();
                     guild.addRoleToMember(member, Roles.SubAccount.role).queue();
                 }
-                isSubAccount = false;
+                return false;
+            };
+
+            if (subMdc == null) {
+                //取得失敗
+                isSubAccount = doSubAccountRemove.apply("メインアカウントの情報が取得できなかったため、剥奪しました。");
             } else if (subMdc.disabled()) {
                 long deadDays = ChronoUnit.DAYS.between(subMdc.dead_at().toLocalDateTime(), now);
                 if (deadDays >= 30) {
                     // disabled & 30日経過
-                    notifyConnection(member, "SubAccount役職剥奪", "メインアカウントが1か月(30日)以上前にlinkを切断しているため、剥奪しました。", Color.YELLOW);
-                    if (!dryRun) {
-                        subAccount.removeMainAccount();
-                        guild.addRoleToMember(member, Roles.SubAccount.role).queue();
-                    }
-                    isSubAccount = false;
+                    isSubAccount = doSubAccountRemove.apply("メインアカウントが1か月(30日)以上前にlinkを切断しているため、剥奪しました。");
                 }
             }
         }
@@ -263,18 +267,20 @@ public class Task_PermSync implements Job {
         // サブアカウントの場合、10分チェックとかのみ (Minecraft linkされている場合は除外)
         if (isSubAccount && !isMinecraftConnected) return;
 
-        if (mdc != null && !mdc.disabled() && !isMinecraftConnected) {
-            // Minecraft-Discord Connectがなされていて、MinecraftConnected役職か付与されていない利用者に対して、MinecraftConnected役職を付与する
-            notifyConnection(member, "MinecraftConnected役職付与", "linkがされていたため、MinecraftConnected役職を付与しました。", Color.BLUE);
+        //giveRole,description,isMinecraftConnected
+        BiFunction<Boolean, String, Boolean> doMinecraftConnectedManage = (giveRole, description) -> {
+            notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), "linkがされていたため、MinecraftConnected役職を付与しました。", Color.BLUE);
             if (!dryRun) guild.addRoleToMember(member, Roles.MinecraftConnected.role).queue();
-            isMinecraftConnected = true;
-        }
-        if ((mdc == null || mdc.disabled()) && isMinecraftConnected) {
+            return true;
+        };
+
+        if (mdc != null && !mdc.disabled() && !isMinecraftConnected)
+            // Minecraft-Discord Connectがなされていて、MinecraftConnected役職か付与されていない利用者に対して、MinecraftConnected役職を付与する
+            isMinecraftConnected = doMinecraftConnectedManage.apply(true, "linkがされていたため、MinecraftConnected役職を付与しました。");
+        if ((mdc == null || mdc.disabled()) && isMinecraftConnected)
             // Minecraft-Discord Connectがなされておらず、MinecraftConnected役職か付与されている利用者に対して、MinecraftConnected役職を剥奪する
-            notifyConnection(member, "MinecraftConnected役職剥奪", "linkがされていなかったため、MinecraftConnected役職を剥奪しました。", Color.BLUE);
-            if (!dryRun) member.getGuild().addRoleToMember(member, Roles.MinecraftConnected.role).queue();
-            isMinecraftConnected = false;
-        }
+            isMinecraftConnected = doMinecraftConnectedManage.apply(false, "linkがされていなかったため、MinecraftConnected役職を剥奪しました。");
+
 
         if (isMinecraftConnected) {
             // MinecraftConnected役職がついている場合、Verified, Regularの役職に応じて役職を付与する

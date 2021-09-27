@@ -229,6 +229,13 @@ public class Task_PermSync implements Job {
         @Override
         public void run() {
             Guild guild = member.getGuild();
+            if (member.getUser().isBot()) {
+                logger.info("[%s] Bot".formatted(
+                    member.getUser().getAsTag()
+                ));
+                return;
+            }
+
             logger.info("[%s] Role: %s".formatted(
                 member.getUser().getAsTag(),
                 member.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "))
@@ -269,7 +276,7 @@ public class Task_PermSync implements Job {
             LocalDateTime loginDate = mdc != null ? mdc.loginDate().toLocalDateTime() : null;
             long joinMinutes = ChronoUnit.MINUTES.between(joinedTime, now);
             long joinDays = ChronoUnit.DAYS.between(joinedTime, now);
-            logger.info("joinMinutes(Days): %s days (%s minutes)".formatted(joinDays, joinMinutes));
+            logger.info("[%s] joinMinutes(Days): %s days (%s minutes)".formatted(member.getUser().getAsTag(), joinDays, joinMinutes));
 
             boolean doReturn = false;
             BiFunction<String, String, Boolean> doKick = (title, description) -> {
@@ -280,10 +287,10 @@ public class Task_PermSync implements Job {
             if (!isMailVerified && !isNeedSupport && joinMinutes >= 10) {
                 // 参加してから10分以内に発言のないユーザーをキックする
                 doReturn = doKick.apply("MailVerifiedキック", "10分以上発言がなかったため、キックしました。");
-            } else if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && joinDays >= 7) {
+            } else if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && mdc == null && joinDays >= 7) {
                 // 参加してから1週間以内にlink・サブアカウント登録・サポートへの問い合わせがない場合はキックする
                 doReturn = doKick.apply("1weekキック", "1週間(7日)以上link・サブアカウント登録・サポートへの問い合わせがなかったため、キックしました。");
-            } else if (!isMinecraftConnected && !isSubAccount && isNeedSupport && joinDays >= 21) {
+            } else if (!isMinecraftConnected && !isSubAccount && isNeedSupport && mdc == null && joinDays >= 21) {
                 // 参加してから3週間後にサポート問い合わせのみの場合はキックする
                 doReturn = doKick.apply("3weeksキック (NeedSupport)", "3週間(21日)以上link・サブアカウント登録がなかったため、キックしました。");
             }
@@ -294,7 +301,7 @@ public class Task_PermSync implements Job {
 
             if (isSubAccount && !subAccount.isSubAccount()) {
                 // SubAccount役職なのにサブアカウントではない
-                notifyConnection(member, "SubAccount役職剥奪", "SubAccount役職が付与されていましたが、サブアカウント登録がなされていないため剥奪しました。", Color.RED);
+                notifyConnection(member, "SubAccount役職剥奪", "SubAccount役職が付与されていましたが、サブアカウント登録がなされていないため剥奪しました。", Color.RED, mdc);
                 if (!dryRun) guild.addRoleToMember(member, Roles.SubAccount.role).queue();
                 isSubAccount = false;
             }
@@ -310,7 +317,7 @@ public class Task_PermSync implements Job {
 
                 //description,isSubAccount
                 Function<String, Boolean> doSubAccountRemove = description -> {
-                    notifyConnection(member, "SubAccount役職剥奪", description, Color.YELLOW);
+                    notifyConnection(member, "SubAccount役職剥奪", description, Color.YELLOW, mdc);
                     if (!dryRun) {
                         subAccount.removeMainAccount();
                         guild.addRoleToMember(member, Roles.SubAccount.role).queue();
@@ -335,7 +342,7 @@ public class Task_PermSync implements Job {
 
             //giveRole,description,isMinecraftConnected
             BiFunction<Boolean, String, Boolean> doMinecraftConnectedManage = (giveRole, description) -> {
-                notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), description, Color.BLUE);
+                notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), description, Color.BLUE, mdc);
                 if (!dryRun) guild.addRoleToMember(member, Roles.MinecraftConnected.role).queue();
                 return true;
             };
@@ -362,20 +369,20 @@ public class Task_PermSync implements Job {
                     member.getUser().getAsTag(), group.name()));
 
                 if (!isVerified && group == PermissionGroup.VERIFIED) {
-                    notifyConnection(member, "Verified役職付与", "Minecraft鯖内の権限に基づき、Verified役職を付与しました。", Color.CYAN);
+                    notifyConnection(member, "Verified役職付与", "Minecraft鯖内の権限に基づき、Verified役職を付与しました。", Color.CYAN, mdc);
                     if (!dryRun) guild.addRoleToMember(member, Roles.Verified.role).queue();
                 }
                 if (!isRegular && group == PermissionGroup.REGULAR) {
-                    notifyConnection(member, "Regular役職付与", "Minecraft鯖内の権限に基づき、Regular役職を付与しました。", Color.CYAN);
+                    notifyConnection(member, "Regular役職付与", "Minecraft鯖内の権限に基づき、Regular役職を付与しました。", Color.CYAN, mdc);
                     if (!dryRun) guild.addRoleToMember(member, Roles.Regular.role).queue();
                 }
 
                 Timestamp checkTS = getMaxTimestamp(mdc.loginDate(), mdc.expired_date());
                 long checkDays = loginDate != null ? ChronoUnit.DAYS.between(checkTS.toLocalDateTime(), now) : -1;
-                logger.info("checkDays: %s".formatted(checkDays));
+                logger.info("[%s] checkDays: %s".formatted(member.getUser().getAsTag(), checkDays));
                 // 最終ログインから2ヶ月(60日)が経過している場合、警告リプライを#generalで送信する
                 if (checkDays >= 60 && !notified.isNotified(Notified.NotifiedType.MONTH2)) {
-                    notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。", Color.MAGENTA);
+                    notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。", Color.MAGENTA, mdc);
                     if (!dryRun) {
                         Channel_General.sendMessage("""
                             <#%s> あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
@@ -387,7 +394,7 @@ public class Task_PermSync implements Job {
 
                 // 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する
                 if (checkDays >= 90) {
-                    notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。", Color.ORANGE);
+                    notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。", Color.ORANGE, mdc);
                     if (!dryRun) {
                         disableLink(mdc, uuid);
                         guild.removeRoleFromMember(member, Roles.MinecraftConnected.role).queue();
@@ -408,7 +415,7 @@ public class Task_PermSync implements Job {
                 if (isRegular) roles.add(Roles.Regular);
 
                 for (Roles role : roles) {
-                    notifyConnection(member, "%s役職剥奪".formatted(role.name()), "linkが解除されているため、%s役職を剥奪しました。".formatted(role.name()), Color.GREEN);
+                    notifyConnection(member, "%s役職剥奪".formatted(role.name()), "linkが解除されているため、%s役職を剥奪しました。".formatted(role.name()), Color.GREEN, mdc);
                     if (!dryRun) guild.removeRoleFromMember(member, role.role).queue();
                 }
             }
@@ -444,7 +451,7 @@ public class Task_PermSync implements Job {
             return isGranted;
         }
 
-        private void notifyConnection(Member member, String title, String description, Color color) {
+        private void notifyConnection(Member member, String title, String description, Color color, MinecraftDiscordConnection mdc) {
             TextChannel channel = Main.getJDA().getTextChannelById(891021520099500082L);
 
             if (channel == null) return;
@@ -454,6 +461,9 @@ public class Task_PermSync implements Job {
                 .setDescription(description)
                 .setColor(color)
                 .setAuthor(member.getUser().getAsTag(), "https://discord.com/users/" + member.getId(), member.getUser().getEffectiveAvatarUrl());
+            if (mdc != null) {
+                embed.addField("MinecraftDiscordConnection", "[%s](https://users.jaoafa.com/%s)".formatted(mdc.player(), mdc.uuid().toString()), false);
+            }
             if (dryRun) embed.setFooter("DRY-RUN MODE");
 
             channel.sendMessageEmbeds(embed.build()).queue();
@@ -499,12 +509,12 @@ public class Task_PermSync implements Job {
 
             if (kicks.toList().contains(member.getId())) {
                 // 処理
-                notifyConnection(member, "[PROCESS] " + title, description, Color.PINK);
+                notifyConnection(member, "[PROCESS] " + title, description, Color.PINK, null);
                 member.getGuild().kick(member).queue();
                 kicks.remove(kicks.toList().indexOf(member.getId()));
             } else {
                 // 動作予告
-                notifyConnection(member, "[PRE] " + title, "次回処理時、本動作が実施されます。", Color.PINK);
+                notifyConnection(member, "[PRE] " + title, "次回処理時、本動作が実施されます。", Color.PINK, null);
                 kicks.put(member.getId());
             }
 

@@ -370,7 +370,6 @@ public class Task_PermSync implements Job {
         List<MinecraftDiscordConnection> connections = new ArrayList<>();
         try {
             try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM discordlink")) {
-                stmt.setBoolean(1, false);
                 try (ResultSet res = stmt.executeQuery()) {
                     connections.add(new MinecraftDiscordConnection(
                         res.getString("player"),

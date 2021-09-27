@@ -371,16 +371,18 @@ public class Task_PermSync implements Job {
         try {
             try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM discordlink")) {
                 try (ResultSet res = stmt.executeQuery()) {
-                    connections.add(new MinecraftDiscordConnection(
-                        res.getString("player"),
-                        UUID.fromString(res.getString("uuid")),
-                        res.getString("disid"),
-                        res.getString("discriminator"),
-                        getLeastLogin(UUID.fromString(res.getString("uuid"))),
-                        res.getTimestamp("expired_date"),
-                        res.getTimestamp("dead_at"),
-                        res.getBoolean("disabled")
-                    ));
+                    while (res.next()) {
+                        connections.add(new MinecraftDiscordConnection(
+                            res.getString("player"),
+                            UUID.fromString(res.getString("uuid")),
+                            res.getString("disid"),
+                            res.getString("discriminator"),
+                            getLeastLogin(UUID.fromString(res.getString("uuid"))),
+                            res.getTimestamp("expired_date"),
+                            res.getTimestamp("dead_at"),
+                            res.getBoolean("disabled")
+                        ));
+                    }
                 }
             }
             return connections;

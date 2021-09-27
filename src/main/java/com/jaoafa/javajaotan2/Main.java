@@ -371,7 +371,8 @@ public class Main {
                         .withIdentity(task.name(), task.group())
                         .withSchedule(DailyTimeIntervalScheduleBuilder
                             .dailyTimeIntervalSchedule()
-                            .startingDailyAt(task.timeOfDay()))
+                            .startingDailyAt(task.timeOfDay())
+                            .endingDailyAfterCount(1))
                         .build()
                 );
             }

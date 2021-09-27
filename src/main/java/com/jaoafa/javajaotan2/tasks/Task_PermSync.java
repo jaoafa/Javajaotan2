@@ -12,10 +12,7 @@
 package com.jaoafa.javajaotan2.tasks;
 
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.JavajaotanData;
-import com.jaoafa.javajaotan2.lib.LibFile;
-import com.jaoafa.javajaotan2.lib.MySQLDBManager;
-import com.jaoafa.javajaotan2.lib.SubAccount;
+import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.json.JSONArray;
@@ -118,7 +115,7 @@ public class Task_PermSync implements Job {
     TextChannel Channel_General;
 
     public Task_PermSync() {
-        this.dryRun = false;
+        this.dryRun = true; // 数日間動作確認
     }
 
     public Task_PermSync(boolean dryRun) {
@@ -146,7 +143,7 @@ public class Task_PermSync implements Job {
 
         Roles.setGuildAndRole(guild);
 
-        Channel_General = guild.getTextChannelById(597419057251090443L);
+        Channel_General = Channels.general.getChannel();
 
         if (Channel_General == null) return;
 
@@ -208,19 +205,20 @@ public class Task_PermSync implements Job {
 
         boolean doReturn = false;
         BiFunction<String, String, Boolean> doKick = (title, description) -> {
-            kickDiscord(member, title, description, Color.PINK);
+            kickDiscord(member, title, description);
             return true;
         };
 
-        if (!isMailVerified && !isNeedSupport && joinMinutes >= 10)
+        if (!isMailVerified && !isNeedSupport && joinMinutes >= 10) {
             // 参加してから10分以内に発言のないユーザーをキックする
             doReturn = doKick.apply("MailVerifiedキック", "10分以上発言がなかったため、キックしました。");
-        else if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && joinDays >= 7)
+        } else if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && joinDays >= 7) {
             // 参加してから1週間以内にlink・サブアカウント登録・サポートへの問い合わせがない場合はキックする
             doReturn = doKick.apply("1weekキック", "1週間(7日)以上link・サブアカウント登録・サポートへの問い合わせがなかったため、キックしました。");
-        else if (!isMinecraftConnected && !isSubAccount && isNeedSupport && joinDays >= 21)
+        } else if (!isMinecraftConnected && !isSubAccount && isNeedSupport && joinDays >= 21) {
             // 参加してから3週間後にサポート問い合わせのみの場合はキックする
             doReturn = doKick.apply("3weeksキック (NeedSupport)", "3週間(21日)以上link・サブアカウント登録がなかったため、キックしました。");
+        }
 
         if (doReturn) return;
 
@@ -274,15 +272,16 @@ public class Task_PermSync implements Job {
             return true;
         };
 
-        if (mdc != null && !mdc.disabled() && !isMinecraftConnected)
+        if (mdc != null && !mdc.disabled() && !isMinecraftConnected) {
             // Minecraft-Discord Connectがなされていて、MinecraftConnected役職か付与されていない利用者に対して、MinecraftConnected役職を付与する
             isMinecraftConnected = doMinecraftConnectedManage.apply(true, "linkがされていたため、MinecraftConnected役職を付与しました。");
-        if ((mdc == null || mdc.disabled()) && isMinecraftConnected)
+        }
+        if ((mdc == null || mdc.disabled()) && isMinecraftConnected) {
             // Minecraft-Discord Connectがなされておらず、MinecraftConnected役職か付与されている利用者に対して、MinecraftConnected役職を剥奪する
             isMinecraftConnected = doMinecraftConnectedManage.apply(false, "linkがされていなかったため、MinecraftConnected役職を剥奪しました。");
+        }
 
-
-        if (isMinecraftConnected) {
+        if (isMinecraftConnected && uuid != null) {
             // MinecraftConnected役職がついている場合、Verified, Regularの役職に応じて役職を付与する
 
             PermissionGroup group = getPermissionGroup(uuid);
@@ -334,13 +333,13 @@ public class Task_PermSync implements Job {
             }
         } else {
             // MinecraftConnected役職がついていない場合、Verified, Community Regular, Regular役職を剥奪する
-            Roles role = null;
+            List<Roles> roles = new ArrayList<>();
 
-            if (isVerified) role = Roles.Verified;
-            if (isCommunityRegular) role = Roles.CommunityRegular;
-            if (isRegular) role = Roles.Regular;
+            if (isVerified) roles.add(Roles.Verified);
+            if (isCommunityRegular) roles.add(Roles.CommunityRegular);
+            if (isRegular) roles.add(Roles.Regular);
 
-            if (role != null) {
+            for (Roles role : roles) {
                 notifyConnection(member, "%s役職剥奪".formatted(role.name()), "linkが解除されているため、%s役職を剥奪しました。".formatted(role.name()), Color.GREEN);
                 if (!dryRun) guild.removeRoleFromMember(member, role.role).queue();
             }
@@ -450,7 +449,7 @@ public class Task_PermSync implements Job {
         }
     }
 
-    private void kickDiscord(Member member, String title, String description, Color color) {
+    private void kickDiscord(Member member, String title, String description) {
         Path path = Path.of("pre-permsync.json");
         JSONObject object = new JSONObject();
         if (Files.exists(path)) {
@@ -468,12 +467,12 @@ public class Task_PermSync implements Job {
 
         if (kicks.toList().contains(member.getId())) {
             // 処理
-            notifyConnection(member, "[PROCESS] " + title, description, color);
+            notifyConnection(member, "[PROCESS] " + title, description, Color.PINK);
             member.getGuild().kick(member).queue();
             kicks.remove(kicks.toList().indexOf(member.getId()));
         } else {
             // 動作予告
-            notifyConnection(member, "[PRE] " + title, "次回処理時、本動作が実施されます。", color);
+            notifyConnection(member, "[PRE] " + title, "次回処理時、本動作が実施されます。", Color.PINK);
             kicks.put(member.getId());
         }
 

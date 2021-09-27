@@ -124,11 +124,14 @@ public class Task_PermSync implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        logger = Main.getLogger();
         Guild guild = Main.getJDA().getGuildById(Main.getConfig().getGuildId());
 
-        if (guild == null) return;
+        if (guild == null) {
+            logger.warn("guild == null");
+            return;
+        }
 
-        logger = Main.getLogger();
         MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
         try {
             conn = manager.getConnection();
@@ -139,13 +142,19 @@ public class Task_PermSync implements Job {
 
         List<MinecraftDiscordConnection> connections = getConnections();
 
-        if (connections == null) return;
+        if (connections == null) {
+            logger.warn("connections == null");
+            return;
+        }
 
         Roles.setGuildAndRole(guild);
 
         Channel_General = Channels.general.getChannel();
 
-        if (Channel_General == null) return;
+        if (Channel_General == null) {
+            logger.warn("Channel_General == null");
+            return;
+        }
 
 
         guild.loadMembers()

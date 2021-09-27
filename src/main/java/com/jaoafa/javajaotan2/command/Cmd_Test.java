@@ -18,11 +18,13 @@ import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
 import com.jaoafa.javajaotan2.lib.Roles;
+import com.jaoafa.javajaotan2.tasks.Task_PermSync;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
+import org.quartz.JobExecutionException;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -45,11 +47,24 @@ public class Cmd_Test implements CommandPremise {
                 .meta(CommandMeta.DESCRIPTION, "あなたのユーザーIDを表示します。")
                 .literal("userid")
                 .handler(context -> execute(context, this::getUserId))
+                .build(),
+            builder
+                .meta(CommandMeta.DESCRIPTION, "PermSyncの動作テストを行います")
+                .literal("permsync")
+                .handler(context -> execute(context, this::runPermSync))
                 .build()
         );
     }
 
     private void getUserId(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
         message.reply(MessageFormat.format("あなたのユーザーIDは `{0}` です。", member.getId())).queue();
+    }
+
+    private void runPermSync(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        try {
+            new Task_PermSync(true).execute(null);
+        } catch (JobExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }

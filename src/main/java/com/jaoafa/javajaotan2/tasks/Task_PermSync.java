@@ -507,7 +507,7 @@ public class Task_PermSync implements Job {
 
             JSONArray kicks = object.getJSONArray("kick");
 
-            if (kicks.toList().contains(member.getId())) {
+            if (kicks.toList().contains(member.getId()) && !dryRun) {
                 // 処理
                 notifyConnection(member, "[PROCESS] " + title, description, Color.PINK, null);
                 member.getGuild().kick(member).queue();

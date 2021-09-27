@@ -12,7 +12,10 @@
 package com.jaoafa.javajaotan2.tasks;
 
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.*;
+import com.jaoafa.javajaotan2.lib.Channels;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
+import com.jaoafa.javajaotan2.lib.MySQLDBManager;
+import com.jaoafa.javajaotan2.lib.SubAccount;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.json.JSONArray;
@@ -520,30 +523,42 @@ public class Task_PermSync implements Job {
     }
 
     class Notified {
-        String path = "permsync-notified.json";
+        Path path = Path.of("permsync-notified.json");
         Member member;
         String memberId;
-        JSONObject object;
 
         Notified(Member member) {
             this.member = member;
             this.memberId = member.getId();
-            this.object = new JSONObject(LibFile.read(path));
         }
 
         private boolean isNotified(NotifiedType type) {
+            JSONObject object = load();
             return object.has(memberId) && object.getJSONObject(memberId).has(type.name());
         }
 
         private void setNotified(NotifiedType type) {
+            JSONObject object = load();
             JSONArray userObject = object.has(memberId) ? object.getJSONArray(memberId) : new JSONArray();
             userObject.put(type.name());
             object.put(memberId, userObject);
             try {
-                Files.writeString(Path.of(path), object.toString());
+                Files.writeString(path, object.toString());
             } catch (IOException e) {
                 logger.warn("Notified.setNotified is failed.", e);
             }
+        }
+
+        private JSONObject load() {
+            JSONObject object = new JSONObject();
+            if (Files.exists(path)) {
+                try {
+                    object = new JSONObject(Files.readString(path));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return object;
         }
 
         enum NotifiedType {

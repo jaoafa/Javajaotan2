@@ -175,10 +175,12 @@ public class Task_PermSync implements Job {
 
     private List<RunPermSync.MinecraftDiscordConnection> getConnections() {
         List<RunPermSync.MinecraftDiscordConnection> connections = new ArrayList<>();
+        List<UUID> inserted = new ArrayList<>();
         try {
-            try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM discordlink")) {
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM discordlink ORDER BY id DESC")) {
                 try (ResultSet res = stmt.executeQuery()) {
                     while (res.next()) {
+                        if (inserted.contains(UUID.fromString(res.getString("uuid")))) continue;
                         connections.add(new RunPermSync.MinecraftDiscordConnection(
                             res.getString("player"),
                             UUID.fromString(res.getString("uuid")),
@@ -189,6 +191,7 @@ public class Task_PermSync implements Job {
                             res.getTimestamp("dead_at"),
                             res.getBoolean("disabled")
                         ));
+                        inserted.add(UUID.fromString(res.getString("uuid")));
                     }
                 }
             }
@@ -332,7 +335,7 @@ public class Task_PermSync implements Job {
 
             //giveRole,description,isMinecraftConnected
             BiFunction<Boolean, String, Boolean> doMinecraftConnectedManage = (giveRole, description) -> {
-                notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), "linkがされていたため、MinecraftConnected役職を付与しました。", Color.BLUE);
+                notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), description, Color.BLUE);
                 if (!dryRun) guild.addRoleToMember(member, Roles.MinecraftConnected.role).queue();
                 return true;
             };

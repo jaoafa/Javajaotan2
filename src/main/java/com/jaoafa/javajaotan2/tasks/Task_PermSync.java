@@ -412,6 +412,9 @@ public class Task_PermSync implements Job {
         }
 
         Timestamp getMaxTimestamp(Timestamp a, Timestamp b) {
+            if (a == null && b != null) return b;
+            if (a != null && b == null) return a;
+            if (a == null) return null;
             if (a.before(b)) {
                 return b;
             } else if (b.before(a)) {
@@ -487,7 +490,7 @@ public class Task_PermSync implements Job {
                 }
             }
 
-            if (!object.has("kick")) object.put("kick", new JSONObject());
+            if (!object.has("kick")) object.put("kick", new JSONArray());
 
             JSONArray kicks = object.getJSONArray("kick");
 

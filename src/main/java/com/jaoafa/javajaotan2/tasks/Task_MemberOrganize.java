@@ -290,8 +290,8 @@ public class Task_MemberOrganize implements Job {
                             <#%s> あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
                             **サーバルール及び個別規約により、3ヶ月を経過すると建築物や自治体の所有権がなくなり、運営によって撤去・移動ができる**ようになり、またMinecraftアカウントとの連携が自動的に解除されます。
                             本日から1ヶ月以内にjao Minecraft Serverにログインがなされない場合、上記のような対応がなされる場合がございますのでご注意ください。""").queue();
-                        notified.setNotified(Notified.NotifiedType.MONTH2);
                     }
+                    notified.setNotified(Notified.NotifiedType.MONTH2);
                 }
 
                 // 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する

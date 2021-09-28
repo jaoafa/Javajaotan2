@@ -22,6 +22,8 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.*;
+import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
+import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
 import com.jaoafa.javajaotan2.tasks.Task_PermSync;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -351,10 +353,29 @@ public class Main {
         SchedulerFactory factory = new StdSchedulerFactory();
         List<TaskConfig> tasks = List.of(
             new TaskConfig(
-                Task_PermSync.class,
-                "permsync",
+                Task_MemberOrganize.class,
+                "memberOrganize",
                 "javajaotan2",
-                TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .endingDailyAfterCount(1)),
+            new TaskConfig(
+                Task_CheckMailVerified.class,
+                "checkMailVerified",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .withInterval(5, DateBuilder.IntervalUnit.MINUTE)),
+            new TaskConfig(
+                Task_PermSync.class,
+                "permSync",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .withInterval(30, DateBuilder.IntervalUnit.MINUTE))
         );
 
         try {
@@ -362,17 +383,14 @@ public class Main {
             scheduler.start();
 
             for (TaskConfig task : tasks) {
-                logger.info("registerTask: " + task.name() + " -> " + task.timeOfDay().toString());
+                logger.info("registerTask: " + task.name());
                 scheduler.scheduleJob(
-                    JobBuilder.newJob(Task_PermSync.class)
+                    JobBuilder.newJob(Task_MemberOrganize.class)
                         .withIdentity(task.name(), task.group())
                         .build(),
                     TriggerBuilder.newTrigger()
                         .withIdentity(task.name(), task.group())
-                        .withSchedule(DailyTimeIntervalScheduleBuilder
-                            .dailyTimeIntervalSchedule()
-                            .startingDailyAt(task.timeOfDay())
-                            .endingDailyAfterCount(1))
+                        .withSchedule(task.scheduleBuilder())
                         .build()
                 );
             }
@@ -381,7 +399,8 @@ public class Main {
         }
     }
 
-    record TaskConfig(Class<? extends Job> clazz, String name, String group, TimeOfDay timeOfDay) {
+    record TaskConfig(Class<? extends Job> clazz, String name, String group,
+                      ScheduleBuilder<?> scheduleBuilder) {
     }
 
     static void defineChannelsAndRoles() {

@@ -16,6 +16,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
+import com.jaoafa.javajaotan2.lib.InviteLink;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
 import com.jaoafa.javajaotan2.lib.Roles;
 import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;

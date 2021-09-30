@@ -84,6 +84,9 @@ public class Task_MemberOrganize implements Job {
         }
 
         MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
+        if(manager == null){
+            return;
+        }
         try {
             conn = manager.getConnection();
         } catch (SQLException e) {

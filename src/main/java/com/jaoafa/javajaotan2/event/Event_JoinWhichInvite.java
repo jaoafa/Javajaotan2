@@ -35,6 +35,7 @@ import java.util.Map;
 public class Event_JoinWhichInvite extends ListenerAdapter {
     final Map<String, String> whereInvite = Map.of(
         "zEGrApgGfB", "GitHub公開コード系",
+        "7fvwYQDaQp", "Webサイトのヘッダー",
         "qhRFRNBFSc", "Webサイトのフッター",
         "KeJWma5UBu", "Webサイト内参加方法ブログ記事",
         "6k8FK78zUy", "ユーザーサイトフッター",

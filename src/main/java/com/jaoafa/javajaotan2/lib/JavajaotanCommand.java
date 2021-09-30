@@ -100,12 +100,9 @@ public class JavajaotanCommand {
         }
     }
 
-    public static class Cmd {
-        private final Command<JDACommandSender>[] commands;
-
+    public record Cmd(Command<JDACommandSender>... commands) {
         @SafeVarargs
-        public Cmd(Command<JDACommandSender>... commands) {
-            this.commands = commands;
+        public Cmd {
         }
 
         /**

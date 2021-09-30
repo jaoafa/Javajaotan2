@@ -127,6 +127,8 @@ public class Main {
 
         watchEmojis = new WatchEmojis();
 
+        jda.getGuilds().forEach(g -> new InviteLink(g).fetchInvites());
+
         if (!isUserDevelopMode && !isGuildDevelopMode) {
             new HTTPServer().start();
         }

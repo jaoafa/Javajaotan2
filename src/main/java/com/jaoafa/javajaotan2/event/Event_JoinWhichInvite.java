@@ -25,13 +25,24 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Event_JoinWhichInvite extends ListenerAdapter {
+    Map<String, String> whereInvite = Map.of(
+        "zEGrApgGfB", "GitHub公開コード系",
+        "qhRFRNBFSc", "Webサイトのフッター",
+        "KeJWma5UBu", "Webサイト内参加方法ブログ記事",
+        "6k8FK78zUy", "ユーザーサイトフッター",
+        "bKaqrvhPRc", "Japan Minecraft Serversのサーバページ"
+    );
+
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         Guild guild = event.getGuild();
@@ -65,6 +76,7 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
                     .setDescription("%sが招待を利用したようです".formatted(user.getAsTag()))
                     .addField("Code", "[`%s`](%s)".formatted(invite.getCode(), invite.getUrl()), true)
                     .addField("Type", invite.getType().name(), true)
+                    .addField("Where", getWhereInvite(invite.getCode()), true)
                     .addField("Uses/MaxUses", "%s/%s".formatted(invite.getUses(), invite.getMaxUses()), true)
                     .addField("Channel", "<#%s>".formatted(invite.getChannel() != null ? invite.getChannel().getId() : null), true)
                     .setColor(Color.YELLOW)
@@ -77,6 +89,7 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
             }else{
                 embed
                     .setTitle("Used invite (unknown)")
+                    .setDescription("%sが参加しましたが、どの招待リンクを利用したか不明です。バニティURLを利用した可能性があります。".formatted(user.getAsTag()))
                     .setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getEffectiveAvatarUrl())
                     .setColor(Color.YELLOW)
                     .setTimestamp(Instant.now());
@@ -113,6 +126,7 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
             .setTitle("Created invite")
             .addField("Code", "[`%s`](%s)".formatted(invite.getCode(), invite.getUrl()), true)
             .addField("Type", invite.getType().name(), true)
+            .addField("Where", getWhereInvite(invite.getCode()), true)
             .addField("Uses/MaxUses", "%s/%s".formatted(invite.getUses(), invite.getMaxUses()), true)
             .addField("Channel", "<#%s>".formatted(invite.getChannel() != null ? invite.getChannel().getId() : null), false)
             .setTimestamp(invite.getTimeCreated())
@@ -172,5 +186,9 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
             return;
         }
         channel.sendMessageEmbeds(embed.build()).queue();
+    }
+
+    String getWhereInvite(String code){
+        return whereInvite.getOrDefault(code, "不明");
     }
 }

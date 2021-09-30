@@ -35,7 +35,9 @@ import java.util.Map;
 public class Event_JoinWhichInvite extends ListenerAdapter {
     final Map<String, String> whereInvite = Map.of(
         "zEGrApgGfB", "GitHub公開コード系",
+        "7fvwYQDaQp", "Webサイトのヘッダー",
         "qhRFRNBFSc", "Webサイトのフッター",
+        "jDY9AwDS9v", "Webサイトトップページ",
         "KeJWma5UBu", "Webサイト内参加方法ブログ記事",
         "6k8FK78zUy", "ユーザーサイトフッター",
         "bKaqrvhPRc", "Japan Minecraft Serversのサーバページ"
@@ -124,7 +126,6 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
             .setTitle("Created invite")
             .addField("Code", "[`%s`](%s)".formatted(invite.getCode(), invite.getUrl()), true)
             .addField("Type", invite.getType().name(), true)
-            .addField("Where", getWhereInvite(invite.getCode()), true)
             .addField("Uses/MaxUses", "%s/%s".formatted(invite.getUses(), invite.getMaxUses()), true)
             .addField("Channel", "<#%s>".formatted(invite.getChannel() != null ? invite.getChannel().getId() : null), false)
             .setTimestamp(invite.getTimeCreated())

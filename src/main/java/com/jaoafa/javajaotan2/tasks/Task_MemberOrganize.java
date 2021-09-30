@@ -22,7 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 
 import java.awt.*;
@@ -59,7 +58,7 @@ import java.util.stream.Collectors;
  * <p>
  */
 public class Task_MemberOrganize implements Job {
-    boolean dryRun;
+    final boolean dryRun;
     Logger logger;
     Connection conn;
 
@@ -74,7 +73,7 @@ public class Task_MemberOrganize implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) {
         logger = Main.getLogger();
         Guild guild = Main.getJDA().getGuildById(Main.getConfig().getGuildId());
 
@@ -84,7 +83,7 @@ public class Task_MemberOrganize implements Job {
         }
 
         MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
-        if(manager == null){
+        if (manager == null) {
             return;
         }
         try {
@@ -167,8 +166,8 @@ public class Task_MemberOrganize implements Job {
     }
 
     class RunMemberOrganize implements Runnable {
-        List<MinecraftDiscordConnection> connections;
-        Member member;
+        final List<MinecraftDiscordConnection> connections;
+        final Member member;
 
         public RunMemberOrganize(List<MinecraftDiscordConnection> connections, Member member) {
             this.connections = connections;
@@ -415,9 +414,9 @@ public class Task_MemberOrganize implements Job {
         }
 
         class Notified {
-            Path path = Path.of("permsync-notified.json");
-            Member member;
-            String memberId;
+            final Path path = Path.of("permsync-notified.json");
+            final Member member;
+            final String memberId;
 
             Notified(Member member) {
                 this.member = member;

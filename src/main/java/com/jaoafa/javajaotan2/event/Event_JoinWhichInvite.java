@@ -25,17 +25,15 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Event_JoinWhichInvite extends ListenerAdapter {
-    Map<String, String> whereInvite = Map.of(
+    final Map<String, String> whereInvite = Map.of(
         "zEGrApgGfB", "GitHub公開コード系",
         "qhRFRNBFSc", "Webサイトのフッター",
         "KeJWma5UBu", "Webサイト内参加方法ブログ記事",

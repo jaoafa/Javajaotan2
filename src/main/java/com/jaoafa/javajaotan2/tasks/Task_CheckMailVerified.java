@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 
 import java.awt.*;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
  * 参加してから10分以内に発言のないユーザーをキックする
  */
 public class Task_CheckMailVerified implements Job {
-    boolean dryRun;
+    final boolean dryRun;
     Logger logger;
 
     public Task_CheckMailVerified() {
@@ -50,7 +49,7 @@ public class Task_CheckMailVerified implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) {
         logger = Main.getLogger();
         Guild guild = Main.getJDA().getGuildById(Main.getConfig().getGuildId());
 
@@ -74,7 +73,7 @@ public class Task_CheckMailVerified implements Job {
     }
 
     class RunCheckMailVerified implements Runnable {
-        Member member;
+        final Member member;
 
         public RunCheckMailVerified(Member member) {
             this.member = member;

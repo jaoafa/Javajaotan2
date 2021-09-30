@@ -78,18 +78,8 @@ public class WatchEmojis {
         }
     }
 
-    public static class EmojiGuild {
-        final long guild_id;
-        final long log_channel_id;
-        final long list_channel_id;
-        final List<Long> list_message_ids;
-
-        public EmojiGuild(long guild_id, long log_channel_id, long list_channel_id, List<Long> list_message_ids) {
-            this.guild_id = guild_id;
-            this.log_channel_id = log_channel_id;
-            this.list_channel_id = list_channel_id;
-            this.list_message_ids = list_message_ids;
-        }
+    public record EmojiGuild(long guild_id, long log_channel_id, long list_channel_id,
+                             List<Long> list_message_ids) {
 
         public long getGuildId() {
             return guild_id;

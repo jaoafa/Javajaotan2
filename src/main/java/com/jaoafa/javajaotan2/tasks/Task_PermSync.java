@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 
 import java.awt.*;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
  * - MinecraftConnected役職がついていない場合、Verified, Community Regular, Regular役職を剥奪する
  */
 public class Task_PermSync implements Job {
-    boolean dryRun;
+    final boolean dryRun;
     Logger logger;
     Connection conn;
 
@@ -58,7 +57,7 @@ public class Task_PermSync implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) {
         logger = Main.getLogger();
         Guild guild = Main.getJDA().getGuildById(Main.getConfig().getGuildId());
 
@@ -148,8 +147,8 @@ public class Task_PermSync implements Job {
     }
 
     class RunPermSync implements Runnable {
-        List<MinecraftDiscordConnection> connections;
-        Member member;
+        final List<MinecraftDiscordConnection> connections;
+        final Member member;
 
         public RunPermSync(List<MinecraftDiscordConnection> connections, Member member) {
             this.connections = connections;

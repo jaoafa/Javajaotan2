@@ -22,6 +22,7 @@ public class JavajaotanLibrary {
      *
      * @return Integer値に変換可能かどうか
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isInt(String str) {
         try {
             Integer.parseInt(str);

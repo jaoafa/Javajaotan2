@@ -16,7 +16,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.InviteLink;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
 import com.jaoafa.javajaotan2.lib.Roles;
 import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
@@ -28,7 +27,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
-import org.quartz.JobExecutionException;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -80,11 +78,7 @@ public class Cmd_Test implements CommandPremise {
             return;
         }
         message.reply(":eyes:").queue();
-        try {
-            new Task_PermSync(true).execute(null);
-        } catch (JobExecutionException e) {
-            e.printStackTrace();
-        }
+        new Task_PermSync(true).execute(null);
     }
 
     private void runMemberOrganize(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
@@ -93,11 +87,7 @@ public class Cmd_Test implements CommandPremise {
             return;
         }
         message.reply(":eyes:").queue();
-        try {
-            new Task_MemberOrganize(true).execute(null);
-        } catch (JobExecutionException e) {
-            e.printStackTrace();
-        }
+        new Task_MemberOrganize(true).execute(null);
     }
 
     private void runCheckMailVerified(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
@@ -106,10 +96,6 @@ public class Cmd_Test implements CommandPremise {
             return;
         }
         message.reply(":eyes:").queue();
-        try {
-            new Task_CheckMailVerified(true).execute(null);
-        } catch (JobExecutionException e) {
-            e.printStackTrace();
-        }
+        new Task_CheckMailVerified(true).execute(null);
     }
 }

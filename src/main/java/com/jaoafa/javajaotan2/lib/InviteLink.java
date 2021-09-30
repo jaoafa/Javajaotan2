@@ -21,13 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InviteLink {
-    public static Map<Long, List<GuildInvite>> invites = new HashMap<>();
-    Guild guild;
-
-    public InviteLink(Guild guild) {
-        this.guild = guild;
-    }
+public record InviteLink(Guild guild) {
+    public static final Map<Long, List<GuildInvite>> invites = new HashMap<>();
 
     @Nullable
     public List<GuildInvite> getInvites() {

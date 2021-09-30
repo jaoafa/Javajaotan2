@@ -37,6 +37,7 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
         "zEGrApgGfB", "GitHub公開コード系",
         "7fvwYQDaQp", "Webサイトのヘッダー",
         "qhRFRNBFSc", "Webサイトのフッター",
+        "jDY9AwDS9v", "Webサイトトップページ",
         "KeJWma5UBu", "Webサイト内参加方法ブログ記事",
         "6k8FK78zUy", "ユーザーサイトフッター",
         "bKaqrvhPRc", "Japan Minecraft Serversのサーバページ"

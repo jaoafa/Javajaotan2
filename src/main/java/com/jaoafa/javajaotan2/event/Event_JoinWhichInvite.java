@@ -175,7 +175,7 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
                 .addField("Channel", "<#%s>".formatted(invite.getChannel() != null ? invite.getChannel().getId() : null), false)
                 .setTimestamp(invite.getTimeCreated());
             if (inviter != null) {
-                embed.setAuthor(inviter.getAsTag(), "https://discord.com/users/" + inviter.getId(), inviter.getEffectiveAvatarUrl());
+                embed.addField("Inviter", inviter.getAsTag(), false);
             }
         }
 

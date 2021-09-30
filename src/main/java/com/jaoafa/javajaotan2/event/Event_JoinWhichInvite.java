@@ -125,7 +125,6 @@ public class Event_JoinWhichInvite extends ListenerAdapter {
             .setTitle("Created invite")
             .addField("Code", "[`%s`](%s)".formatted(invite.getCode(), invite.getUrl()), true)
             .addField("Type", invite.getType().name(), true)
-            .addField("Where", getWhereInvite(invite.getCode()), true)
             .addField("Uses/MaxUses", "%s/%s".formatted(invite.getUses(), invite.getMaxUses()), true)
             .addField("Channel", "<#%s>".formatted(invite.getChannel() != null ? invite.getChannel().getId() : null), false)
             .setTimestamp(invite.getTimeCreated())

@@ -299,7 +299,7 @@ public class Task_MemberOrganize implements Job {
                                 mdc.player()
                             ))
                             .setColor(Color.YELLOW)
-                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_ZONED_DATE_TIME)));
+                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
                         Channel_General.sendMessage(new MessageBuilder()
                             .setEmbeds(embed.build())
                             .setContent("<@%s>".formatted(member.getId()))
@@ -321,7 +321,7 @@ public class Task_MemberOrganize implements Job {
                                 mdc.player()
                             ))
                             .setColor(Color.RED)
-                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_ZONED_DATE_TIME)));
+                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
                         Channel_General.sendMessage(new MessageBuilder()
                             .setEmbeds(embed.build())
                             .setContent("<@%s>".formatted(member.getId()))
@@ -452,7 +452,7 @@ public class Task_MemberOrganize implements Job {
 
             private boolean isNotified(NotifiedType type) {
                 JSONObject object = load();
-                return object.has(memberId) && object.getJSONObject(memberId).has(type.name());
+                return object.has(memberId) && object.getJSONArray(memberId).toList().contains(type.name());
             }
 
             private void setNotified(NotifiedType type) {

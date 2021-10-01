@@ -65,7 +65,7 @@ public class Task_MemberOrganize implements Job {
     TextChannel Channel_General;
 
     public Task_MemberOrganize() {
-        this.dryRun = true; // 数日間動作確認
+        this.dryRun = false; // 数日間動作確認
     }
 
     public Task_MemberOrganize(boolean dryRun) {

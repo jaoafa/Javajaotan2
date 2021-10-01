@@ -17,6 +17,7 @@ import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import com.jaoafa.javajaotan2.lib.MySQLDBManager;
 import com.jaoafa.javajaotan2.lib.SubAccount;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -288,10 +290,21 @@ public class Task_MemberOrganize implements Job {
                 if (checkDays >= 60 && !notified.isNotified(Notified.NotifiedType.MONTH2)) {
                     notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。", Color.MAGENTA, mdc);
                     if (!dryRun) {
-                        Channel_General.sendMessage("""
-                            <#%s> あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
-                            **サーバルール及び個別規約により、3ヶ月を経過すると建築物や自治体の所有権がなくなり、運営によって撤去・移動ができる**ようになり、またMinecraftアカウントとの連携が自動的に解除されます。
-                            本日から1ヶ月以内にjao Minecraft Serverにログインがなされない場合、上記のような対応がなされる場合がございますのでご注意ください。""").queue();
+                        EmbedBuilder embed = new EmbedBuilder()
+                            .setTitle(":exclamation:最終ログインから2か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(mdc.uuid().toString()))
+                            .setDescription("""
+                                あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
+                                **サーバルール及び個別規約により、3ヶ月を経過すると建築物や自治体の所有権がなくなり、運営によって撤去・移動ができる**ようになり、またMinecraftアカウントとの連携が自動的に解除されます。
+                                本日から1ヶ月以内にjao Minecraft Serverにログインがなされない場合、上記のような対応がなされる場合がございますのでご注意ください。""".formatted(
+                                mdc.player()
+                            ))
+                            .setColor(Color.YELLOW)
+                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_ZONED_DATE_TIME)));
+                        Channel_General.sendMessage(new MessageBuilder()
+                            .setEmbeds(embed.build())
+                            .setContent("<@%s>".formatted(member.getId()))
+                            .build()
+                        ).queue();
                     }
                     notified.setNotified(Notified.NotifiedType.MONTH2);
                 }
@@ -300,6 +313,20 @@ public class Task_MemberOrganize implements Job {
                 if (checkDays >= 90) {
                     notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。", Color.ORANGE, mdc);
                     if (!dryRun) {
+                        EmbedBuilder embed = new EmbedBuilder()
+                            .setTitle(":bangbang:最終ログインから3か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(mdc.uuid().toString()))
+                            .setDescription("""
+                                あなたのDiscordアカウントに接続されていたMinecraftアカウント「`%s`」が最終ログインから3ヶ月経過致しました。
+                                サーバルール及び個別規約により、建築物や自治体の所有権がなくなり、Minecraftアカウントとの接続が自動的に切断されました。""".formatted(
+                                mdc.player()
+                            ))
+                            .setColor(Color.RED)
+                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_ZONED_DATE_TIME)));
+                        Channel_General.sendMessage(new MessageBuilder()
+                            .setEmbeds(embed.build())
+                            .setContent("<@%s>".formatted(member.getId()))
+                            .build()
+                        ).queue();
                         disableLink(mdc, uuid);
                         guild.removeRoleFromMember(member, Roles.MinecraftConnected.role).queue();
                     }

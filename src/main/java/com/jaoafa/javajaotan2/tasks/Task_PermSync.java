@@ -49,7 +49,7 @@ public class Task_PermSync implements Job {
     TextChannel Channel_General;
 
     public Task_PermSync() {
-        this.dryRun = true; // 数日間動作確認
+        this.dryRun = false; // 数日間動作確認
     }
 
     public Task_PermSync(boolean dryRun) {

@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
  * - Minecraft-Discord Connectがなされておらず、MinecraftConnected役職か付与されている利用者に対して、MinecraftConnected役職を剥奪する
  * - MinecraftConnected役職がついている場合、Verified, Regularの役職に応じて役職を付与する
  * - MinecraftConnected役職がついていない場合、Verified, Community Regular, Regular役職を剥奪する
+ * - Nitroの場合(gif画像がアイコンの場合)、Nitrotanを付与する
  */
 public class Task_PermSync implements Job {
     final boolean dryRun;
@@ -180,6 +181,12 @@ public class Task_PermSync implements Job {
             boolean isVerified = isGrantedRole(member, Roles.Verified.role);
             boolean isMinecraftConnected = isGrantedRole(member, Roles.MinecraftConnected.role);
             boolean isSubAccount = isGrantedRole(member, Roles.SubAccount.role);
+            boolean isNitrotan = isGrantedRole(member, Roles.Nitrotan.role);
+
+            if (member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && !isNitrotan) {
+                notifyConnection(member, "Nitrotan役職付与", "アイコンがGIF画像だったので、Nitrotan役職を付与しました。", Color.LIGHT_GRAY, mdc);
+                if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.role).queue();
+            }
 
             String minecraftId;
             UUID uuid = null;
@@ -336,6 +343,7 @@ public class Task_PermSync implements Job {
         MailVerified(597421078817669121L, null),
         NeedSupport(786110419470254102L, null),
         SubAccount(753047225751568474L, null),
+        Nitrotan(795153241385861130L, null),
         Unknown(null, null);
 
         private final Long id;

@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -111,7 +112,8 @@ public class Task_MemberOrganize implements Job {
             return;
         }
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {

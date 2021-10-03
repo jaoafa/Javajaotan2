@@ -10,6 +10,11 @@ parser.add_argument(
     required=True,
     help='メンバーを取得する対象のGuild Id'
 )
+parser.add_argument(
+    "--output",
+    required=True,
+    help='出力先のファイルパス'
+)
 
 def load_config():
     if not os.path.exists("config.json"):
@@ -32,8 +37,10 @@ def main(args: argparse.Namespace):
         exit(1)
 
     guildId = args.guild_id
+    output_path = args.output
     members = get_guild_members(config, guildId)
-    print(json.dumps(members), end="")
+    with open(output_path, "w") as f:
+        json.dump(members, f)
 
 
 if __name__ == '__main__':

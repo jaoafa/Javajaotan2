@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
 import com.jaoafa.javajaotan2.lib.JavajaotanData;
@@ -95,7 +96,8 @@ public class Task_PermSync implements Job {
             return;
         }
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {

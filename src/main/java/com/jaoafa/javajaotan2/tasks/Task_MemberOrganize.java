@@ -12,13 +12,13 @@
 package com.jaoafa.javajaotan2.tasks;
 
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.Channels;
-import com.jaoafa.javajaotan2.lib.JavajaotanData;
-import com.jaoafa.javajaotan2.lib.MySQLDBManager;
-import com.jaoafa.javajaotan2.lib.SubAccount;
+import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
@@ -67,7 +67,7 @@ public class Task_MemberOrganize implements Job {
     TextChannel Channel_General;
 
     public Task_MemberOrganize() {
-        this.dryRun = false; // 数日間動作確認
+        this.dryRun = false;
     }
 
     public Task_MemberOrganize(boolean dryRun) {
@@ -197,9 +197,9 @@ public class Task_MemberOrganize implements Job {
                 .findFirst()
                 .orElse(null);
 
-            boolean isMinecraftConnected = isGrantedRole(member, Roles.MinecraftConnected.role);
-            boolean isNeedSupport = isGrantedRole(member, Roles.NeedSupport.role);
-            boolean isSubAccount = isGrantedRole(member, Roles.SubAccount.role);
+            boolean isMinecraftConnected = JavajaotanLibrary.isGrantedRole(member, Roles.MinecraftConnected.role);
+            boolean isNeedSupport = JavajaotanLibrary.isGrantedRole(member, Roles.NeedSupport.role);
+            boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.role);
 
             String minecraftId;
             UUID uuid = null;
@@ -352,22 +352,6 @@ public class Task_MemberOrganize implements Job {
                 return a;
             }
             return null;
-        }
-
-
-        private boolean isGrantedRole(Member member, Role role) {
-            boolean isGranted = member
-                .getRoles()
-                .stream()
-                .map(ISnowflake::getIdLong)
-                .anyMatch(i -> role.getIdLong() == i);
-            if (isGranted) {
-                logger.info("[%s] %s".formatted(
-                    member.getUser().getAsTag(),
-                    "is%s: true".formatted(role.getName())
-                ));
-            }
-            return isGranted;
         }
 
         private void notifyConnection(Member member, String title, String description, Color color, MinecraftDiscordConnection mdc) {

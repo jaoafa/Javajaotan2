@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,7 +27,9 @@ import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -56,6 +59,7 @@ public class Task_SyncOtherServerPerm implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
         logger = Main.getLogger();
+        logger.info("Task_SyncOtherServerPerm");
         guild = Main.getJDA().getGuildById(Main.getConfig().getGuildId());
 
         if (guild == null) {
@@ -65,11 +69,23 @@ public class Task_SyncOtherServerPerm implements Job {
 
         Roles.setGuildAndRole(guild);
 
+        logger.info("loading fruitMembers");
         fruitMembers = getGuildMember(String.valueOf(Roles.FruitPlayers.guild_id));
+        logger.info("fruitMembers count: %s".formatted(fruitMembers != null ? fruitMembers.size() : null));
+        logger.info("sabamisoMembers");
         sabamisoMembers = getGuildMember(String.valueOf(Roles.SabamisoPlayers.guild_id));
+        logger.info("sabamisoMembers count: %s".formatted(sabamisoMembers != null ? sabamisoMembers.size() : null));
+        logger.info("toroMembers");
         toroMembers = getGuildMember(String.valueOf(Roles.TOROPlayers.guild_id));
+        logger.info("toroMembers count: %s".formatted(toroMembers != null ? toroMembers.size() : null));
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        if (fruitMembers == null || sabamisoMembers == null || toroMembers == null) {
+            logger.error("いずれかの項目がnullだったため、処理を続行できません。");
+            return;
+        }
+
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {
@@ -145,11 +161,9 @@ public class Task_SyncOtherServerPerm implements Job {
 
     private List<GuildMember> getGuildMember(String guildId) {
         try {
-            String output = getRunCommand("python3",
-                "external_scripts/getguildmembers/main.py",
-                "--guild-id",
-                guildId);
+            String output = getGuildMembers(guildId);
             if (output == null) {
+                logger.warn("getGuildMember(%s): output == null".formatted(guildId));
                 return null;
             }
             JSONArray array = new JSONArray(output);
@@ -184,21 +198,22 @@ public class Task_SyncOtherServerPerm implements Job {
                 .stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
-            this.nick = object.optString("nick", null);
+            this.nick = object.optString("nick");
             this.joined_at = ZonedDateTime.parse(object.getString("joined_at"), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
             this.user_id = object.getJSONObject("user").getString("id");
             this.user_name = object.getJSONObject("user").getString("username");
-            this.user_avatar = object.getJSONObject("user").getString("avatar");
+            this.user_avatar = object.getJSONObject("user").optString("avatar");
             this.user_discriminator = object.getJSONObject("user").getString("discriminator");
             this.user_public_flags = object.getJSONObject("user").getInt("public_flags");
         }
     }
 
-    private String getRunCommand(String... command) throws IOException {
+    private String getGuildMembers(String guild_id) throws IOException {
+        File tmp = File.createTempFile("mem", ".json");
         Process p;
         try {
             ProcessBuilder builder = new ProcessBuilder();
-            builder.command(command);
+            builder.command(Arrays.asList("python3", "main.py", "--guild-id", guild_id, "--output", tmp.getAbsolutePath()));
             builder.redirectErrorStream(true);
             builder.directory(new File("external_scripts/getguildmembers/"));
             p = builder.start();
@@ -209,19 +224,10 @@ public class Task_SyncOtherServerPerm implements Job {
         } catch (InterruptedException e) {
             return null;
         }
-        try (InputStream is = p.getInputStream()) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-                StringBuilder text = new StringBuilder();
-                while (true) {
-                    String line = br.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    text.append(line).append("\n");
-                }
-                return text.toString();
-            }
-        }
+        String output = Files.readString(tmp.toPath());
+        boolean bool = tmp.delete();
+        if (!bool) logger.warn("delete temp file failed");
+        return output;
     }
 
     private void notifyConnection(Member member, String title, String description, Color color) {

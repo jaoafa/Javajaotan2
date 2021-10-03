@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -64,7 +65,8 @@ public class Task_CheckMailVerified implements Job {
 
         Roles.setGuildAndRole(guild);
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {

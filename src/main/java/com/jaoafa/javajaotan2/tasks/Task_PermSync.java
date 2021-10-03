@@ -14,9 +14,13 @@ package com.jaoafa.javajaotan2.tasks;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
 import com.jaoafa.javajaotan2.lib.JavajaotanData;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.MySQLDBManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -50,7 +54,7 @@ public class Task_PermSync implements Job {
     TextChannel Channel_General;
 
     public Task_PermSync() {
-        this.dryRun = false; // 数日間動作確認
+        this.dryRun = false;
     }
 
     public Task_PermSync(boolean dryRun) {
@@ -176,12 +180,12 @@ public class Task_PermSync implements Job {
                 .findFirst()
                 .orElse(null);
 
-            boolean isRegular = isGrantedRole(member, Roles.Regular.role);
-            boolean isCommunityRegular = isGrantedRole(member, Roles.CommunityRegular.role);
-            boolean isVerified = isGrantedRole(member, Roles.Verified.role);
-            boolean isMinecraftConnected = isGrantedRole(member, Roles.MinecraftConnected.role);
-            boolean isSubAccount = isGrantedRole(member, Roles.SubAccount.role);
-            boolean isNitrotan = isGrantedRole(member, Roles.Nitrotan.role);
+            boolean isRegular = JavajaotanLibrary.isGrantedRole(member, Roles.Regular.role);
+            boolean isCommunityRegular = JavajaotanLibrary.isGrantedRole(member, Roles.CommunityRegular.role);
+            boolean isVerified = JavajaotanLibrary.isGrantedRole(member, Roles.Verified.role);
+            boolean isMinecraftConnected = JavajaotanLibrary.isGrantedRole(member, Roles.MinecraftConnected.role);
+            boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.role);
+            boolean isNitrotan = JavajaotanLibrary.isGrantedRole(member, Roles.Nitrotan.role);
 
             if (member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && !isNitrotan) {
                 notifyConnection(member, "Nitrotan役職付与", "アイコンがGIF画像だったので、Nitrotan役職を付与しました。", Color.LIGHT_GRAY, mdc);
@@ -261,22 +265,6 @@ public class Task_PermSync implements Job {
                     if (!dryRun) guild.removeRoleFromMember(member, role.role).queue();
                 }
             }
-        }
-
-
-        private boolean isGrantedRole(Member member, Role role) {
-            boolean isGranted = member
-                .getRoles()
-                .stream()
-                .map(ISnowflake::getIdLong)
-                .anyMatch(i -> role.getIdLong() == i);
-            if (isGranted) {
-                logger.info("[%s] %s".formatted(
-                    member.getUser().getAsTag(),
-                    "is%s: true".formatted(role.getName())
-                ));
-            }
-            return isGranted;
         }
 
         private void notifyConnection(Member member, String title, String description, Color color, MinecraftDiscordConnection mdc) {

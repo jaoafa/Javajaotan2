@@ -21,6 +21,7 @@ import com.jaoafa.javajaotan2.lib.Roles;
 import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
 import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
 import com.jaoafa.javajaotan2.tasks.Task_PermSync;
+import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -61,9 +62,14 @@ public class Cmd_Test implements CommandPremise {
                 .handler(context -> execute(context, this::runMemberOrganize))
                 .build(),
             builder
-                .meta(CommandMeta.DESCRIPTION, "PermSyncの動作テストを行います")
+                .meta(CommandMeta.DESCRIPTION, "CheckMailVerifiedの動作テストを行います")
                 .literal("checkmailverified")
                 .handler(context -> execute(context, this::runCheckMailVerified))
+                .build(),
+            builder
+                .meta(CommandMeta.DESCRIPTION, "SyncOtherServerPermの動作テストを行います")
+                .literal("otherserverpermsync")
+                .handler(context -> execute(context, this::runSyncOtherServerPerm))
                 .build()
         );
     }
@@ -97,5 +103,14 @@ public class Cmd_Test implements CommandPremise {
         }
         message.reply(":eyes:").queue();
         new Task_CheckMailVerified(true).execute(null);
+    }
+
+    private void runSyncOtherServerPerm(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        if (!member.hasPermission(Permission.ADMINISTRATOR)) {
+            message.reply("このコマンドを実行するにはADMINISTRATOR権限が必要です。").queue();
+            return;
+        }
+        message.reply(":eyes:").queue();
+        new Task_SyncOtherServerPerm(true).execute(null);
     }
 }

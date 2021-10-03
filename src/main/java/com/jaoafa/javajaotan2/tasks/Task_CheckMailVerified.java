@@ -66,7 +66,7 @@ public class Task_CheckMailVerified implements Job {
         Roles.setGuildAndRole(guild);
 
         ExecutorService service = Executors.newFixedThreadPool(10,
-            new ThreadFactoryBuilder().setNameFormat(getClass().getName() + "-%d").build());
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {

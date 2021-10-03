@@ -97,7 +97,7 @@ public class Task_PermSync implements Job {
         }
 
         ExecutorService service = Executors.newFixedThreadPool(10,
-            new ThreadFactoryBuilder().setNameFormat(getClass().getName() + "-%d").build());
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {

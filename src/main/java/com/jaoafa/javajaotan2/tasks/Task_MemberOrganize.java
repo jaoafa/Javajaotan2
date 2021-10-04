@@ -413,7 +413,7 @@ public class Task_MemberOrganize implements Job {
             try (PreparedStatement stmt = conn.prepareStatement("UPDATE discordlink SET disabled = ? WHERE uuid = ? AND disabled = ?")) {
                 stmt.setBoolean(1, true);
                 stmt.setString(2, uuid.toString());
-                stmt.setBoolean(3, true);
+                stmt.setBoolean(3, false);
                 stmt.execute();
             } catch (SQLException e) {
                 logger.warn("disableLink(%s): failed".formatted(mdc.player + "#" + mdc.uuid), e);

@@ -31,6 +31,7 @@ public class SubAccount {
     private boolean exists = true;
     private User user = null;
     private long discordId;
+    private SubAccount main = null;
 
     public SubAccount(long discordId) {
         try {
@@ -124,18 +125,20 @@ public class SubAccount {
     }
 
     public SubAccount getMainAccount() {
+        if (main != null) {
+            return main;
+        }
         try {
             MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
             Connection conn = manager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM subaccount WHERE disid = ?");
-            stmt.setLong(1, discordId);
-            ResultSet res = stmt.executeQuery();
-            SubAccount main = null;
-            if (res.next()) {
-                main = new SubAccount(res.getLong("main_disid"));
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM subaccount WHERE disid = ?")) {
+                stmt.setLong(1, discordId);
+                try (ResultSet res = stmt.executeQuery()) {
+                    if (res.next()) {
+                        main = new SubAccount(res.getLong("main_disid"));
+                    }
+                }
             }
-            res.close();
-            stmt.close();
             return main;
         } catch (SQLException e) {
             return null;

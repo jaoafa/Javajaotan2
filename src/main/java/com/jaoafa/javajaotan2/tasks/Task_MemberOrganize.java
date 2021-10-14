@@ -56,6 +56,8 @@ import java.util.stream.Collectors;
  * - 最終ログインから2ヶ月が経過している場合、警告リプライを#generalで送信する
  * - 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する
  * - メインアカウントが1か月以上前に退出しているのにも関わらず、SubAccount役職がついている利用者から本役職を外す。
+ * - SubAccount役職がついているのにサブアカウントではない場合、SubAccount役職を剥奪する
+ * - サブアカウントなのにSubAccount役職がついていない場合、SubAccount役職を付与する
  * <p>
  * - 解除関連処理時、ExpiredDateが設定されている場合は、期限日は最終ログインから3ヶ月後かExpiredDateのいずれか遅い方を使用する
  * <p>
@@ -244,15 +246,22 @@ public class Task_MemberOrganize implements Job {
             SubAccount subAccount = new SubAccount(member);
 
             if (isSubAccount && !subAccount.isSubAccount()) {
-                // SubAccount役職なのにサブアカウントではない
+                // SubAccount役職がついているのにサブアカウントではない場合、SubAccount役職を剥奪する
                 notifyConnection(member, "SubAccount役職剥奪", "SubAccount役職が付与されていましたが、サブアカウント登録がなされていないため剥奪しました。", Color.RED, mdc);
-                if (!dryRun) guild.addRoleToMember(member, Roles.SubAccount.role).queue();
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.SubAccount.role).queue();
                 isSubAccount = false;
+            }
+
+
+            if (!isSubAccount && subAccount.isSubAccount()) {
+                // サブアカウントなのにSubAccount役職がついていない場合、SubAccount役職を付与する
+                notifyConnection(member, "SubAccount役職付与", "サブアカウント登録がされていましたが、SubAccount役職が付与されていなかったため付与しました。", Color.RED, mdc);
+                if (!dryRun) guild.addRoleToMember(member, Roles.SubAccount.role).queue();
+                isSubAccount = true;
             }
 
             if (isSubAccount) {
                 // メインアカウントが1か月以上前に退出しているのにも関わらず、SubAccount役職がついている利用者から本役職を外す。
-                // 多分この実装は不十分
                 MinecraftDiscordConnection subMdc = connections
                     .stream()
                     .filter(c -> c.disid().equals(subAccount.getMainAccount().getUser().getId()))

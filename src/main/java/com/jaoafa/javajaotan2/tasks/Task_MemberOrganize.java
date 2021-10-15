@@ -11,13 +11,15 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.Channels;
-import com.jaoafa.javajaotan2.lib.JavajaotanData;
-import com.jaoafa.javajaotan2.lib.MySQLDBManager;
-import com.jaoafa.javajaotan2.lib.SubAccount;
+import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
@@ -31,6 +33,7 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +56,8 @@ import java.util.stream.Collectors;
  * - 最終ログインから2ヶ月が経過している場合、警告リプライを#generalで送信する
  * - 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する
  * - メインアカウントが1か月以上前に退出しているのにも関わらず、SubAccount役職がついている利用者から本役職を外す。
+ * - SubAccount役職がついているのにサブアカウントではない場合、SubAccount役職を剥奪する
+ * - サブアカウントなのにSubAccount役職がついていない場合、SubAccount役職を付与する
  * <p>
  * - 解除関連処理時、ExpiredDateが設定されている場合は、期限日は最終ログインから3ヶ月後かExpiredDateのいずれか遅い方を使用する
  * <p>
@@ -65,7 +70,7 @@ public class Task_MemberOrganize implements Job {
     TextChannel Channel_General;
 
     public Task_MemberOrganize() {
-        this.dryRun = true; // 数日間動作確認
+        this.dryRun = false;
     }
 
     public Task_MemberOrganize(boolean dryRun) {
@@ -109,7 +114,8 @@ public class Task_MemberOrganize implements Job {
             return;
         }
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {
@@ -195,9 +201,9 @@ public class Task_MemberOrganize implements Job {
                 .findFirst()
                 .orElse(null);
 
-            boolean isMinecraftConnected = isGrantedRole(member, Roles.MinecraftConnected.role);
-            boolean isNeedSupport = isGrantedRole(member, Roles.NeedSupport.role);
-            boolean isSubAccount = isGrantedRole(member, Roles.SubAccount.role);
+            boolean isMinecraftConnected = JavajaotanLibrary.isGrantedRole(member, Roles.MinecraftConnected.role);
+            boolean isNeedSupport = JavajaotanLibrary.isGrantedRole(member, Roles.NeedSupport.role);
+            boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.role);
 
             String minecraftId;
             UUID uuid = null;
@@ -240,15 +246,22 @@ public class Task_MemberOrganize implements Job {
             SubAccount subAccount = new SubAccount(member);
 
             if (isSubAccount && !subAccount.isSubAccount()) {
-                // SubAccount役職なのにサブアカウントではない
+                // SubAccount役職がついているのにサブアカウントではない場合、SubAccount役職を剥奪する
                 notifyConnection(member, "SubAccount役職剥奪", "SubAccount役職が付与されていましたが、サブアカウント登録がなされていないため剥奪しました。", Color.RED, mdc);
-                if (!dryRun) guild.addRoleToMember(member, Roles.SubAccount.role).queue();
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.SubAccount.role).queue();
                 isSubAccount = false;
+            }
+
+
+            if (!isSubAccount && subAccount.isSubAccount()) {
+                // サブアカウントなのにSubAccount役職がついていない場合、SubAccount役職を付与する
+                notifyConnection(member, "SubAccount役職付与", "サブアカウント登録がされていましたが、SubAccount役職が付与されていなかったため付与しました。", Color.RED, mdc);
+                if (!dryRun) guild.addRoleToMember(member, Roles.SubAccount.role).queue();
+                isSubAccount = true;
             }
 
             if (isSubAccount) {
                 // メインアカウントが1か月以上前に退出しているのにも関わらず、SubAccount役職がついている利用者から本役職を外す。
-                // 多分この実装は不十分
                 MinecraftDiscordConnection subMdc = connections
                     .stream()
                     .filter(c -> c.disid().equals(subAccount.getMainAccount().getUser().getId()))
@@ -288,10 +301,21 @@ public class Task_MemberOrganize implements Job {
                 if (checkDays >= 60 && !notified.isNotified(Notified.NotifiedType.MONTH2)) {
                     notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。", Color.MAGENTA, mdc);
                     if (!dryRun) {
-                        Channel_General.sendMessage("""
-                            <#%s> あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
-                            **サーバルール及び個別規約により、3ヶ月を経過すると建築物や自治体の所有権がなくなり、運営によって撤去・移動ができる**ようになり、またMinecraftアカウントとの連携が自動的に解除されます。
-                            本日から1ヶ月以内にjao Minecraft Serverにログインがなされない場合、上記のような対応がなされる場合がございますのでご注意ください。""").queue();
+                        EmbedBuilder embed = new EmbedBuilder()
+                            .setTitle(":exclamation:最終ログインから2か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(mdc.uuid().toString()))
+                            .setDescription("""
+                                あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
+                                **サーバルール及び個別規約により、3ヶ月を経過すると建築物や自治体の所有権がなくなり、運営によって撤去・移動ができる**ようになり、またMinecraftアカウントとの連携が自動的に解除されます。
+                                本日から1ヶ月以内にjao Minecraft Serverにログインがなされない場合、上記のような対応がなされる場合がございますのでご注意ください。""".formatted(
+                                mdc.player()
+                            ))
+                            .setColor(Color.YELLOW)
+                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                        Channel_General.sendMessage(new MessageBuilder()
+                            .setEmbeds(embed.build())
+                            .setContent("<@%s>".formatted(member.getId()))
+                            .build()
+                        ).queue();
                     }
                     notified.setNotified(Notified.NotifiedType.MONTH2);
                 }
@@ -300,6 +324,20 @@ public class Task_MemberOrganize implements Job {
                 if (checkDays >= 90) {
                     notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。", Color.ORANGE, mdc);
                     if (!dryRun) {
+                        EmbedBuilder embed = new EmbedBuilder()
+                            .setTitle(":bangbang:最終ログインから3か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(mdc.uuid().toString()))
+                            .setDescription("""
+                                あなたのDiscordアカウントに接続されていたMinecraftアカウント「`%s`」が最終ログインから3ヶ月経過致しました。
+                                サーバルール及び個別規約により、建築物や自治体の所有権がなくなり、Minecraftアカウントとの接続が自動的に切断されました。""".formatted(
+                                mdc.player()
+                            ))
+                            .setColor(Color.RED)
+                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                        Channel_General.sendMessage(new MessageBuilder()
+                            .setEmbeds(embed.build())
+                            .setContent("<@%s>".formatted(member.getId()))
+                            .build()
+                        ).queue();
                         disableLink(mdc, uuid);
                         guild.removeRoleFromMember(member, Roles.MinecraftConnected.role).queue();
                     }
@@ -325,22 +363,6 @@ public class Task_MemberOrganize implements Job {
                 return a;
             }
             return null;
-        }
-
-
-        private boolean isGrantedRole(Member member, Role role) {
-            boolean isGranted = member
-                .getRoles()
-                .stream()
-                .map(ISnowflake::getIdLong)
-                .anyMatch(i -> role.getIdLong() == i);
-            if (isGranted) {
-                logger.info("[%s] %s".formatted(
-                    member.getUser().getAsTag(),
-                    "is%s: true".formatted(role.getName())
-                ));
-            }
-            return isGranted;
         }
 
         private void notifyConnection(Member member, String title, String description, Color color, MinecraftDiscordConnection mdc) {
@@ -400,7 +422,7 @@ public class Task_MemberOrganize implements Job {
             try (PreparedStatement stmt = conn.prepareStatement("UPDATE discordlink SET disabled = ? WHERE uuid = ? AND disabled = ?")) {
                 stmt.setBoolean(1, true);
                 stmt.setString(2, uuid.toString());
-                stmt.setBoolean(3, true);
+                stmt.setBoolean(3, false);
                 stmt.execute();
             } catch (SQLException e) {
                 logger.warn("disableLink(%s): failed".formatted(mdc.player + "#" + mdc.uuid), e);
@@ -425,7 +447,7 @@ public class Task_MemberOrganize implements Job {
 
             private boolean isNotified(NotifiedType type) {
                 JSONObject object = load();
-                return object.has(memberId) && object.getJSONObject(memberId).has(type.name());
+                return object.has(memberId) && object.getJSONArray(memberId).toList().contains(type.name());
             }
 
             private void setNotified(NotifiedType type) {

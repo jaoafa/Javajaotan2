@@ -11,6 +11,10 @@
 
 package com.jaoafa.javajaotan2.lib;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -22,6 +26,7 @@ public class JavajaotanLibrary {
      *
      * @return Integer値に変換可能かどうか
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isInt(String str) {
         try {
             Integer.parseInt(str);
@@ -70,5 +75,21 @@ public class JavajaotanLibrary {
     protected static String sdfTimeFormat(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         return sdf.format(date);
+    }
+
+    /**
+     * 指定されたRoleをMemberが持っているかどうかを確認します
+     *
+     * @param member チェックされるメンバー
+     * @param role   チェックするロール
+     *
+     * @return ロールを持っているか(所属しているか)
+     */
+    public static boolean isGrantedRole(Member member, Role role) {
+        return member
+            .getRoles()
+            .stream()
+            .map(ISnowflake::getIdLong)
+            .anyMatch(i -> role.getIdLong() == i);
     }
 }

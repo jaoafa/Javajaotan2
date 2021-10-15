@@ -22,6 +22,10 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.*;
+import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
+import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
+import com.jaoafa.javajaotan2.tasks.Task_PermSync;
+import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,6 +35,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +51,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -117,8 +124,11 @@ public class Main {
         copyExternalScripts();
 
         registerCommand(jda);
+        registerTask();
 
         watchEmojis = new WatchEmojis();
+
+        jda.getGuilds().forEach(g -> new InviteLink(g).fetchInvites());
 
         if (!isUserDevelopMode && !isGuildDevelopMode) {
             new HTTPServer().start();
@@ -162,8 +172,7 @@ public class Main {
                 sender -> {
                     MessageReceivedEvent event = sender.getEvent().orElse(null);
 
-                    if (sender instanceof JDAGuildSender) {
-                        JDAGuildSender jdaGuildSender = (JDAGuildSender) sender;
+                    if (sender instanceof JDAGuildSender jdaGuildSender) {
                         return new JDAGuildSender(event, jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
                     }
 
@@ -172,8 +181,7 @@ public class Main {
                 user -> {
                     MessageReceivedEvent event = user.getEvent().orElse(null);
 
-                    if (user instanceof JDAGuildSender) {
-                        JDAGuildSender guildUser = (JDAGuildSender) user;
+                    if (user instanceof JDAGuildSender guildUser) {
                         return new JDAGuildSender(event, guildUser.getMember(), guildUser.getTextChannel());
                     }
 
@@ -189,7 +197,7 @@ public class Main {
                 (c, e) -> {
                     logger.info("InvalidSyntaxException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
                     if (c.getEvent().isPresent()) {
-                        if(isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()){
+                        if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {
                             return;
                         }
                         c.getEvent().get().getMessage().reply(String.format("コマンドの構文が不正です。正しい構文: `%s`", e.getCorrectSyntax())).queue();
@@ -202,7 +210,7 @@ public class Main {
                     return;
                 }
                 if (c.getEvent().isPresent()) {
-                    if(isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()){
+                    if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {
                         return;
                     }
                     c.getEvent().get().getMessage().reply("コマンドを使用する権限がありません。").queue();
@@ -213,7 +221,7 @@ public class Main {
                 logger.info("CommandExecutionException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
                 e.printStackTrace();
                 if (c.getEvent().isPresent()) {
-                    if(isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()){
+                    if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {
                         return;
                     }
                     c.getEvent().get().getMessage().reply(MessageFormat.format("コマンドの実行に失敗しました: {0} ({1})",
@@ -243,10 +251,10 @@ public class Main {
                     CommandPremise cmdPremise = (CommandPremise) instance;
 
                     Command.Builder<JDACommandSender> builder = manager.commandBuilder(
-                        commandName,
-                        ArgumentDescription.of(cmdPremise.details().getDescription()),
-                        cmdPremise.details().getAliases().toArray(new String[0])
-                    )
+                            commandName,
+                            ArgumentDescription.of(cmdPremise.details().getDescription()),
+                            cmdPremise.details().getAliases().toArray(new String[0])
+                        )
                         .meta(CommandMeta.DESCRIPTION, cmdPremise.details().getDescription());
                     if (cmdPremise.details().getAllowRoles() != null) {
                         builder = builder.permission(
@@ -342,6 +350,68 @@ public class Main {
             getLogger().error("イベントの登録に失敗しました。");
             e.printStackTrace();
         }
+    }
+
+    static void registerTask() {
+        SchedulerFactory factory = new StdSchedulerFactory();
+        List<TaskConfig> tasks = List.of(
+            new TaskConfig(
+                Task_MemberOrganize.class,
+                "memberOrganize",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .endingDailyAfterCount(1)),
+            new TaskConfig(
+                Task_CheckMailVerified.class,
+                "checkMailVerified",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .withInterval(5, DateBuilder.IntervalUnit.MINUTE)),
+            new TaskConfig(
+                Task_PermSync.class,
+                "permSync",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .withInterval(30, DateBuilder.IntervalUnit.MINUTE)),
+            new TaskConfig(
+                Task_SyncOtherServerPerm.class,
+                "otherServerPermSync",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .withInterval(30, DateBuilder.IntervalUnit.MINUTE))
+        );
+
+        try {
+            Scheduler scheduler = factory.getScheduler();
+            scheduler.start();
+
+            for (TaskConfig task : tasks) {
+                logger.info("registerTask: " + task.name());
+                scheduler.scheduleJob(
+                    JobBuilder.newJob(Task_MemberOrganize.class)
+                        .withIdentity(task.name(), task.group())
+                        .build(),
+                    TriggerBuilder.newTrigger()
+                        .withIdentity(task.name(), task.group())
+                        .withSchedule(task.scheduleBuilder())
+                        .build()
+                );
+            }
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    record TaskConfig(Class<? extends Job> clazz, String name, String group,
+                      ScheduleBuilder<?> scheduleBuilder) {
     }
 
     static void defineChannelsAndRoles() {

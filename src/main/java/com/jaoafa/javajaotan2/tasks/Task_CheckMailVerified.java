@@ -11,9 +11,14 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
@@ -41,7 +46,7 @@ public class Task_CheckMailVerified implements Job {
     Logger logger;
 
     public Task_CheckMailVerified() {
-        this.dryRun = true; // 数日間動作確認
+        this.dryRun = false;
     }
 
     public Task_CheckMailVerified(boolean dryRun) {
@@ -60,7 +65,8 @@ public class Task_CheckMailVerified implements Job {
 
         Roles.setGuildAndRole(guild);
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {
@@ -93,8 +99,8 @@ public class Task_CheckMailVerified implements Job {
                 member.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "))
             ));
 
-            boolean isMailVerified = isGrantedRole(member, Roles.MailVerified.role);
-            boolean isNeedSupport = isGrantedRole(member, Roles.NeedSupport.role);
+            boolean isMailVerified = JavajaotanLibrary.isGrantedRole(member, Roles.MailVerified.role);
+            boolean isNeedSupport = JavajaotanLibrary.isGrantedRole(member, Roles.NeedSupport.role);
 
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime joinedTime = member.getTimeJoined().atZoneSameInstant(ZoneId.of("Asia/Tokyo")).toLocalDateTime();
@@ -161,21 +167,6 @@ public class Task_CheckMailVerified implements Job {
         if (dryRun) embed.setFooter("DRY-RUN MODE");
 
         channel.sendMessageEmbeds(embed.build()).queue();
-    }
-
-    private boolean isGrantedRole(Member member, Role role) {
-        boolean isGranted = member
-            .getRoles()
-            .stream()
-            .map(ISnowflake::getIdLong)
-            .anyMatch(i -> role.getIdLong() == i);
-        if (isGranted) {
-            logger.info("[%s] %s".formatted(
-                member.getUser().getAsTag(),
-                "is%s: true".formatted(role.getName())
-            ));
-        }
-        return isGranted;
     }
 
     public enum Roles {

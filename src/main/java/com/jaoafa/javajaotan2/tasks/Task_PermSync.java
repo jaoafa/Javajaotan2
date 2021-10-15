@@ -11,25 +11,33 @@
 
 package com.jaoafa.javajaotan2.tasks;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
 import com.jaoafa.javajaotan2.lib.JavajaotanData;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.MySQLDBManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 
 import java.awt.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
@@ -40,16 +48,18 @@ import java.util.stream.Collectors;
  * - Minecraft-Discord Connectがなされておらず、MinecraftConnected役職か付与されている利用者に対して、MinecraftConnected役職を剥奪する
  * - MinecraftConnected役職がついている場合、Verified, Regularの役職に応じて役職を付与する
  * - MinecraftConnected役職がついていない場合、Verified, Community Regular, Regular役職を剥奪する
+ * - Nitroの場合(gif画像がアイコンの場合)、Nitrotanを付与する
+ * - Nitrotan役職がついていて、GIFアイコンでなく、アニメーション/外部絵文字の最終メッセージ送信日時が1週間前の場合、Nitrotan役職を剥奪する
  */
 public class Task_PermSync implements Job {
     final boolean dryRun;
     Logger logger;
     Connection conn;
-
     TextChannel Channel_General;
+    JSONObject nitrotan = new JSONObject();
 
     public Task_PermSync() {
-        this.dryRun = true; // 数日間動作確認
+        this.dryRun = false;
     }
 
     public Task_PermSync(boolean dryRun) {
@@ -84,13 +94,22 @@ public class Task_PermSync implements Job {
         Roles.setGuildAndRole(guild);
 
         Channel_General = Channels.general.getChannel();
-
         if (Channel_General == null) {
             logger.warn("Channel_General == null");
             return;
         }
 
-        ExecutorService service = Executors.newFixedThreadPool(10);
+        Path path = Path.of("nitrotan.json");
+        try {
+            if (Files.exists(path)) {
+                nitrotan = new JSONObject(Files.readString(path));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ExecutorService service = Executors.newFixedThreadPool(10,
+            new ThreadFactoryBuilder().setNameFormat(getClass().getSimpleName() + "-%d").build());
         guild.loadMembers()
             .onSuccess(members ->
                 {
@@ -175,11 +194,27 @@ public class Task_PermSync implements Job {
                 .findFirst()
                 .orElse(null);
 
-            boolean isRegular = isGrantedRole(member, Roles.Regular.role);
-            boolean isCommunityRegular = isGrantedRole(member, Roles.CommunityRegular.role);
-            boolean isVerified = isGrantedRole(member, Roles.Verified.role);
-            boolean isMinecraftConnected = isGrantedRole(member, Roles.MinecraftConnected.role);
-            boolean isSubAccount = isGrantedRole(member, Roles.SubAccount.role);
+            boolean isRegular = JavajaotanLibrary.isGrantedRole(member, Roles.Regular.role);
+            boolean isCommunityRegular = JavajaotanLibrary.isGrantedRole(member, Roles.CommunityRegular.role);
+            boolean isVerified = JavajaotanLibrary.isGrantedRole(member, Roles.Verified.role);
+            boolean isMinecraftConnected = JavajaotanLibrary.isGrantedRole(member, Roles.MinecraftConnected.role);
+            boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.role);
+            boolean isNitrotan = JavajaotanLibrary.isGrantedRole(member, Roles.Nitrotan.role);
+
+            // Nitroの場合(gif画像がアイコンの場合)、Nitrotanを付与する
+            if (member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && !isNitrotan) {
+                notifyConnection(member, "Nitrotan役職付与", "アイコンがGIF画像だったので、Nitrotan役職を付与しました。", Color.LIGHT_GRAY, mdc);
+                if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.role).queue();
+                isNitrotan = true;
+            }
+            // Nitrotan役職がついていて、GIFアイコンでなく、アニメーション/外部絵文字の最終メッセージ送信日時が1週間前の場合、Nitrotan役職を剥奪する
+            // アニメーション/外部絵文字の最終メッセージ送信日時が何ミリ秒前か？
+            long lastNitroAgo = nitrotan.has(member.getId()) ? new Date().getTime() - nitrotan.getLong(member.getId()) : -1;
+            // 7日 * 24時間 * 60分 * 60秒 * 1000秒
+            if (isNitrotan && !member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && (lastNitroAgo == -1 || lastNitroAgo > 7 * 24 * 60 * 60 * 1000)) {
+                notifyConnection(member, "Nitrotan役職剥奪", "アイコンがGIF画像ではなく、またアニメーション/外部絵文字を使用したメッセージが1週間以上前だったためNitrotan役職を剥奪しました。", Color.LIGHT_GRAY, mdc);
+                if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.role).queue();
+            }
 
             String minecraftId;
             UUID uuid = null;
@@ -208,7 +243,13 @@ public class Task_PermSync implements Job {
             //giveRole,description,isMinecraftConnected
             BiFunction<Boolean, String, Boolean> doMinecraftConnectedManage = (giveRole, description) -> {
                 notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), description, Color.BLUE, mdc);
-                if (!dryRun) guild.addRoleToMember(member, Roles.MinecraftConnected.role).queue();
+                if (!dryRun) {
+                    if (giveRole) {
+                        guild.addRoleToMember(member, Roles.MinecraftConnected.role).queue();
+                    } else {
+                        guild.removeRoleFromMember(member, Roles.MinecraftConnected.role).queue();
+                    }
+                }
                 return true;
             };
 
@@ -254,22 +295,6 @@ public class Task_PermSync implements Job {
                     if (!dryRun) guild.removeRoleFromMember(member, role.role).queue();
                 }
             }
-        }
-
-
-        private boolean isGrantedRole(Member member, Role role) {
-            boolean isGranted = member
-                .getRoles()
-                .stream()
-                .map(ISnowflake::getIdLong)
-                .anyMatch(i -> role.getIdLong() == i);
-            if (isGranted) {
-                logger.info("[%s] %s".formatted(
-                    member.getUser().getAsTag(),
-                    "is%s: true".formatted(role.getName())
-                ));
-            }
-            return isGranted;
         }
 
         private void notifyConnection(Member member, String title, String description, Color color, MinecraftDiscordConnection mdc) {
@@ -336,6 +361,7 @@ public class Task_PermSync implements Job {
         MailVerified(597421078817669121L, null),
         NeedSupport(786110419470254102L, null),
         SubAccount(753047225751568474L, null),
+        Nitrotan(795153241385861130L, null),
         Unknown(null, null);
 
         private final Long id;

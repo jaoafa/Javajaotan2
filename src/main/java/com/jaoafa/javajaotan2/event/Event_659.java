@@ -123,9 +123,12 @@ public class Event_659 extends ListenerAdapter {
         int mill = (int) Math.floor(minute_remain % 1000L);
         if (sec != 0) {
             builder.append(sec);
-            if (mill != 0) {
-                builder.append(".").append(mill);
-            }
+            builder.append("秒");
+        } else {
+            builder.append("0");
+        }
+        if (mill != 0) {
+            builder.append(".").append(mill);
             builder.append("秒");
         }
 

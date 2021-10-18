@@ -396,7 +396,7 @@ public class Main {
             for (TaskConfig task : tasks) {
                 logger.info("registerTask: " + task.name());
                 scheduler.scheduleJob(
-                    JobBuilder.newJob(Task_MemberOrganize.class)
+                    JobBuilder.newJob(task.clazz())
                         .withIdentity(task.name(), task.group())
                         .build(),
                     TriggerBuilder.newTrigger()

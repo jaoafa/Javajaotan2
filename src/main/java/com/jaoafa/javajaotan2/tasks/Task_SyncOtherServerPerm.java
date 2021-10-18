@@ -128,7 +128,7 @@ public class Task_SyncOtherServerPerm implements Job {
             if (!isFruitMember && isFruitPlayers) {
                 // 鯖にいないのにロールついてる
                 notifyConnection(member, "FruitPlayers役職剥奪", "FruitServerのメンバーでないため、FruitPlayers役職を剥奪しました。", Color.getHSBColor(247, 79, 38));
-                if (!dryRun) guild.addRoleToMember(member, Roles.FruitPlayers.role).queue();
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.FruitPlayers.role).queue();
             }
 
             // Sabamiso
@@ -141,7 +141,7 @@ public class Task_SyncOtherServerPerm implements Job {
             if (!isSabamisoMember && isSabamisoPlayers) {
                 // 鯖にいないのにロールついてる
                 notifyConnection(member, "SabamisoPlayers役職剥奪", "SabamisoServerのメンバーでないため、SabamisoPlayers役職を剥奪しました。", Color.getHSBColor(144, 33, 93));
-                if (!dryRun) guild.addRoleToMember(member, Roles.SabamisoPlayers.role).queue();
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.SabamisoPlayers.role).queue();
             }
 
             // toro
@@ -154,7 +154,7 @@ public class Task_SyncOtherServerPerm implements Job {
             if (!isTOROMember && isTOROPlayers) {
                 // 鯖にいないのにロールついてる
                 notifyConnection(member, "TOROPlayers役職剥奪", "TOROServerのメンバーでないため、TOROPlayers役職を剥奪しました。", Color.BLACK);
-                if (!dryRun) guild.addRoleToMember(member, Roles.TOROPlayers.role).queue();
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.TOROPlayers.role).queue();
             }
         }
     }

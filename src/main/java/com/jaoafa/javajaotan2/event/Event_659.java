@@ -36,6 +36,14 @@ import java.util.Map;
 
 public class Event_659 extends ListenerAdapter {
     Map<String, List<Time>> msgTimes = Map.of(
+        "334", List.of(
+            new Time(3, 34, 0, 0),
+            new Time(15, 34, 0, 0)
+        ),
+        "ｻﾝｼﾞﾊﾝ!!", List.of(
+            new Time(3, 30, 0, 0),
+            new Time(15, 30, 0, 0)
+        ),
         "659", List.of(
             new Time(6, 59, 59, 999),
             new Time(18, 59, 59, 999)
@@ -45,10 +53,16 @@ public class Event_659 extends ListenerAdapter {
             new Time(18, 59, 59, 999)
         ),
         "ななじ", List.of(
-            new Time(7, 0, 0, 0)
+            new Time(7, 0, 0, 0),
+            new Time(19, 0, 0, 0)
+        ),
+        "ななじすき", List.of(
+            new Time(7, 0, 0, 0),
+            new Time(19, 0, 0, 0)
         ),
         "ななじすぎ", List.of(
-            new Time(7, 1, 0, 0)
+            new Time(7, 1, 0, 0),
+            new Time(19, 1, 0, 0)
         )
     );
 

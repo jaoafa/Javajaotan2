@@ -88,7 +88,7 @@ public class Event_659 extends ListenerAdapter {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
         Map.Entry<String, List<Time>> match = msgTimes.entrySet().stream()
-            .sorted(Comparator.comparingInt(o -> o.getKey().length()))
+            .sorted((o1, o2) -> Integer.compare(o2.getKey().length(), o1.getKey().length()))
             .filter(o -> contents.contains(o.getKey())).findFirst()
             .orElse(null);
         Time time = match != null ? match.getValue().stream()
@@ -137,9 +137,12 @@ public class Event_659 extends ListenerAdapter {
         int mill = (int) Math.floor(minute_remain % 1000L);
         if (sec != 0) {
             builder.append(sec);
-            if (mill != 0) {
-                builder.append(".").append(mill);
-            }
+            builder.append("秒");
+        } else {
+            builder.append("0");
+        }
+        if (mill != 0) {
+            builder.append(".").append(mill);
             builder.append("秒");
         }
 
@@ -166,7 +169,7 @@ public class Event_659 extends ListenerAdapter {
             }
             object.put(time.toString(), time_object);
             Files.writeString(path, object.toString());
-            return new LinkedList<>(time_object.keySet()).indexOf(String.valueOf(diff));
+            return new LinkedList<>(time_object.keySet()).indexOf(String.valueOf(diff)) + 1;
         } catch (IOException e) {
             e.printStackTrace();
         }

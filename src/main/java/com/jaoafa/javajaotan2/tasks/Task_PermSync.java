@@ -213,7 +213,7 @@ public class Task_PermSync implements Job {
             // 7日 * 24時間 * 60分 * 60秒 * 1000秒
             if (isNitrotan && !member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && (lastNitroAgo == -1 || lastNitroAgo > 7 * 24 * 60 * 60 * 1000)) {
                 notifyConnection(member, "Nitrotan役職剥奪", "アイコンがGIF画像ではなく、またアニメーション/外部絵文字を使用したメッセージが1週間以上前だったためNitrotan役職を剥奪しました。", Color.LIGHT_GRAY, mdc);
-                if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.role).queue();
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.Nitrotan.role).queue();
             }
 
             String minecraftId;

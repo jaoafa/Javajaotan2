@@ -170,7 +170,7 @@ public class Event_659 extends ListenerAdapter {
             }
             object.put(time.toString(), time_object);
             Files.writeString(path, object.toString());
-            return new LinkedList<>(time_object.keySet()).indexOf(String.valueOf(diff)) + 1;
+            return new LinkedList<>(time_object.keySet().stream().sorted().toList()).indexOf(String.valueOf(diff)) + 1;
         } catch (IOException e) {
             e.printStackTrace();
         }

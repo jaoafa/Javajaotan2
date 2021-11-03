@@ -229,7 +229,19 @@ public class Task_MemberOrganize implements Job {
 
             boolean doReturn = false;
             BiFunction<String, String, Boolean> doKick = (title, description) -> {
-                kickDiscord(member, title, description);
+                boolean kicked = kickDiscord(member, title, description);
+                if (kicked) {
+                    EmbedBuilder embed = new EmbedBuilder()
+                        .setTitle(":wave:自動キックのお知らせ (%s)".formatted(title), "https://discord.com/users/%s".formatted(member.getId()))
+                        .setDescription(description)
+                        .setColor(Color.RED)
+                        .setFooter("サーバ参加日時: %s".formatted(joinedTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                    Channel_General.sendMessage(new MessageBuilder()
+                        .setEmbeds(embed.build())
+                        .setContent("<@%s> (%s)".formatted(member.getId(), member.getUser().getAsTag()))
+                        .build()
+                    ).queue();
+                }
                 return true;
             };
 
@@ -383,7 +395,7 @@ public class Task_MemberOrganize implements Job {
             channel.sendMessageEmbeds(embed.build()).queue();
         }
 
-        private void kickDiscord(Member member, String title, String description) {
+        private boolean kickDiscord(Member member, String title, String description) {
             Path path = Path.of("pre-permsync.json");
             JSONObject object = new JSONObject();
             if (Files.exists(path)) {
@@ -391,7 +403,7 @@ public class Task_MemberOrganize implements Job {
                     object = new JSONObject(Files.readString(path));
                 } catch (IOException e) {
                     logger.warn("grantDiscordPerm json load failed.", e);
-                    return;
+                    return false;
                 }
             }
 
@@ -399,11 +411,13 @@ public class Task_MemberOrganize implements Job {
 
             JSONArray kicks = object.getJSONArray("kick");
 
+            boolean kicked = false;
             if (kicks.toList().contains(member.getId()) && !dryRun) {
                 // 処理
                 notifyConnection(member, "[PROCESS] " + title, description, Color.PINK, null);
                 member.getGuild().kick(member).queue();
                 kicks.remove(kicks.toList().indexOf(member.getId()));
+                kicked = true;
             } else {
                 // 動作予告
                 notifyConnection(member, "[PRE] " + title, "次回処理時、本動作が実施されます。", Color.PINK, null);
@@ -416,6 +430,7 @@ public class Task_MemberOrganize implements Job {
             } catch (IOException e) {
                 logger.warn("grantDiscordPerm json save failed.", e);
             }
+            return kicked;
         }
 
         private void disableLink(MinecraftDiscordConnection mdc, UUID uuid) {

@@ -19,7 +19,8 @@ public enum Channels {
     general(597419057251090443L),
     jaotan(597423444501463040L),
     invite_checker(893166232772161577L),
-    c659(621632815599190016L); // 最初を数字にできない…
+    c659(621632815599190016L), // 最初を数字にできない…
+    meeting_vote(597423974816808970L);
 
     private long channel_id;
 

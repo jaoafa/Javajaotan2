@@ -434,14 +434,47 @@ public class Task_MemberOrganize implements Job {
         }
 
         private void disableLink(MinecraftDiscordConnection mdc, UUID uuid) {
-            try (PreparedStatement stmt = conn.prepareStatement("UPDATE discordlink SET disabled = ? WHERE uuid = ? AND disabled = ?")) {
+            PermissionGroup group = getPermissionGroup(uuid);
+            try (PreparedStatement stmt = conn.prepareStatement("UPDATE discordlink SET disabled = ?, dead_perm = ?, dead_at = CURRENT_TIMESTAMP WHERE uuid = ? AND disabled = ?")) {
                 stmt.setBoolean(1, true);
-                stmt.setString(2, uuid.toString());
-                stmt.setBoolean(3, false);
+                stmt.setString(2, group != null ? group.name() : null);
+                stmt.setString(3, uuid.toString());
+                stmt.setBoolean(4, false);
                 stmt.execute();
             } catch (SQLException e) {
                 logger.warn("disableLink(%s): failed".formatted(mdc.player + "#" + mdc.uuid), e);
             }
+        }
+
+        private PermissionGroup getPermissionGroup(UUID uuid) {
+            try {
+                try (PreparedStatement statement = conn.prepareStatement("SELECT * FROM permissions WHERE uuid = ?")) {
+                    statement.setString(1, uuid.toString());
+                    try (ResultSet res = statement.executeQuery()) {
+                        if (!res.next()) {
+                            return null;
+                        }
+                        String permissionGroup = res.getString("permission");
+                        return Arrays
+                            .stream(PermissionGroup.values())
+                            .filter(p -> p.name().equalsIgnoreCase(permissionGroup))
+                            .findFirst()
+                            .orElse(PermissionGroup.UNKNOWN);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        enum PermissionGroup {
+            ADMIN,
+            MODERATOR,
+            REGULAR,
+            VERIFIED,
+            DEFAULT,
+            UNKNOWN
         }
 
         record MinecraftDiscordConnection(String player, UUID uuid, String disid, String discriminator,

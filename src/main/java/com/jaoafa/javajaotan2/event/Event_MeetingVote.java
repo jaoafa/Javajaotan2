@@ -115,29 +115,24 @@ public class Event_MeetingVote extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
-            return;
-        }
-        if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) {
-            return;
-        }
-        if (event.getAuthor().isBot()) {
-            return;
-        }
-        if (event.getMember() == null) {
-            return;
-        }
+        if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
+
+        if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
+
+        if (event.getAuthor().isBot()) return;
+
+        if (event.getMember() == null) return;
+
         Member member = event.getMember();
         TextChannel channel = event.getTextChannel();
         Message message = event.getMessage();
         String content = message.getContentRaw();
-        if (message.getType() != MessageType.DEFAULT) {
-            return;
-        }
 
-        if (message.isPinned()) {
-            return;
-        }
+        if (message.getType() != MessageType.DEFAULT) return;
+
+
+        if (message.isPinned()) return;
+
         // ・対象チャンネルへ投稿がされた場合、投票開始メッセージを送信しピン止めする
 
         logger.info("New meeting vote!");

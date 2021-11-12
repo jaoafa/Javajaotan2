@@ -17,8 +17,10 @@ import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.MySQLDBManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -74,15 +76,9 @@ import java.util.stream.Collectors;
  * 　　・否認の場合は該当DB行の status に -1 を入れ、#city_request で否認されたことを知らせる
  */
 public class Event_MeetingVote extends ListenerAdapter {
-    Logger logger;
+    Logger logger = null;
     TextChannel meeting;
     TextChannel cityRequest;
-
-    public Event_MeetingVote() {
-        this.logger = Main.getLogger();
-        this.meeting = Main.getJDA().getTextChannelById(597423467796758529L);
-        this.cityRequest = Main.getJDA().getTextChannelById(709008822043148340L);
-    }
 
     /** 賛成リアクション絵文字 */
     static final String GOOD_EMOJI = "\uD83D\uDC4D";
@@ -116,6 +112,17 @@ public class Event_MeetingVote extends ListenerAdapter {
     /** 自治体情報変更リクエスト管理テキストパターン */
     static final Pattern CITIES_CHANGE_OTHER_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CHANGE-OTHER-WAITING:([0-9]+)]");
 
+    public void initChannels(JDA jda) {
+        this.logger = Main.getLogger();
+        this.meeting = jda.getTextChannelById(597423467796758529L);
+        this.cityRequest = jda.getTextChannelById(709008822043148340L);
+    }
+
+    @Override
+    public void onReady(@Nonnull ReadyEvent event) {
+        initChannels(event.getJDA());
+    }
+
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
@@ -134,6 +141,10 @@ public class Event_MeetingVote extends ListenerAdapter {
         if (message.getType() != MessageType.DEFAULT) return;
 
         if (message.isPinned()) return;
+
+        if (logger == null) {
+            initChannels(event.getJDA());
+        }
 
         // ・対象チャンネルへ投稿がされた場合、投票開始メッセージを送信しピン止めする
 
@@ -574,21 +585,21 @@ public class Event_MeetingVote extends ListenerAdapter {
      * 自治体 ID から自治体所有者の Discord user id を取得
      */
     private String getDiscordUserID(Connection conn, int cities_id) {
-        return getStringFromCitiesRecord.apply("discord_userid",cities_id);
+        return getStringFromCitiesRecord.apply("discord_userid", cities_id);
     }
 
     /**
      * 自治体 ID から自治体名を取得
      */
     private String getCitiesName(Connection conn, int cities_id) {
-        return getStringFromCitiesRecord.apply("name",cities_id);
+        return getStringFromCitiesRecord.apply("name", cities_id);
     }
 
     /**
      * 自治体 ID から自治体保護名を取得
      */
     private String getRegionName(Connection conn, int cities_id) {
-        return getStringFromCitiesRecord.apply("regionname",cities_id);
+        return getStringFromCitiesRecord.apply("regionname", cities_id);
     }
 
     enum DisapprovalReason {

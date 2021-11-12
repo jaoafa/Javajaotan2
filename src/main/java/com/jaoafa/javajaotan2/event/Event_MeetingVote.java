@@ -78,7 +78,7 @@ public class Event_MeetingVote extends ListenerAdapter {
     TextChannel meeting;
     TextChannel cityRequest;
 
-    Event_MeetingVote() {
+    public Event_MeetingVote() {
         this.logger = Main.getLogger();
         this.meeting = Main.getJDA().getTextChannelById(597423467796758529L);
         this.cityRequest = Main.getJDA().getTextChannelById(709008822043148340L);

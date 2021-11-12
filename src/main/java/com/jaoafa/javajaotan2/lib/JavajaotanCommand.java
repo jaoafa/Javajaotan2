@@ -13,11 +13,11 @@ package com.jaoafa.javajaotan2.lib;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.jda.JDACommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,7 +100,7 @@ public class JavajaotanCommand {
         }
     }
 
-    public record Cmd(Command<JDACommandSender>... commands) {
+    public record Cmd(@NonNull Command<JDACommandSender>... commands) {
         @SafeVarargs
         public Cmd {
         }
@@ -111,7 +111,7 @@ public class JavajaotanCommand {
          * @return Commandリスト
          */
         public List<Command<JDACommandSender>> getCommands() {
-            return Arrays.asList(this.commands);
+            return List.of(this.commands);
         }
     }
 }

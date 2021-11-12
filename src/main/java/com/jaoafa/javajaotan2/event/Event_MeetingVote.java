@@ -41,6 +41,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -130,7 +133,6 @@ public class Event_MeetingVote extends ListenerAdapter {
 
         if (message.getType() != MessageType.DEFAULT) return;
 
-
         if (message.isPinned()) return;
 
         // ・対象チャンネルへ投稿がされた場合、投票開始メッセージを送信しピン止めする
@@ -171,26 +173,25 @@ public class Event_MeetingVote extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
-            return;
-        }
-        if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) {
-            return;
-        }
+        if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
+
+        if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
+
         User user = event.getUser();
-        if (user == null) {
-            user = event.retrieveUser().complete();
-        }
-        if (user.isBot()) {
-            return;
-        }
+
+        if (user == null) user = event.retrieveUser().complete();
+
+        if (user.isBot()) return;
+
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
-        if (!emote.isEmoji()) {
+
+        if (!emote.isEmoji()) return;
+
+        if (!emote.getEmoji().equals(GOOD_EMOJI)
+            && !emote.getEmoji().equals(BAD_EMOJI)
+            && !emote.getEmoji().equals(WHITE_EMOJI))
             return;
-        }
-        if (!emote.getEmoji().equals(GOOD_EMOJI) && !emote.getEmoji().equals(BAD_EMOJI) && !emote.getEmoji().equals(WHITE_EMOJI)) {
-            return;
-        }
+
         processVotes();
     }
 
@@ -204,46 +205,36 @@ public class Event_MeetingVote extends ListenerAdapter {
             logger.error("meeting_vote channel is not found.");
             return;
         }
-        List<Message> messages = channel.retrievePinnedMessages().complete();
-        for (Message message : messages) {
-            List<User> good = message.retrieveReactionUsers(GOOD_EMOJI).complete();
-            if (good == null) {
-                good = new ArrayList<>();
-            }
-            good = good.stream().filter(u -> !u.isBot()).collect(Collectors.toList());
-            List<User> bad = message.retrieveReactionUsers(BAD_EMOJI).complete();
-            if (bad == null) {
-                bad = new ArrayList<>();
-            }
-            bad = bad.stream().filter(u -> !u.isBot()).collect(Collectors.toList());
-            List<User> white = message.retrieveReactionUsers(WHITE_EMOJI).complete();
-            if (white == null) {
-                white = new ArrayList<>();
-            }
-            white = white.stream().filter(u -> !u.isBot()).collect(Collectors.toList());
+
+        for (Message message : channel.retrievePinnedMessages().complete()) {
+            Function<String, List<User>> getUsers = emoji ->
+                Optional.ofNullable(
+                    message.retrieveReactionUsers(emoji).complete()
+                ).orElse(new ArrayList<>()).stream().filter(u -> !u.isBot()).collect(Collectors.toList());
+
+            List<User> good = getUsers.apply(GOOD_EMOJI);
+            List<User> bad = getUsers.apply(BAD_EMOJI);
+            List<User> white = getUsers.apply(WHITE_EMOJI);
 
             // ・過半数が賛成の場合は承認、反対の場合は否認する
             int border = getVoteBorderFromContent(message.getContentRaw(), white.size());
-            if (good.size() >= border) {
+            if (good.size() >= border)
                 approval(message, good, bad, white);
-            }
-            if (bad.size() >= border) {
+            if (bad.size() >= border)
                 disapproval(message, good, bad, white, DisapprovalReason.VOTE);
-            }
 
             ZonedDateTime limit = getVoteLimitDateTime(message);
-            if (ZonedDateTime.now().isAfter(limit)) {
+            if (ZonedDateTime.now().isAfter(limit))
                 // ・投票の有効会議期限は2週間。それまでに投票が確定しない場合は否認されたものとして扱う
                 disapproval(message, good, bad, white, DisapprovalReason.LIMIT);
-            }
 
-            if (ZonedDateTime.now().isAfter(message
-                .getTimeCreated()
-                .atZoneSameInstant(ZoneId.of("Asia/Tokyo"))
-                .plus(7, ChronoUnit.DAYS))) {
+            if (ZonedDateTime.now().isAfter(
+                message
+                    .getTimeCreated()
+                    .atZoneSameInstant(ZoneId.of("Asia/Tokyo"))
+                    .plus(7, ChronoUnit.DAYS)))
                 // ・投票開始から1週間経過時点でリマインドする
                 remind(message, good, bad, white);
-            }
         }
     }
 
@@ -252,15 +243,19 @@ public class Event_MeetingVote extends ListenerAdapter {
      */
     void approval(Message message, List<User> good, List<User> bad, List<User> white) {
         int border = getVoteBorderFromContent(message.getContentRaw(), white.size());
-        EmbedBuilder embed = new EmbedBuilder()
+
+        Function<List<User>, String> getAsTag = users ->
+            users.stream().map(User::getAsTag).collect(Collectors.joining(" "));
+
+        message.replyEmbeds(new EmbedBuilder()
             .setTitle("投票承認のお知らせ")
             .setDescription(":+1: 過半数が賛成したため、投票が承認されたことをお知らせします。")
-            .addField("賛成 / 反対 / 白票", "%s / %s / %s".formatted(good.size(), bad.size(), white.size()), false)
+            .addField("賛成 / 反対 / 白票", "%s / %s / %s".formatted(
+                good.size(), bad.size(), white.size()
+            ), false)
             .addField("決議ボーダー", String.valueOf(border), false)
             .addField("メンバー", "賛成: %s\n反対: %s\n白票: %s".formatted(
-                good.stream().map(User::getAsTag).collect(Collectors.joining(" ")),
-                bad.stream().map(User::getAsTag).collect(Collectors.joining(" ")),
-                white.stream().map(User::getAsTag).collect(Collectors.joining(" "))
+                getAsTag.apply(good), getAsTag.apply(bad), getAsTag.apply(white)
             ), false)
             .addField("内容", message.getContentRaw().length() < MessageEmbed.VALUE_MAX_LENGTH
                 ? message.getContentRaw()
@@ -268,8 +263,9 @@ public class Event_MeetingVote extends ListenerAdapter {
             .addField("対象メッセージURL", message.getJumpUrl(), false)
             .addField("投票開始日時", message.getTimeCreated().format(DATETIME_FORMAT), false)
             .setColor(Color.GREEN)
-            .setTimestamp(Instant.now());
-        message.replyEmbeds(embed.build()).queue();
+            .setTimestamp(Instant.now())
+            .build()
+        ).queue();
         message.unpin().queue();
 
         processCityRequest(message, true);
@@ -331,6 +327,21 @@ public class Event_MeetingVote extends ListenerAdapter {
         }
     }
 
+    private final Function<JSONArray, List<String>> getApprovalFlowBuilder = corners -> new LinkedList<>() {{
+        add("サーバにログインします。");
+        add("鯖内でコマンドを実行: `//sel poly`");
+        for (int i = 0; i < corners.length(); i++) {
+            JSONObject corner = corners.getJSONObject(i);
+            add("鯖内でコマンドを実行: `/tp %d 100 %d`".formatted(corner.getInt("x"), corner.getInt("z")));
+            if (i == 0)
+                add("鯖内でコマンドを実行: `//pos1`");
+            else
+                add("鯖内でコマンドを実行: `//pos2`");
+        }
+        add("鯖内でコマンドを実行: `//expand vert`");
+    }};
+
+
     /**
      * 自治体新規登録リクエスト処理
      */
@@ -361,20 +372,7 @@ public class Event_MeetingVote extends ListenerAdapter {
             }
 
             if (approval) {
-                List<String> approvalFlowBuilder = new LinkedList<>();
-                approvalFlowBuilder.add("サーバにログインします。");
-                approvalFlowBuilder.add("鯖内でコマンドを実行: `//sel poly`");
-                for (int i = 0; i < corners.length(); i++) {
-                    JSONObject corner = corners.getJSONObject(i);
-                    approvalFlowBuilder
-                        .add("鯖内でコマンドを実行: `/tp %d 100 %d`".formatted(corner.getInt("x"), corner.getInt("z")));
-                    if (i == 0) {
-                        approvalFlowBuilder.add("鯖内でコマンドを実行: `//pos1`");
-                    } else {
-                        approvalFlowBuilder.add("鯖内でコマンドを実行: `//pos2`");
-                    }
-                }
-                approvalFlowBuilder.add("鯖内でコマンドを実行: `//expand vert`");
+                List<String> approvalFlowBuilder = getApprovalFlowBuilder.apply(corners);
                 approvalFlowBuilder.add("鯖内でコマンドを実行: `/rg define %s %s`".formatted(regionName, regionOwner));
                 approvalFlowBuilder.add("<#597423467796758529>内でコマンド「`/approvalcity create %d`」を実行".formatted(id));
 
@@ -433,20 +431,7 @@ public class Event_MeetingVote extends ListenerAdapter {
             String regionName = getRegionName(conn, citiesId);
 
             if (approval) {
-                List<String> approvalFlowBuilder = new LinkedList<>();
-                approvalFlowBuilder.add("サーバにログインします。");
-                approvalFlowBuilder.add("鯖内でコマンドを実行: `//sel poly`");
-                for (int i = 0; i < corners.length(); i++) {
-                    JSONObject corner = corners.getJSONObject(i);
-                    approvalFlowBuilder
-                        .add("鯖内でコマンドを実行: `/tp %d 100 %d`".formatted(corner.getInt("x"), corner.getInt("z")));
-                    if (i == 0) {
-                        approvalFlowBuilder.add("鯖内でコマンドを実行: `//pos1`");
-                    } else {
-                        approvalFlowBuilder.add("鯖内でコマンドを実行: `//pos2`");
-                    }
-                }
-                approvalFlowBuilder.add("鯖内でコマンドを実行: `//expand vert`");
+                List<String> approvalFlowBuilder = getApprovalFlowBuilder.apply(corners);
                 approvalFlowBuilder.add("鯖内でコマンドを実行: `/rg redefine %s`".formatted(regionName));
                 approvalFlowBuilder.add("<#597423467796758529>内でコマンド「`/approvalcity corners %d`」を実行してください。".formatted(id));
 
@@ -463,7 +448,10 @@ public class Event_MeetingVote extends ListenerAdapter {
                         String.join("\n", approvalFlows)
                     )).queue();
             } else {
-                cityRequest.sendMessage("<@%s> 自治体「`%s` (%d)」の自治体範囲変更申請を**否認**しました。(リクエストID: %d)".formatted(discordUserID, citiesName, citiesId, id)).queue();
+                cityRequest.sendMessage(
+                    "<@%s> 自治体「`%s` (%d)」の自治体範囲変更申請を**否認**しました。(リクエストID: %d)".formatted(
+                        discordUserID, citiesName, citiesId, id
+                    )).queue();
 
                 try (PreparedStatement stmt = conn
                     .prepareStatement("UPDATE cities_corners_waiting SET status = ? WHERE id = ?")) {
@@ -534,7 +522,6 @@ public class Event_MeetingVote extends ListenerAdapter {
             String citiesName = getCitiesName(conn, citiesId);
 
             if (approval) {
-
                 meeting.sendMessage("自治体情報更新のため、次のSQLが実行されました: `%s` (%s)".formatted(
                     "UPDATE cities SET " + String.join(", ", pre_sql) + " WHERE id = ?",
                     setStrings.stream().map("`%s`"::formatted).collect(Collectors.joining(", "))
@@ -563,18 +550,16 @@ public class Event_MeetingVote extends ListenerAdapter {
         }
     }
 
-    /**
-     * 自治体 ID から自治体所有者の Discord user id を取得
-     */
-    private String getDiscordUserID(Connection conn, int cities_id) {
+    private final BiFunction<String, Integer, String> getStringFromCitiesRecord = (str, cities_id) -> {
         try {
-            try (PreparedStatement stmt = conn
-                .prepareStatement("SELECT * FROM cities WHERE id = ?")) {
+            try (PreparedStatement stmt =
+                     JavajaotanData
+                         .getMainMySQLDBManager()
+                         .getConnection()
+                         .prepareStatement("SELECT * FROM cities WHERE id = ?")) {
                 stmt.setInt(1, cities_id);
                 try (ResultSet res = stmt.executeQuery()) {
-                    if (!res.next()) {
-                        return null;
-                    }
+                    if (!res.next()) return null;
 
                     return res.getString("discord_userid");
                 }
@@ -583,50 +568,27 @@ public class Event_MeetingVote extends ListenerAdapter {
             e.printStackTrace();
             return null;
         }
+    };
+
+    /**
+     * 自治体 ID から自治体所有者の Discord user id を取得
+     */
+    private String getDiscordUserID(Connection conn, int cities_id) {
+        return getStringFromCitiesRecord.apply("discord_userid",cities_id);
     }
 
     /**
      * 自治体 ID から自治体名を取得
      */
     private String getCitiesName(Connection conn, int cities_id) {
-        try {
-            try (PreparedStatement stmt = conn
-                .prepareStatement("SELECT * FROM cities WHERE id = ?")) {
-                stmt.setInt(1, cities_id);
-                try (ResultSet res = stmt.executeQuery()) {
-                    if (!res.next()) {
-                        return null;
-                    }
-
-                    return res.getString("name");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return getStringFromCitiesRecord.apply("name",cities_id);
     }
 
     /**
      * 自治体 ID から自治体保護名を取得
      */
     private String getRegionName(Connection conn, int cities_id) {
-        try {
-            try (PreparedStatement stmt = conn
-                .prepareStatement("SELECT * FROM cities WHERE id = ?")) {
-                stmt.setInt(1, cities_id);
-                try (ResultSet res = stmt.executeQuery()) {
-                    if (!res.next()) {
-                        return null;
-                    }
-
-                    return res.getString("regionname");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return getStringFromCitiesRecord.apply("regionname",cities_id);
     }
 
     enum DisapprovalReason {
@@ -643,10 +605,11 @@ public class Event_MeetingVote extends ListenerAdapter {
         // 一度リマインドしたらそれ以降はリマインドしないこと
         // リマインドの判定は絵文字？
         List<User> remindUsers = message.retrieveReactionUsers(REMIND_EMOJI).complete();
-        if (remindUsers.stream().anyMatch(u -> u.getIdLong() == Main.getJDA().getSelfUser().getIdLong())) {
-            // リマインド済み
-            return;
-        }
+
+        // リマインド済み
+        if (remindUsers.stream()
+            .anyMatch(u -> u.getIdLong() == Main.getJDA().getSelfUser().getIdLong())) return;
+
         String non_voters_mention = AdminAndModerators.stream()
             .filter(uid -> good.stream().noneMatch(u -> u.getIdLong() == uid))
             .filter(uid -> bad.stream().noneMatch(u -> u.getIdLong() == uid))
@@ -685,22 +648,18 @@ public class Event_MeetingVote extends ListenerAdapter {
      * メッセージテキストと白票数から投票ボーダーを算出
      */
     int getVoteBorderFromContent(String content, int white_count) {
-        Pattern p = Pattern.compile("\\[Border:([0-9]+)]");
-        Matcher m = p.matcher(content);
-        if (m.find() && JavajaotanLibrary.isInt(m.group(1))) {
+        Matcher m = Pattern.compile("\\[Border:([0-9]+)]").matcher(content);
+
+        if (m.find() && JavajaotanLibrary.isInt(m.group(1)))
             return Integer.parseInt(m.group(1));
-        } else {
+        else
             return getVoteBorder(white_count);
-        }
     }
 
     /**
      * 白票数から投票ボーダーを算出
      */
     int getVoteBorder(int white_count) {
-        int admin_and_moderators = AdminAndModerators.size();
-        admin_and_moderators = admin_and_moderators - white_count;
-
-        return (admin_and_moderators / 2) + 1;
+        return ((AdminAndModerators.size() - white_count) / 2) + 1;
     }
 }

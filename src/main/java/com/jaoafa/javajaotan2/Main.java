@@ -60,15 +60,13 @@ public class Main {
     static boolean isGuildDevelopMode = false;
     static long developUserId;
     static long developGuildId;
-    static Logger logger;
+    static Logger logger = LoggerFactory.getLogger("Javajaotan2");
     static JavajaotanConfig config;
     static JDA jda;
     static JSONArray commands;
     static WatchEmojis watchEmojis;
 
     public static void main(String[] args) {
-        logger = LoggerFactory.getLogger("Javajaotan2");
-
         isUserDevelopMode = new File("../build.json").exists();
         if (isUserDevelopMode) {
             try {
@@ -483,6 +481,10 @@ public class Main {
 
     public static JavajaotanConfig getConfig() {
         return config;
+    }
+
+    public static void setConfig(JavajaotanConfig config) {
+        Main.config = config;
     }
 
     public static JDA getJDA() {

@@ -24,6 +24,8 @@ public class JavajaotanConfig {
     final Logger logger;
     String token;
     long guild_id;
+    String gcp_key;
+    String customSearchCX;
 
     public JavajaotanConfig() throws RuntimeException {
         logger = Main.getLogger();
@@ -44,6 +46,8 @@ public class JavajaotanConfig {
             // - 設定項目の取得
             token = config.getString("token");
             guild_id = config.optLong("guild_id", 597378876556967936L);
+            gcp_key = config.optString("gcp_key", null);
+            customSearchCX = config.optString("customSearchCX", null);
 
             // -- データベース関連
             if (config.has("main_database")) {
@@ -104,5 +108,13 @@ public class JavajaotanConfig {
 
     public long getGuildId() {
         return guild_id;
+    }
+
+    public String getGCPKey() {
+        return gcp_key;
+    }
+
+    public String getCustomSearchCX() {
+        return customSearchCX;
     }
 }

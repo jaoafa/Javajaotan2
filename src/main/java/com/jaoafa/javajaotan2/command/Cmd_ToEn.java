@@ -49,7 +49,7 @@ public class Cmd_ToEn implements CommandPremise {
         String text = context.get("text");
 
         Translate.TranslateResult result = Translate.translate(
-            Translate.Language.AUTO,
+            Translate.Language.UNKNOWN,
             Translate.Language.EN,
             text
         );

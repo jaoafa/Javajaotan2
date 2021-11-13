@@ -49,7 +49,7 @@ public class Cmd_ToZh implements CommandPremise {
         String text = context.get("text");
 
         Translate.TranslateResult result = Translate.translate(
-            Translate.Language.AUTO,
+            Translate.Language.UNKNOWN,
             Translate.Language.ZH,
             text
         );

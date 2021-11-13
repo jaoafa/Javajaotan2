@@ -78,11 +78,11 @@ public class Cmd_ToEnJa implements CommandPremise {
         EmbedBuilder embed = new EmbedBuilder()
             .setTitle("翻訳が成功しました:clap:")
             .addField("`%s` -> `%s`".formatted(result1.from().toString(), lang1.toString()),
-                "```%s```".formatted(text),
-                false)
+                "```%s```".formatted(result1.result()),
+                true)
             .addField("`%s` -> `%s`".formatted(lang1.toString(), lang2.toString()),
-                "```%s```".formatted(text),
-                false)
+                "```%s```".formatted(result2.result()),
+                true)
             .setColor(Color.PINK)
             .setTimestamp(Instant.now());
         message.replyEmbeds(embed.build()).queue();

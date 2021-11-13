@@ -39,12 +39,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Cmd_Search implements CommandPremise {
+public class Cmd_SearchImg implements CommandPremise {
     @Override
     public JavajaotanCommand.Detail details() {
         return new JavajaotanCommand.Detail(
-            "search",
-            "Google検索を用いて検索を行います。"
+            "searchimg",
+            "Google検索を用いて画像の検索を行います。"
         );
     }
 
@@ -52,7 +52,7 @@ public class Cmd_Search implements CommandPremise {
     public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
         return new JavajaotanCommand.Cmd(
             builder
-                .meta(CommandMeta.DESCRIPTION, "Google検索を用いて検索を行います。")
+                .meta(CommandMeta.DESCRIPTION, "Google検索を用いて画像の検索を行います。")
                 .argument(StringArgument.greedy("text"))
                 .handler(context -> execute(context, this::search))
                 .build()
@@ -73,25 +73,28 @@ public class Cmd_Search implements CommandPremise {
             return;
         }
         EmbedBuilder embed = new EmbedBuilder()
-            .setTitle("「%s」の検索結果".formatted(text))
+            .setTitle("「%s」の画像検索結果".formatted(text))
             .setDescription("検索時間: %s, 累計件数: %s".formatted(result.searchTime(), result.totalResult()))
             .setColor(Color.GREEN)
             .setTimestamp(Instant.now());
         for (SearchResultItem item : result.items()) {
             embed.addField(
                 decode(item.htmlTitle().replaceAll("</?b>", "**")),
-                decode(item.htmlSnippet().replaceAll("</?b>", "**")),
+                "%s\nFrom %s".formatted(item.imageUrl(), item.link()),
                 false
             );
-            if (embed.getFields().size() >= 5) {
+            if (embed.getFields().size() >= 3) {
                 break;
             }
+        }
+        if (result.items().size() > 0) {
+            embed.setImage(result.items().get(0).imageUrl());
         }
         message.replyEmbeds(embed.build()).queue();
     }
 
     SearchResult customSearch(String gcpKey, String cx, String text) {
-        String url = "https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s".formatted(gcpKey, cx, text);
+        String url = "https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&searchType=image".formatted(gcpKey, cx, text);
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder().url(url).build();
@@ -111,8 +114,7 @@ public class Cmd_Search implements CommandPremise {
                     item.getString("title"),
                     item.getString("htmlTitle"),
                     item.getString("link"),
-                    item.getString("htmlFormattedUrl"),
-                    item.getString("htmlSnippet")
+                    item.getJSONObject("image").getString("contextLink")
                 ));
             }
             return new SearchResult(
@@ -167,9 +169,8 @@ public class Cmd_Search implements CommandPremise {
     record SearchResultItem(
         String title,
         String htmlTitle,
-        String link,
-        String htmlLink,
-        String htmlSnippet
+        String imageUrl,
+        String link
     ) {
     }
 }

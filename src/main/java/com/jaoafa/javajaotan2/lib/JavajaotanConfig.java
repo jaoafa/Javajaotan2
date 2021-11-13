@@ -46,7 +46,7 @@ public class JavajaotanConfig {
             // - 設定項目の取得
             token = config.getString("token");
             guild_id = config.optLong("guild_id", 597378876556967936L);
-            gcp_key = config.optString("gcp_kep", null);
+            gcp_key = config.optString("gcp_key", null);
             customSearchCX = config.optString("customSearchCX", null);
 
             // -- データベース関連

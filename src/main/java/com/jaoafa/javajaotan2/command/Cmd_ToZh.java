@@ -18,6 +18,7 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.Translate;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -47,11 +48,12 @@ public class Cmd_ToZh implements CommandPremise {
 
     private void translateZh(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
         String text = context.get("text");
+        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
 
         Translate.TranslateResult result = Translate.translate(
             Translate.Language.UNKNOWN,
             Translate.Language.ZH,
-            text
+            displayText
         );
         if (result == null) {
             message.reply("翻訳に失敗しました。").queue();

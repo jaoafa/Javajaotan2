@@ -18,6 +18,7 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.Translate;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -54,6 +55,7 @@ public class Cmd_Translate implements CommandPremise {
         String from_raw = context.get("from");
         String to_raw = context.get("to");
         String text = context.get("text");
+        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
 
         Translate.Language from = Translate.getLanguage(from_raw);
         Translate.Language to = Translate.getLanguage(to_raw);
@@ -63,7 +65,7 @@ public class Cmd_Translate implements CommandPremise {
             return;
         }
 
-        Translate.TranslateResult result = Translate.translate(from, to, text);
+        Translate.TranslateResult result = Translate.translate(from, to, displayText);
         if (result == null) {
             message.reply("翻訳に失敗しました。").queue();
             return;

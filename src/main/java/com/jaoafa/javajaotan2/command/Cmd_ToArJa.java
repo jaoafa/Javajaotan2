@@ -18,6 +18,7 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.Translate;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -51,6 +52,7 @@ public class Cmd_ToArJa implements CommandPremise {
 
     private void translateArJa(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
         String text = context.get("text");
+        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
 
         Translate.Language lang1 = Translate.Language.AR;
         Translate.Language lang2 = Translate.Language.JA;
@@ -58,7 +60,7 @@ public class Cmd_ToArJa implements CommandPremise {
         Translate.TranslateResult result1 = Translate.translate(
             Translate.Language.UNKNOWN,
             lang1,
-            text
+            displayText
         );
         if (result1 == null) {
             message.reply("翻訳に失敗しました。").queue();
@@ -68,7 +70,7 @@ public class Cmd_ToArJa implements CommandPremise {
         Translate.TranslateResult result2 = Translate.translate(
             lang1,
             lang2,
-            text
+            result1.result()
         );
         if (result2 == null) {
             message.reply("翻訳に失敗しました。").queue();

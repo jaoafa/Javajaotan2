@@ -18,6 +18,7 @@ import cloud.commandframework.jda.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
 import com.jaoafa.javajaotan2.lib.CommandPremise;
 import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.Translate;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -28,8 +29,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Cmd_ToRandJa implements CommandPremise {
     @Override
@@ -54,14 +57,19 @@ public class Cmd_ToRandJa implements CommandPremise {
 
     private void translateRandJa(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
         String text = context.get("text");
+        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
 
-        Translate.Language lang1 = Translate.Language.values()[new Random().nextInt(Translate.Language.values().length)];
+        List<Translate.Language> ignoreAutoUnknown = Arrays.stream(Translate.Language.values())
+            .filter(l -> l != Translate.Language.AUTO)
+            .filter(l -> l != Translate.Language.UNKNOWN)
+            .collect(Collectors.toList());
+        Translate.Language lang1 = ignoreAutoUnknown.get(new Random().nextInt(ignoreAutoUnknown.size()));
         Translate.Language lang2 = Translate.Language.JA;
 
         Translate.TranslateResult result1 = Translate.translate(
             Translate.Language.UNKNOWN,
             lang1,
-            text
+            displayText
         );
         if (result1 == null) {
             message.reply("翻訳に失敗しました。").queue();
@@ -71,7 +79,7 @@ public class Cmd_ToRandJa implements CommandPremise {
         Translate.TranslateResult result2 = Translate.translate(
             lang1,
             lang2,
-            text
+            result1.result()
         );
         if (result2 == null) {
             message.reply("翻訳に失敗しました。").queue();

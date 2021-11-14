@@ -11,12 +11,12 @@
 
 package com.jaoafa.javajaotan2.lib;
 
-import net.dv8tion.jda.api.entities.ISnowflake;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JavajaotanLibrary {
     /**
@@ -91,5 +91,30 @@ public class JavajaotanLibrary {
             .stream()
             .map(ISnowflake::getIdLong)
             .anyMatch(i -> role.getIdLong() == i);
+    }
+
+    public static String getContentDisplay(Message message, String raw) {
+        String tmp = raw;
+        for (User user : message.getMentionedUsers()) {
+            String name;
+            if (message.isFromGuild() && message.getGuild().isMember(user)) {
+                Member member = message.getGuild().getMember(user);
+                assert member != null;
+                name = member.getEffectiveName();
+            } else {
+                name = user.getName();
+            }
+            tmp = tmp.replaceAll("<@!?" + Pattern.quote(user.getId()) + '>', '@' + Matcher.quoteReplacement(name));
+        }
+        for (Emote emote : message.getEmotes()) {
+            tmp = tmp.replace(emote.getAsMention(), ":" + emote.getName() + ":");
+        }
+        for (TextChannel mentionedChannel : message.getMentionedChannels()) {
+            tmp = tmp.replace(mentionedChannel.getAsMention(), '#' + mentionedChannel.getName());
+        }
+        for (Role mentionedRole : message.getMentionedRoles()) {
+            tmp = tmp.replace(mentionedRole.getAsMention(), '@' + mentionedRole.getName());
+        }
+        return tmp;
     }
 }

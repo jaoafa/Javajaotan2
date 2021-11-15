@@ -43,6 +43,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -76,6 +79,7 @@ import java.util.stream.Collectors;
  */
 public class Event_MeetingVote extends ListenerAdapter {
     Logger logger = null;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     TextChannel meeting;
     TextChannel cityRequest;
 
@@ -190,7 +194,21 @@ public class Event_MeetingVote extends ListenerAdapter {
         Message message = event.retrieveMessage().complete();
         if (VoteReaction.multipleVote(message, user)) {
             event.getReaction().removeReaction(user).queue();
-            event.getChannel().sendMessage(user.getAsMention() + ", 賛成・反対・白票はいずれか一つのみリアクションしてください！変更する場合はすでにつけているリアクションを外してからリアクションしてください。").queue();
+            Message replyMessage = new MessageBuilder()
+                .setContent(user.getAsMention())
+                .setEmbeds(new EmbedBuilder()
+                    .setDescription("賛成・反対・白票はいずれか一つのみリアクションしてください！変更する場合はすでにつけているリアクションを外してからリアクションしてください。")
+                    .setFooter("このメッセージは1分で削除されます")
+                    .build())
+                .build();
+            event
+                .getChannel()
+                .sendMessage(replyMessage)
+                .reference(message)
+                .mentionRepliedUser(false)
+                .delay(1, TimeUnit.MINUTES, scheduler) // delete 1 minute later
+                .flatMap(Message::delete)
+                .queue();
             return;
         }
 

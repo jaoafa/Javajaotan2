@@ -40,10 +40,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -77,17 +79,10 @@ import java.util.stream.Collectors;
  */
 public class Event_MeetingVote extends ListenerAdapter {
     Logger logger = null;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     TextChannel meeting;
     TextChannel cityRequest;
 
-    /** 賛成リアクション絵文字 */
-    static final String GOOD_EMOJI = "\uD83D\uDC4D";
-    /** 反対リアクション絵文字 */
-    static final String BAD_EMOJI = "\uD83D\uDC4E";
-    /** 白票リアクション絵文字 */
-    static final String WHITE_EMOJI = "\uD83C\uDFF3";
-    /** リマインド済みリアクション絵文字 */
-    static final String REMIND_EMOJI = "\uD83D\uDCF3";
     /** Admin と Moderator の定義 */
     static final List<Long> AdminAndModerators = List.of(
         206692134991036416L, // zakuro
@@ -126,11 +121,8 @@ public class Event_MeetingVote extends ListenerAdapter {
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
-
         if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
-
         if (event.getAuthor().isBot()) return;
-
         if (event.getMember() == null) return;
 
         Member member = event.getMember();
@@ -139,7 +131,6 @@ public class Event_MeetingVote extends ListenerAdapter {
         String content = message.getContentRaw();
 
         if (message.getType() != MessageType.DEFAULT) return;
-
         if (message.isPinned()) return;
 
         if (logger == null) {
@@ -154,9 +145,9 @@ public class Event_MeetingVote extends ListenerAdapter {
             null,
             e -> message.reply("ピン止めに失敗しました: `%s: %s`".formatted(e.getClass().getName(), e.getMessage())).queue()
         );
-        message.addReaction(GOOD_EMOJI).queue();
-        message.addReaction(BAD_EMOJI).queue();
-        message.addReaction(WHITE_EMOJI).queue();
+        VoteReaction.GOOD.addReaction(message);
+        VoteReaction.BAD.addReaction(message);
+        VoteReaction.WHITE.addReaction(message);
 
         ZonedDateTime limit = getVoteLimitDateTime(message);
 
@@ -185,23 +176,41 @@ public class Event_MeetingVote extends ListenerAdapter {
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
-
         if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
 
         User user = event.getUser();
 
         if (user == null) user = event.retrieveUser().complete();
-
         if (user.isBot()) return;
 
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
 
         if (!emote.isEmoji()) return;
-
-        if (!emote.getEmoji().equals(GOOD_EMOJI)
-            && !emote.getEmoji().equals(BAD_EMOJI)
-            && !emote.getEmoji().equals(WHITE_EMOJI))
+        if (!emote.getEmoji().equals(VoteReaction.GOOD.getUnicode())
+            && !emote.getEmoji().equals(VoteReaction.BAD.getUnicode())
+            && !emote.getEmoji().equals(VoteReaction.WHITE.getUnicode()))
             return;
+
+        Message message = event.retrieveMessage().complete();
+        if (VoteReaction.multipleVote(message, user)) {
+            event.getReaction().removeReaction(user).queue();
+            Message replyMessage = new MessageBuilder()
+                .setContent(user.getAsMention())
+                .setEmbeds(new EmbedBuilder()
+                    .setDescription("賛成・反対・白票はいずれか一つのみリアクションしてください！変更する場合はすでにつけているリアクションを外してからリアクションしてください。")
+                    .setFooter("このメッセージは1分で削除されます")
+                    .build())
+                .build();
+            event
+                .getChannel()
+                .sendMessage(replyMessage)
+                .reference(message)
+                .mentionRepliedUser(false)
+                .delay(1, TimeUnit.MINUTES, scheduler) // delete 1 minute later
+                .flatMap(Message::delete)
+                .queue();
+            return;
+        }
 
         processVotes();
     }
@@ -218,14 +227,9 @@ public class Event_MeetingVote extends ListenerAdapter {
         }
 
         for (Message message : channel.retrievePinnedMessages().complete()) {
-            Function<String, List<User>> getUsers = emoji ->
-                Optional.ofNullable(
-                    message.retrieveReactionUsers(emoji).complete()
-                ).orElse(new ArrayList<>()).stream().filter(u -> !u.isBot()).collect(Collectors.toList());
-
-            List<User> good = getUsers.apply(GOOD_EMOJI);
-            List<User> bad = getUsers.apply(BAD_EMOJI);
-            List<User> white = getUsers.apply(WHITE_EMOJI);
+            List<User> good = VoteReaction.GOOD.getUsers(message);
+            List<User> bad = VoteReaction.BAD.getUsers(message);
+            List<User> white = VoteReaction.WHITE.getUsers(message);
 
             // ・過半数が賛成の場合は承認、反対の場合は否認する
             int border = getVoteBorderFromContent(message.getContentRaw(), white.size());
@@ -437,9 +441,9 @@ public class Event_MeetingVote extends ListenerAdapter {
                 }
             }
 
-            String discordUserID = getDiscordUserID(conn, citiesId);
-            String citiesName = getCitiesName(conn, citiesId);
-            String regionName = getRegionName(conn, citiesId);
+            String discordUserID = getDiscordUserID(citiesId);
+            String citiesName = getCitiesName(citiesId);
+            String regionName = getRegionName(citiesId);
 
             if (approval) {
                 List<String> approvalFlowBuilder = getApprovalFlowBuilder.apply(corners);
@@ -529,8 +533,8 @@ public class Event_MeetingVote extends ListenerAdapter {
             }
 
 
-            String discordUserID = getDiscordUserID(conn, citiesId);
-            String citiesName = getCitiesName(conn, citiesId);
+            String discordUserID = getDiscordUserID(citiesId);
+            String citiesName = getCitiesName(citiesId);
 
             if (approval) {
                 meeting.sendMessage("自治体情報更新のため、次のSQLが実行されました: `%s` (%s)".formatted(
@@ -561,7 +565,10 @@ public class Event_MeetingVote extends ListenerAdapter {
         }
     }
 
-    private final BiFunction<String, Integer, String> getStringFromCitiesRecord = (str, cities_id) -> {
+    /**
+     * 自治体情報から指定されたカラムにあるデータを取り出します。
+     */
+    private final BiFunction<String, Integer, String> getStringFromCitiesRecord = (column, cities_id) -> {
         try {
             try (PreparedStatement stmt =
                      JavajaotanData
@@ -572,7 +579,7 @@ public class Event_MeetingVote extends ListenerAdapter {
                 try (ResultSet res = stmt.executeQuery()) {
                     if (!res.next()) return null;
 
-                    return res.getString("discord_userid");
+                    return res.getString(column);
                 }
             }
         } catch (SQLException e) {
@@ -584,21 +591,21 @@ public class Event_MeetingVote extends ListenerAdapter {
     /**
      * 自治体 ID から自治体所有者の Discord user id を取得
      */
-    private String getDiscordUserID(Connection conn, int cities_id) {
+    private String getDiscordUserID(int cities_id) {
         return getStringFromCitiesRecord.apply("discord_userid", cities_id);
     }
 
     /**
      * 自治体 ID から自治体名を取得
      */
-    private String getCitiesName(Connection conn, int cities_id) {
+    private String getCitiesName(int cities_id) {
         return getStringFromCitiesRecord.apply("name", cities_id);
     }
 
     /**
      * 自治体 ID から自治体保護名を取得
      */
-    private String getRegionName(Connection conn, int cities_id) {
+    private String getRegionName(int cities_id) {
         return getStringFromCitiesRecord.apply("regionname", cities_id);
     }
 
@@ -615,7 +622,7 @@ public class Event_MeetingVote extends ListenerAdapter {
     void remind(Message message, List<User> good, List<User> bad, List<User> white) {
         // 一度リマインドしたらそれ以降はリマインドしないこと
         // リマインドの判定は絵文字？
-        List<User> remindUsers = message.retrieveReactionUsers(REMIND_EMOJI).complete();
+        List<User> remindUsers = VoteReaction.REMIND.getUsers(message);
 
         // リマインド済み
         if (remindUsers.stream()
@@ -642,7 +649,80 @@ public class Event_MeetingVote extends ListenerAdapter {
             .reference(message)
             .mentionRepliedUser(false)
             .queue();
-        message.addReaction(REMIND_EMOJI).queue();
+        VoteReaction.REMIND.addReaction(message);
+    }
+
+    /** リアクションで使う絵文字群 */
+    enum VoteReaction {
+        GOOD("\uD83D\uDC4D"),
+        BAD("\uD83D\uDC4E"),
+        WHITE("\uD83C\uDFF3"),
+        REMIND("\uD83D\uDCF3");
+
+        String unicode;
+
+        VoteReaction(String unicode) {
+            this.unicode = unicode;
+        }
+
+        public String getUnicode() {
+            return unicode;
+        }
+
+        /**
+         * リアクションを付けます
+         *
+         * @param message メッセージ
+         */
+        public void addReaction(@NotNull Message message) {
+            message.addReaction(getUnicode()).queue();
+        }
+
+        /**
+         * リアクションを付けたユーザーのうち、Botを除外したリストを返します。
+         *
+         * @param message メッセージ
+         *
+         * @return リアクションを付けたユーザーのうち、Botを除外したリスト
+         */
+        public List<User> getUsers(@NotNull Message message) {
+            return message
+                .retrieveReactionUsers(getUnicode())
+                .complete()
+                .stream()
+                .filter(u -> !u.isBot())
+                .collect(Collectors.toList());
+        }
+
+        /**
+         * メッセージにユーザーがリアクションを付けているかを調べます
+         *
+         * @param message メッセージ
+         * @param user    ユーザー
+         *
+         * @return リアクションをつけているか
+         */
+        public boolean isReacted(Message message, User user) {
+            return message
+                .retrieveReactionUsers(getUnicode())
+                .stream()
+                .anyMatch(u -> u.getIdLong() == user.getIdLong());
+        }
+
+        /**
+         * 複数の対象絵文字のリアクションを付けているかを判定します。(リマインド絵文字は除く)
+         *
+         * @param message メッセージ
+         * @param user    ユーザー
+         *
+         * @return 複数の対象絵文字のリアクションを付けているか (リマインド絵文字は除く)
+         */
+        static boolean multipleVote(Message message, User user) {
+            return Arrays.stream(values())
+                .filter(v -> v != REMIND)
+                .filter(v -> v.isReacted(message, user))
+                .count() > 1;
+        }
     }
 
     /**

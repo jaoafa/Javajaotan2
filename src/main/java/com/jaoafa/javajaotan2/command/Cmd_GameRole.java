@@ -66,12 +66,6 @@ public class Cmd_GameRole implements CommandPremise {
                 .handler(context -> execute(context, this::renameRole))
                 .build(),
             builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールを削除します。（CommunityRegular以上のみ使用可能）")
-                .literal("remove", "delete", "del", "rem")
-                .argument(StringArgument.greedy("name"))
-                .handler(context -> execute(context, this::takeGameRole))
-                .build(),
-            builder
                 .meta(CommandMeta.DESCRIPTION, "自分にゲームロールを付与します。")
                 .literal("give", "join")
                 .argument(StringArgument.greedy("name"))

@@ -30,9 +30,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 public class Cmd_GameRole implements CommandPremise {
     Path path = Path.of("gameRoles.json");
+    long SERVER_ID = 597378876556967936L;
+    long GAME_ROLE_BORDER_ID = 911556139496374293L;
 
     @Override
     public JavajaotanCommand.Detail details() {
@@ -81,11 +84,11 @@ public class Cmd_GameRole implements CommandPremise {
     }
 
     private void newGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (guild.getIdLong() != 597378876556967936L) {
+        if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
         }
-        Role gameRole = guild.getRoleById(911556139496374293L);
+        Role gameRole = guild.getRoleById(GAME_ROLE_BORDER_ID);
         if (gameRole == null) {
             message.reply("基準ゲームロールが見つからないため、このコマンドを実行できません。運営にお問い合わせください。").queue();
         }
@@ -102,11 +105,11 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("同一名のロールがあるため、作成できません。").queue();
             return;
         }
-        addGameRole(message, gameRole, roleName);
+        addGameRole(message, roleName);
     }
 
     private void changeColor(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (guild.getIdLong() != 597378876556967936L) {
+        if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
         }
@@ -144,7 +147,7 @@ public class Cmd_GameRole implements CommandPremise {
     }
 
     private void renameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (guild.getIdLong() != 597378876556967936L) {
+        if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
         }
@@ -177,7 +180,7 @@ public class Cmd_GameRole implements CommandPremise {
     }
 
     private void giveGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (guild.getIdLong() != 597378876556967936L) {
+        if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
         }
@@ -198,7 +201,7 @@ public class Cmd_GameRole implements CommandPremise {
         }
         guild.addRoleToMember(member, role).queue(
             tmp -> message.reply(
-                "ゲームロール `%s` を付与しました。解除(剥奪)するには `/gamerule take %s` で可能です。".formatted(
+                "ゲームロール `%s` を付与しました。解除(剥奪)するには `/gamerole take %s` で可能です。".formatted(
                     role.getName(),
                     role.getName()
                 )
@@ -210,7 +213,7 @@ public class Cmd_GameRole implements CommandPremise {
     }
 
     private void takeGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        if (guild.getIdLong() != 597378876556967936L) {
+        if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
         }
@@ -241,7 +244,7 @@ public class Cmd_GameRole implements CommandPremise {
         );
     }
 
-    private void addGameRole(Message message, Role gameRole, String name) {
+    private void addGameRole(Message message, String name) {
         Guild guild = message.getGuild();
         JSONArray roles;
         try {
@@ -260,7 +263,11 @@ public class Cmd_GameRole implements CommandPremise {
             .setPermissions(0L)
             .queue(
                 role -> {
-                    guild.modifyRolePositions().selectPosition(role).moveTo(gameRole.getPosition() + 1).queue();
+                    guild
+                        .modifyRolePositions()
+                        .selectPosition(role)
+                        .moveTo(Objects.requireNonNull(guild.getRoleById(GAME_ROLE_BORDER_ID)).getPosition() - 1)
+                        .queue();
 
                     message.reply(
                         "ロールの作成に成功しました: %s\nゲームを所持している場合は `/gamerole join %s` で自分にロールを付与しましょう！".formatted(

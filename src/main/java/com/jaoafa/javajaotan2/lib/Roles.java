@@ -18,6 +18,7 @@ public enum Roles {
     Admin(597405109290532864L),
     Moderator(597405110683041793L),
     Regular(597405176189419554L),
+    CommunityRegular(888150763421970492L),
     Verified(597405176969560064L),
     MinecraftConnected(604011598952136853L),
     MailVerified(597421078817669121L),

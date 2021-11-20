@@ -270,7 +270,7 @@ public class Cmd_GameRole implements CommandPremise {
                         .queue();
 
                     message.reply(
-                        "ロールの作成に成功しました: %s\nゲームを所持している場合は `/gamerole join %s` で自分にロールを付与しましょう！".formatted(
+                        "ロールの作成に成功しました: %s\nゲームを所持している場合は `/gamerole give %s` で自分にロールを付与しましょう！".formatted(
                             role.getAsMention(),
                             role.getName()
                         )).queue();

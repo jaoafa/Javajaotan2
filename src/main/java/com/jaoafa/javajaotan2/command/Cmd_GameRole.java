@@ -102,7 +102,7 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("同一名のロールがあるため、作成できません。").queue();
             return;
         }
-        addGameRole(message, roleName);
+        addGameRole(message, gameRole, roleName);
     }
 
     private void changeColor(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
@@ -241,7 +241,8 @@ public class Cmd_GameRole implements CommandPremise {
         );
     }
 
-    private void addGameRole(Message message, String name) {
+    private void addGameRole(Message message, Role gameRole, String name) {
+        Guild guild = message.getGuild();
         JSONArray roles;
         try {
             roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();
@@ -252,13 +253,15 @@ public class Cmd_GameRole implements CommandPremise {
             ).queue();
             return;
         }
-        message
-            .getGuild()
+        guild
             .createRole()
             .setName(name)
             .setMentionable(true)
+            .setPermissions(0L)
             .queue(
                 role -> {
+                    guild.modifyRolePositions().selectPosition(role).moveTo(gameRole.getPosition() + 1).queue();
+
                     message.reply(
                         "ロールの作成に成功しました: %s\nゲームを所持している場合は `/gamerole join %s` で自分にロールを付与しましょう！".formatted(
                             role.getAsMention(),

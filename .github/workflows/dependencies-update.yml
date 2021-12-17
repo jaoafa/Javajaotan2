@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Update dependencies
-        uses: book000/pomxml-dep-update@v1.0.0
+        uses: book000/pomxml-dep-update@v1.0.1
         with:
           pom-path: pom.xml
 
@@ -52,8 +52,9 @@ jobs:
       - name: Is modified
         id: is-modified
         run: |
-          git status | grep modified
-          echo "::set-output name=modified::`echo $?`"
+          MODIFIED=`git status | grep modified ; echo $? ; true`
+          echo $MODIFIED
+          echo "::set-output name=modified::`echo $MODIFIED`"
 
       - name: Create pull request
         if: ${{ steps.is-modified.outputs.modified == '0' }}

@@ -40,6 +40,7 @@ jobs:
         uses: book000/pomxml-dep-update@v1.0.4
         with:
           pom-path: pom.xml
+          ignore-packages: com.squareup.okhttp3.okhttp
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml

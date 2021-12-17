@@ -96,12 +96,12 @@ public class Cmd_WatchEmoji implements CommandPremise {
             return;
         }
 
-        if (!selfMember.hasPermission(log_guild_channel, Permission.MESSAGE_WRITE)) {
+        if (!selfMember.hasPermission(log_guild_channel, Permission.MESSAGE_SEND)) {
             message.reply("このコマンドを実行するには、jaotanがログチャンネルへの書き込み権限を持っている必要があります。").queue();
             return;
         }
 
-        if (!selfMember.hasPermission(list_guild_channel, Permission.MESSAGE_WRITE)) {
+        if (!selfMember.hasPermission(list_guild_channel, Permission.MESSAGE_SEND)) {
             message.reply("このコマンドを実行するには、jaotanがリストチャンネルへの書き込み権限を持っている必要があります。").queue();
             return;
         }

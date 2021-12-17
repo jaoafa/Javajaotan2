@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Update dependencies
-        uses: book000/pomxml-dep-update@v1.0.3
+        uses: book000/pomxml-dep-update@v1.0.4
         with:
           pom-path: pom.xml
 

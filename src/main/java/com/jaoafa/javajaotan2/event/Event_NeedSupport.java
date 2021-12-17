@@ -14,7 +14,7 @@ package com.jaoafa.javajaotan2.event;
 import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
  */
 public class Event_NeedSupport extends ListenerAdapter {
     @Override
-    public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         JDA jda = event.getJDA();
         Guild guild = event.getGuild();
         Message message = event.getMessage();

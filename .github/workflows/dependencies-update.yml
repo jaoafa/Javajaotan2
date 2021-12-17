@@ -1,6 +1,12 @@
 name: Update dependencies packages
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      exec-from:
+        description: "The project/user to execute from"
+        required: false
+        default: None
 
 jobs:
   update:
@@ -31,11 +37,9 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Update dependencies
-        id: update-dependencies
-        run: |
-          mvn versions:display-dependency-updates
-          mvn versions:display-dependency-updates | tee ../dependency-updates.md
-          mvn versions:use-next-releases
+        uses: book000/pomxml-dep-update@v1.0.0
+        with:
+          pom-path: pom.xml
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
@@ -58,10 +62,7 @@ jobs:
           hub commit -m "chore: Update dependencies packages"
           hub push --set-upstream origin dependencies-update-${{ steps.date.outputs.date }}
           echo -e "Update dependencies packages\n\n" > description.md
-          echo "\`\`\`" >> description.md
-          cat ../dependency-updates.md >> description.md
-          echo "\`\`\`" >> description.md
-
-          hub pull-request -b master -F description.md -r book000
+          echo "Executed from ${{ github.event.inputs.exec-from }}" >> description.md
+          hub pull-request -b master -F description.md -r ${{ github.event.sender.login }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

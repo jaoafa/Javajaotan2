@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -92,7 +92,6 @@ public class Event_MeetingVote extends ListenerAdapter {
         189377054955798528L, // ekusas
         189372008147058688L, // zokasu
         315726390844719114L, // kohona
-        290787709721509890L, // nudonge
         310570792691826688L, // ekp
         492088741167366144L // yuua
     );
@@ -659,7 +658,7 @@ public class Event_MeetingVote extends ListenerAdapter {
         WHITE("\uD83C\uDFF3"),
         REMIND("\uD83D\uDCF3");
 
-        String unicode;
+        final String unicode;
 
         VoteReaction(String unicode) {
             this.unicode = unicode;

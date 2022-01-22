@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -52,6 +52,8 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -65,6 +67,7 @@ public class Main {
     static JDA jda;
     static JSONArray commands;
     static WatchEmojis watchEmojis;
+    static ScheduledExecutorService scheduler;
 
     public static void main(String[] args) {
         isUserDevelopMode = new File("../build.json").exists();
@@ -125,6 +128,8 @@ public class Main {
         registerTask();
 
         watchEmojis = new WatchEmojis();
+
+        scheduler = Executors.newSingleThreadScheduledExecutor();
 
         jda.getGuilds().forEach(g -> new InviteLink(g).fetchInvites());
 
@@ -509,5 +514,9 @@ public class Main {
 
     public static WatchEmojis getWatchEmojis() {
         return watchEmojis;
+    }
+
+    public static ScheduledExecutorService getScheduler() {
+        return scheduler;
     }
 }

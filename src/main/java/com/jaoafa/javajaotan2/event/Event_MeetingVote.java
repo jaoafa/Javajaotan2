@@ -43,8 +43,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -79,7 +77,6 @@ import java.util.stream.Collectors;
  */
 public class Event_MeetingVote extends ListenerAdapter {
     Logger logger = null;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     TextChannel meeting;
     TextChannel cityRequest;
 
@@ -205,7 +202,7 @@ public class Event_MeetingVote extends ListenerAdapter {
                 .sendMessage(replyMessage)
                 .reference(message)
                 .mentionRepliedUser(false)
-                .delay(1, TimeUnit.MINUTES, scheduler) // delete 1 minute later
+                .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
                 .flatMap(Message::delete)
                 .queue();
             return;

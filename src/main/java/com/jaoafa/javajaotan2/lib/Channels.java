@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -20,7 +20,8 @@ public enum Channels {
     jaotan(597423444501463040L),
     invite_checker(893166232772161577L),
     c659(621632815599190016L), // 最初を数字にできない…
-    meeting_vote(597423974816808970L);
+    meeting_vote(597423974816808970L),
+    vc_speech_log(927666435336056862L);
 
     private long channel_id;
 

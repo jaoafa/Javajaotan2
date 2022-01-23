@@ -14,6 +14,7 @@ package com.jaoafa.javajaotan2.event;
 import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -41,11 +42,17 @@ public class Event_VCSpeechLogLink extends ListenerAdapter {
         String channelId = match.group(2);
         String messageId = match.group(3);
 
-        if (!channelId.equals("927666435336056862")) {
-            // vc-speech-logではない
-            return;
+        GuildMessageChannel logChannel = null;
+        if (channelId.equals("927666435336056862")) {
+            // #vc-speech-log
+            logChannel = Main.getJDA().getTextChannelById(927666435336056862L);
+            if (logChannel == null) {
+                return;
+            }
+        } else if (channelId.equals("927685488821829653")) {
+            // #vc -> スレッド#発言ログ
+            logChannel = Main.getJDA().getThreadChannelById(927685488821829653L);
         }
-        TextChannel logChannel = Main.getJDA().getTextChannelById(927666435336056862L);
         if (logChannel == null) {
             return;
         }

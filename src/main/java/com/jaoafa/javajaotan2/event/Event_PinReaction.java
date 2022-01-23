@@ -30,7 +30,7 @@ public class Event_PinReaction extends ListenerAdapter {
         if (!reactionEmote.isEmoji()) {
             return;
         }
-        if (!reactionEmote.getAsCodepoints().equals("U+1F4CC")) {
+        if (!reactionEmote.getEmoji().equals("📌")) {
             return;
         }
         if (message.isPinned()) {

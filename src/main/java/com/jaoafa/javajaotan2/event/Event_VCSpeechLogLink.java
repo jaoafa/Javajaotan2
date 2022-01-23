@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -27,6 +28,9 @@ public class Event_VCSpeechLogLink extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        if (!event.isFromType(ChannelType.TEXT)) {
+            return;
+        }
         TextChannel channel = event.getTextChannel();
         Message message = event.getMessage();
         String content = message.getContentRaw();
@@ -49,11 +53,6 @@ public class Event_VCSpeechLogLink extends ListenerAdapter {
         if (logMessage == null) {
             return;
         }
-        channel.sendMessageEmbeds(
-            new EmbedBuilder()
-                .setDescription(logMessage.getContentRaw())
-                .setTimestamp(logMessage.getTimeCreated())
-                .build()
-        ).queue();
+        channel.sendMessageEmbeds(new EmbedBuilder().setDescription(logMessage.getContentRaw()).setTimestamp(logMessage.getTimeCreated()).build()).queue();
     }
 }

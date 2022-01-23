@@ -48,7 +48,7 @@ public class Event_VC_Minerals extends ListenerAdapter {
             }
             boolean isWarn = false;
             for (String word : words) {
-                if (!event.getMessage().getContentRaw().contains(word)) {
+                if (event.getMessage().getContentRaw().contains(word)) {
                     isWarn = true;
                     break;
                 }

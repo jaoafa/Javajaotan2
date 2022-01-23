@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -72,6 +73,9 @@ public class Event_659 extends ListenerAdapter {
             return;
         }
         if (Channels.c659.getChannelId() != event.getChannel().getIdLong()) {
+            return;
+        }
+        if (!event.isFromType(ChannelType.TEXT)) {
             return;
         }
         Member member = event.getMember();

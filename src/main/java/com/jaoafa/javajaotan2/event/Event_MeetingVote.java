@@ -120,6 +120,9 @@ public class Event_MeetingVote extends ListenerAdapter {
         if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
         if (event.getAuthor().isBot()) return;
         if (event.getMember() == null) return;
+        if (!event.isFromType(ChannelType.TEXT)) {
+            return;
+        }
 
         Member member = event.getMember();
         TextChannel channel = event.getTextChannel();

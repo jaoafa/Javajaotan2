@@ -15,10 +15,12 @@ import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Event_PinReaction extends ListenerAdapter {
@@ -36,12 +38,19 @@ public class Event_PinReaction extends ListenerAdapter {
         if (message.isPinned()) {
             return;
         }
+        List<User> users = message.retrieveReactionUsers("📌").complete();
+        if (users.size() < 2) {
+            return;
+        }
+        if (users.stream().anyMatch(user -> event.getJDA().getSelfUser().getIdLong() == user.getIdLong())) {
+            return;
+        }
         Member member = event.getMember();
         if (member == null) {
             return;
         }
         message.pin().queue(
-            null,
+            s -> message.addReaction("📌").queue(),
             e -> event
                 .getChannel()
                 .sendMessage("<@" + member.getId() + "> Failed to pin message: " + e.getMessage())

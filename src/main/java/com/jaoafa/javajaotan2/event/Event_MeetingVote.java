@@ -118,13 +118,9 @@ public class Event_MeetingVote extends ListenerAdapter {
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
         if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
-        if (event.getAuthor().isBot()) return;
-        if (event.getMember() == null) return;
-        if (!event.isFromType(ChannelType.TEXT)) {
-            return;
-        }
+        if (!event.isFromType(ChannelType.TEXT)) return;
 
-        Member member = event.getMember();
+        User author = event.getAuthor();
         TextChannel channel = event.getTextChannel();
         Message message = event.getMessage();
         String content = message.getContentRaw();
@@ -153,7 +149,7 @@ public class Event_MeetingVote extends ListenerAdapter {
         // 新規開始メッセージ
         EmbedBuilder embed = new EmbedBuilder()
             .setTitle(":new: 新しい投票")
-            .setDescription("%s からの新しい審議投票です。".formatted(member.getAsMention()))
+            .setDescription("%s からの新しい審議投票です。".formatted(author.getAsMention()))
             .addField("賛成の場合", "**投票メッセージに対して**:thumbsup:リアクションを付けてください。", false)
             .addField("反対の場合", "**投票メッセージに対して**:thumbsdown:リアクションを付けてください。\n" +
                 "反対の場合は <#597423467796758529> に意見理由を必ず書いてください。", false)

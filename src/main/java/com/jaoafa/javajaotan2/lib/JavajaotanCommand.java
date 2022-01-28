@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -100,9 +100,12 @@ public class JavajaotanCommand {
         }
     }
 
-    public record Cmd(@NonNull Command<JDACommandSender>... commands) {
+    public static class Cmd {
+        Command<JDACommandSender>[] commands;
+
         @SafeVarargs
-        public Cmd {
+        public Cmd(@NonNull Command<JDACommandSender>... commands) {
+            this.commands = commands;
         }
 
         /**

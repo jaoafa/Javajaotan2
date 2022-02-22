@@ -298,7 +298,8 @@ public class Cmd_GameRole implements CommandPremise {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("__**:video_game: ゲームロール一覧 :video_game:**__\n");
-        sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n\n");
+        sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n");
+        sb.append("ロールの剥奪（解除）は運営側では対応しません。`/gamerole take <GAMENAME>`（GAMENAMEはゲーム名）で解除できます。\n\n");
         List<String> usedEmojis = GameRole.getUsedGameEmojis();
         List<String> emoteIds = guild.getEmotes()
             .stream()
@@ -494,7 +495,8 @@ public class Cmd_GameRole implements CommandPremise {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**:video_game: ゲームロール一覧 :video_game:**__\n");
-        sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n\n");
+        sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n");
+        sb.append("ロールの剥奪（解除）は運営側では対応しません。`/gamerole take <GAMENAME>`（GAMENAMEはゲーム名）で解除できます。\n\n");
         List<String> usedEmojis = GameRole.getUsedGameEmojis();
         List<String> emoteIds = guild.getEmotes()
             .stream()

@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -15,27 +15,33 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.jda.JDACommandSender;
+import cloud.commandframework.jda.parsers.RoleArgument;
 import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
-import com.jaoafa.javajaotan2.lib.Roles;
+import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.*;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Cmd_GameRole implements CommandPremise {
-    Path path = Path.of("gameRoles.json");
-    long SERVER_ID = 597378876556967936L;
-    long GAME_ROLE_BORDER_ID = 911556139496374293L;
+    Path path = GameRole.getPath();
+    Path pathMessages = GameRole.getPathMessages();
+    Pattern emojiPattern = GameRole.getEmojiPattern();
+    long SERVER_ID = GameRole.getServerId();
+    long GAME_ROLE_BORDER_ID = GameRole.getGameRoleBorderId();
 
     @Override
     public JavajaotanCommand.Detail details() {
@@ -62,7 +68,7 @@ public class Cmd_GameRole implements CommandPremise {
                 .handler(context -> execute(context, this::changeColor))
                 .build(),
             builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールの色を変更します。（CommunityRegular以上のみ使用可能）")
+                .meta(CommandMeta.DESCRIPTION, "ゲームロールの名前を変更します。（CommunityRegular以上のみ使用可能）")
                 .literal("rename")
                 .argument(StringArgument.quoted("name"))
                 .argument(StringArgument.quoted("newName"))
@@ -79,6 +85,28 @@ public class Cmd_GameRole implements CommandPremise {
                 .literal("take", "leave")
                 .argument(StringArgument.of("name"))
                 .handler(context -> execute(context, this::takeGameRole))
+                .build(),
+            builder
+                .meta(CommandMeta.DESCRIPTION, "ゲームロールメッセージを投稿します。")
+                .literal("message")
+                .literal("post")
+                .handler(context -> execute(context, this::createGameRoleMessage))
+                .build(),
+            builder
+                .meta(CommandMeta.DESCRIPTION, "ゲームロールメッセージを更新します。")
+                .literal("message")
+                .literal("update")
+                .handler(context -> execute(context, this::updateGameRoleMessage))
+                .build(),
+            builder
+                .meta(CommandMeta.DESCRIPTION, "ゲームロールメッセージの絵文字を設定します。")
+                .literal("message")
+                .literal("set-emoji")
+                .argument(RoleArgument.<JDACommandSender>newBuilder("role")
+                    .withParsers(Arrays.stream(RoleArgument.ParserMode.values())
+                        .collect(Collectors.toSet())).build())
+                .argument(StringArgument.of("emojiId"))
+                .handler(context -> execute(context, this::changeGameRoleEmoji))
                 .build()
         );
     }
@@ -106,6 +134,7 @@ public class Cmd_GameRole implements CommandPremise {
             return;
         }
         addGameRole(message, roleName);
+        updateMessages();
     }
 
     private void changeColor(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
@@ -177,6 +206,7 @@ public class Cmd_GameRole implements CommandPremise {
                 "ロール名の変更に失敗しました: `%s`".formatted(e.getMessage())
             ).queue()
         );
+        updateMessages();
     }
 
     private void giveGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
@@ -195,7 +225,7 @@ public class Cmd_GameRole implements CommandPremise {
             return;
         }
         Role role = matchRoles.get(0);
-        if (!isGameRole(role)) {
+        if (!GameRole.isGameRole(role)) {
             message.reply("指定されたロール `%s` はゲームロールではありません。".formatted(role.getName())).queue();
             return;
         }
@@ -210,6 +240,7 @@ public class Cmd_GameRole implements CommandPremise {
                 "ロールの付与に失敗しました: `%s`".formatted(e.getMessage())
             ).queue()
         );
+        updateMessages();
     }
 
     private void takeGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
@@ -228,7 +259,7 @@ public class Cmd_GameRole implements CommandPremise {
             return;
         }
         Role role = matchRoles.get(0);
-        if (!isGameRole(role)) {
+        if (!GameRole.isGameRole(role)) {
             message.reply("指定されたロール `%s` はゲームロールではありません。".formatted(role.getName())).queue();
             return;
         }
@@ -242,6 +273,111 @@ public class Cmd_GameRole implements CommandPremise {
                 "ロールの剥奪に失敗しました: `%s`".formatted(e.getMessage())
             ).queue()
         );
+        updateMessages();
+    }
+
+    private void createGameRoleMessage(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        JDA jda = Main.getJDA();
+        if (guild.getIdLong() != SERVER_ID) {
+            message.reply("このサーバではこのコマンドは使用できません。").queue();
+            return;
+        }
+        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole())) {
+            message.reply("ゲームロールメッセージの投稿は Admin のみ利用可能です。").queue();
+            return;
+        }
+
+        List<String> games = GameRole.getGameRoles();
+        if (games == null) {
+            message.reply("ゲームロールの取得に失敗しました。").queue();
+            return;
+        }
+        if (games.isEmpty()) {
+            message.reply("ゲームロールが見つかりませんでした。").queue();
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**:video_game: ゲームロール一覧 :video_game:**__\n");
+        sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n\n");
+        List<String> usedEmojis = GameRole.getUsedGameEmojis();
+        List<String> emoteIds = guild.getEmotes()
+            .stream()
+            .map(Emote::getId)
+            .filter(s -> !usedEmojis.contains(s))
+            .collect(Collectors.toList());
+        List<Emote> emotes = new ArrayList<>();
+
+        for (String gameId : games) {
+            Role role = guild.getRoleById(gameId);
+            if (role == null) {
+                continue;
+            }
+            String gameName = role.getName();
+            String gameEmoji = GameRole.getGameEmoji(gameId);
+            while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmoteById(gameEmoji) == null) {
+                gameEmoji = emoteIds.get(new Random().nextInt(emoteIds.size()));
+            }
+            Emote emoji = jda.getEmoteById(gameEmoji);
+            if (emoji == null) {
+                continue;
+            }
+            sb
+                .append(emoji.getAsMention())
+                .append(" ")
+                .append(gameName)
+                .append("\n");
+            emotes.add(emoji);
+        }
+
+        Message postMessage = channel.sendMessage(sb.toString()).complete();
+        for (Emote emote : emotes) {
+            postMessage.addReaction(emote).queue();
+        }
+        addMessage(postMessage);
+    }
+
+    private void updateGameRoleMessage(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        JDA jda = Main.getJDA();
+        if (guild.getIdLong() != SERVER_ID) {
+            message.reply("このサーバではこのコマンドは使用できません。").queue();
+            return;
+        }
+        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole())) {
+            message.reply("ゲームロールメッセージの投稿は Admin のみ利用可能です。").queue();
+            return;
+        }
+        updateMessages();
+        message.reply("ゲームロールメッセージの更新を行いました。").queue();
+    }
+
+    private void changeGameRoleEmoji(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+        JDA jda = Main.getJDA();
+        if (guild.getIdLong() != SERVER_ID) {
+            message.reply("このサーバではこのコマンドは使用できません。").queue();
+            return;
+        }
+        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole())) {
+            message.reply("ゲームロール絵文字の更新は Admin のみ利用可能です。").queue();
+            return;
+        }
+        Role role = context.get("role");
+        if (!GameRole.isGameRole(role)) {
+            message.reply("指定されたロール `%s` はゲームロールではありません。".formatted(role.getName())).queue();
+            return;
+        }
+        String emojiId = context.get("emojiId");
+        Matcher matcher = emojiPattern.matcher(emojiId);
+        if (matcher.matches()) {
+            emojiId = matcher.group(1);
+        }
+        Emote emoji = jda.getEmoteById(emojiId);
+        if (emoji == null) {
+            message.reply("指定された絵文字が見つかりませんでした。").queue();
+            return;
+        }
+        setGameEmoji(role, emojiId);
+        message.reply("ゲームロール `%s` の絵文字を %s に変更しました。".formatted(role.getName(), emoji.getAsMention())).queue();
+        updateMessages();
     }
 
     private void addGameRole(Message message, String name) {
@@ -290,14 +426,119 @@ public class Cmd_GameRole implements CommandPremise {
             );
     }
 
-    private boolean isGameRole(Role role) {
-        JSONArray roles;
+    private void setGameEmoji(Role gameRole, String emojiId) {
+        JSONObject games;
         try {
-            roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();
+            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
-            return false;
+            return;
         }
-        return roles.toList().contains(role.getIdLong());
+        if (!games.has("emojis")) {
+            games.put("emojis", new JSONObject());
+        }
+        JSONObject emojis = games.getJSONObject("emojis");
+        emojis.put(gameRole.getId(), emojiId);
+        try {
+            Files.writeString(pathMessages, games.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addMessage(Message message) {
+        JSONObject games;
+        try {
+            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        if (!games.has("messages")) {
+            games.put("messages", new JSONArray());
+        }
+        JSONArray messages = games.getJSONArray("messages");
+        messages.put(new JSONObject()
+            .put("channelId", message.getChannel().getId())
+            .put("messageId", message.getId()));
+        try {
+            Files.writeString(pathMessages, games.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateMessages() {
+        JSONObject games;
+        try {
+            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        if (!games.has("messages")) {
+            games.put("messages", new JSONArray());
+        }
+        Guild guild = Main.getJDA().getGuildById(SERVER_ID);
+        if (guild == null) {
+            return;
+        }
+        JDA jda = Main.getJDA();
+        List<String> gameRoles = GameRole.getGameRoles();
+        if (gameRoles == null) {
+            return;
+        }
+        if (gameRoles.isEmpty()) {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**:video_game: ゲームロール一覧 :video_game:**__\n");
+        sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n\n");
+        List<String> usedEmojis = GameRole.getUsedGameEmojis();
+        List<String> emoteIds = guild.getEmotes()
+            .stream()
+            .map(Emote::getId)
+            .filter(s -> !usedEmojis.contains(s))
+            .collect(Collectors.toList());
+        List<Emote> emotes = new ArrayList<>();
+
+        for (String gameId : gameRoles) {
+            Role role = guild.getRoleById(gameId);
+            if (role == null) {
+                continue;
+            }
+            String gameName = role.getName();
+            String gameEmoji = GameRole.getGameEmoji(gameId);
+            while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmoteById(gameEmoji) == null) {
+                gameEmoji = emoteIds.get(new Random().nextInt(emoteIds.size()));
+            }
+            Emote emoji = jda.getEmoteById(gameEmoji);
+            if (emoji == null) {
+                continue;
+            }
+            sb
+                .append(emoji.getAsMention())
+                .append(" ")
+                .append(gameName)
+                .append("\n");
+            emotes.add(emoji);
+        }
+        JSONArray messages = games.getJSONArray("messages");
+        for (int i = 0; i < messages.length(); i++) {
+            JSONObject data = messages.getJSONObject(i);
+            String channelId = data.getString("channelId");
+            String messageId = data.getString("messageId");
+            TextChannel channel = guild.getTextChannelById(channelId);
+            if (channel == null) {
+                return;
+            }
+            String content = sb.toString();
+            Message message = channel.editMessageById(messageId, content).complete();
+            message.clearReactions().complete();
+            for (Emote emote : emotes) {
+                message.addReaction(emote).queue();
+            }
+        }
     }
 }

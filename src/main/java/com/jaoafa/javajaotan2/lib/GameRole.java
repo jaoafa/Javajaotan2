@@ -30,11 +30,8 @@ public class GameRole {
     static Path path = Path.of("gameRoles.json");
     static Path pathMessages = Path.of("gameRoleMessages.json");
     static Pattern emojiPattern = Pattern.compile("<:.+?:(\\d+)>");
-    // static long SERVER_ID = 597378876556967936L;
-    // static long GAME_ROLE_BORDER_ID = 911556139496374293L;
-
-    static long SERVER_ID = 840825962156654622L;
-    static long GAME_ROLE_BORDER_ID = 911629293380075601L;
+    static long SERVER_ID = 597378876556967936L;
+    static long GAME_ROLE_BORDER_ID = 911556139496374293L;
 
     public static long getServerId() {
         return SERVER_ID;

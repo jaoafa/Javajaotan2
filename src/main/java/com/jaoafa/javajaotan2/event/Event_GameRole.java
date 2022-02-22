@@ -61,7 +61,7 @@ public class Event_GameRole extends ListenerAdapter {
                 .queue();
             return;
         }
-        Member member = guild.getMember(user);
+        Member member = guild.retrieveMember(user).complete();
         if (member == null) {
             channel
                 .sendMessage(user.getAsMention() + " メンバー情報の取得に失敗しました。")

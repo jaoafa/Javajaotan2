@@ -83,7 +83,7 @@ public class Cmd_GameRole implements CommandPremise {
             builder
                 .meta(CommandMeta.DESCRIPTION, "自分からゲームロールを剥奪します。")
                 .literal("take", "leave")
-                .argument(StringArgument.of("name"))
+                .argument(StringArgument.greedy("name"))
                 .handler(context -> execute(context, this::takeGameRole))
                 .build(),
             builder

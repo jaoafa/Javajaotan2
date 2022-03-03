@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public enum Channels {
     general(597419057251090443L),
+    greeting(603841992404893707L),
     jaotan(597423444501463040L),
     invite_checker(893166232772161577L),
     c659(621632815599190016L), // 最初を数字にできない…

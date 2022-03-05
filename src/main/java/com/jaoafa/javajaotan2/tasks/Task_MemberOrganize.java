@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -229,9 +229,6 @@ public class Task_MemberOrganize implements Job {
 
             boolean doReturn = false;
             BiFunction<String, String, Boolean> doKick = (title, description) -> {
-                // 2021/12/12 15:40 - Minecraftサーバ停止に伴いlinkが必要なキック処理を停止
-                return true;
-                /*
                 boolean kicked = kickDiscord(member, title, description);
                 if (kicked) {
                     EmbedBuilder embed = new EmbedBuilder()
@@ -245,7 +242,7 @@ public class Task_MemberOrganize implements Job {
                         .build()
                     ).queue();
                 }
-                return true;*/
+                return true;
             };
 
             if (!isMinecraftConnected && !isSubAccount && !isNeedSupport && mdc == null && joinDays >= 7) {

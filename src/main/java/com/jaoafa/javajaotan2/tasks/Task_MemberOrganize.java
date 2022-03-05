@@ -316,9 +316,10 @@ public class Task_MemberOrganize implements Job {
                 boolean isExpiredDate = expired_date != null && checkTS.equals(expired_date);
                 long checkDays = loginDate != null ? ChronoUnit.DAYS.between(checkTS.toLocalDateTime(), now) : -1;
                 logger.info("[%s] checkDays: %s".formatted(member.getUser().getAsTag(), checkDays));
+
                 // 最終ログインから2ヶ月(60日)が経過している場合、警告リプライを#generalで送信する
-                if (checkDays >= 60 && !notified.isNotified(Notified.NotifiedType.MONTH2)) {
-                    notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。（isExpiredDate: " + isExpiredDate + "）", Color.MAGENTA, mdc);
+                if (checkDays >= 60 && checkDays < 90 && !notified.isNotified(Notified.NotifiedType.MONTH2)) {
+                    notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。(isExpiredDate: " + isExpiredDate + ")", Color.MAGENTA, mdc);
                     if (!dryRun) {
                         EmbedBuilder embed = new EmbedBuilder()
                             .setTitle(":exclamation:最終ログインから2か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(mdc.uuid().toString()))
@@ -342,7 +343,7 @@ public class Task_MemberOrganize implements Job {
 
                 // 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する
                 if (checkDays >= 90) {
-                    notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。（isExpiredDate: " + isExpiredDate + "）", Color.ORANGE, mdc);
+                    notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。(isExpiredDate: " + isExpiredDate + ")", Color.ORANGE, mdc);
                     if (!dryRun) {
                         EmbedBuilder embed = new EmbedBuilder()
                             .setTitle(":bangbang:最終ログインから3か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(mdc.uuid().toString()))

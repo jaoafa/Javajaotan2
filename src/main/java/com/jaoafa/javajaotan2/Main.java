@@ -70,6 +70,8 @@ public class Main {
     static ScheduledExecutorService scheduler;
 
     public static void main(String[] args) {
+        logger.info("Starting Javajaotan2...");
+
         isUserDevelopMode = new File("../build.json").exists();
         if (isUserDevelopMode) {
             try {

@@ -310,6 +310,8 @@ public class Task_MemberOrganize implements Job {
                 if (expired_date != null) {
                     expired_date.setTime(expired_date.getTime() + (1000L * 60 * 60 * 24 * 90)); // 最終ログイン日時が期限日の90日前と仮定
                 }
+                logger.info("[%s] loginDate: %s".formatted(member.getUser().getAsTag(), loginDate));
+                logger.info("[%s] expired_date: %s".formatted(member.getUser().getAsTag(), expired_date));
                 Timestamp checkTS = getMaxTimestamp(mdc.loginDate(), expired_date);
                 boolean isExpiredDate = expired_date != null && checkTS.equals(expired_date);
                 long checkDays = loginDate != null ? ChronoUnit.DAYS.between(checkTS.toLocalDateTime(), now) : -1;

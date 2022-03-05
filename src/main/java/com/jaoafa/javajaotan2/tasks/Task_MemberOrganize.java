@@ -308,7 +308,7 @@ public class Task_MemberOrganize implements Job {
             if (isMinecraftConnected && uuid != null) {
                 Timestamp expired_date = mdc.expired_date();
                 if (expired_date != null) {
-                    expired_date.setTime(expired_date.getTime() + (1000L * 60 * 60 * 24 * 90)); // 最終ログイン日時が期限日の90日前と仮定
+                    expired_date.setTime(expired_date.getTime() - (1000L * 60 * 60 * 24 * 90)); // 最終ログイン日時が期限日の90日前と仮定
                 }
                 logger.info("[%s] loginDate: %s".formatted(member.getUser().getAsTag(), loginDate));
                 logger.info("[%s] expired_date: %s".formatted(member.getUser().getAsTag(), expired_date));

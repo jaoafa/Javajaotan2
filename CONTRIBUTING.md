@@ -140,6 +140,20 @@ master ブランチ = 本番環境動作ソースコード です。
 - コミットされると、ZakuroHat でビルドされ DiscordBot jaotan にて本番環境下で動作します。
 - バージョン表記は本番環境でのビルド処理によって、`yyyy.mm.dd_hh.mm_最終コミットsha8桁` に変更されます。
 
+## Code Quality
+
+コードの品質や安全性、依存パッケージを管理し一定以上に保つため、以下のサービスを利用しています。
+
+- [CodeQL](https://codeql.github.com/): GitHub によるの静的アプリケーションセキュリティテスト (SAST) です。Push / Pull Request 時にチェックされます。
+- [GitHub Security Advisories](https://docs.github.com/ja/code-security/repository-security-advisories/about-github-security-advisories-for-repositories):
+  GitHub によるリポジトリセキュリティ脆弱性検知ツールです。
+- [Dependabot](https://docs.github.com/ja/code-security/supply-chain-security/managing-vulnerabilities-in-your-projects-dependencies):
+  GitHub による依存パッケージ脆弱性管理サービスです。
+- [Renovate](https://www.whitesourcesoftware.com/free-developer-tools/renovate/): WhiteSource
+  による依存パッケージバージョン管理ツールです。自動でアップデートを収集し、Pull Request を作成します。
+- [Qodana](https://www.jetbrains.com/ja-jp/qodana/): IntelliJ によるコード品質管理ツールです。Push / Pull Request 時にチェックされます。master
+  ブランチのレポートは [こちら](https://jaoafa.github.io/MyMaid4/) にあります。
+
 ## Other
 
 - 不明な点は jMS Gamers Club の `#development` チャンネルで質問してください。

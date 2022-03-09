@@ -17,7 +17,7 @@ jobs:
 
       - run: |
           sudo apt install -y tree
-          tree -L 1 -I '.git'
+          tree -a -L 5 -I '.git'
 
       - name: Set up JDK 16
         uses: actions/setup-java@v3

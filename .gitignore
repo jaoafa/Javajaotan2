@@ -4,6 +4,7 @@
 !.idea/copyright
 !.idea/codeStyles
 !.idea/artifacts
+!.idea/misc.xml
 
 *.iml
 *.ipr

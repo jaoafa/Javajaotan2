@@ -1,0 +1,218 @@
+{
+  "modules": [
+    {
+      "name": "project",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/src/main/java",
+              "type": "Source",
+              "packagePrefix": ""
+            },
+            {
+              "path": "file://$PROJECT_DIR$/src/main/resources",
+              "type": "Resource",
+              "packagePrefix": ""
+            }
+          ]
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "corretto-16",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "Maven: net.dv8tion:JDA:5.0.0-alpha.9",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.code.findbugs:jsr305:3.0.2",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.jetbrains:annotations:16.0.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.neovisionaries:nv-websocket-client:2.14",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.apache.commons:commons-collections4:4.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: net.sf.trove4j:trove4j:3.0.3",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.fasterxml.jackson.core:jackson-databind:2.10.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.fasterxml.jackson.core:jackson-core:2.10.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: cloud.commandframework:cloud-jda:1.6.2",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: cloud.commandframework:cloud-core:1.6.2",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: cloud.commandframework:cloud-services:1.6.2",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: io.leangen.geantyref:geantyref:1.3.13",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.checkerframework:checker-qual:3.21.0",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.json:json:20211205",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: mysql:mysql-connector-java:8.0.28",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.protobuf:protobuf-java:3.11.4",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.xerial:sqlite-jdbc:3.36.0.3",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.squareup.okhttp3:okhttp:5.0.0-alpha.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.squareup.okio:okio:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.10",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.jetbrains.kotlin:kotlin-stdlib:1.4.10",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: ch.qos.logback:logback-classic:1.3.0-alpha14",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: ch.qos.logback:logback-core:1.3.0-alpha14",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.slf4j:slf4j-api:2.0.0-alpha6",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.apache.commons:commons-lang3:3.12.0",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.twitter4j:twitter4j-core:4.0.7",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.quartz-scheduler:quartz:2.3.2",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.mchange:c3p0:0.9.5.4",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.mchange:mchange-commons-java:0.2.15",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.zaxxer:HikariCP-java7:2.4.13",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.guava:guava:31.1-jre",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.guava:failureaccess:1.0.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.errorprone:error_prone_annotations:2.11.0",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.j2objc:j2objc-annotations:1.3",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.junit.jupiter:junit-jupiter:5.9.0-SNAPSHOT",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.junit.jupiter:junit-jupiter-api:5.9.0-SNAPSHOT",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.opentest4j:opentest4j:1.2.0",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.junit.platform:junit-platform-commons:1.9.0-SNAPSHOT",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.apiguardian:apiguardian-api:1.1.2",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.junit.jupiter:junit-jupiter-params:5.9.0-SNAPSHOT",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.junit.jupiter:junit-jupiter-engine:5.9.0-SNAPSHOT",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.junit.platform:junit-platform-engine:1.9.0-SNAPSHOT",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.detectlanguage:detectlanguage:1.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: com.google.code.gson:gson:2.2.4",
+          "type": "Library"
+        }
+      ]
+    }
+  ]
+}

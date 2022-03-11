@@ -359,7 +359,7 @@ public class Task_MemberOrganize implements Job {
                             .setContent("<@%s>".formatted(member.getId()))
                             .build()
                         ).queue();
-                        disableLink(mdc, uuid);
+                        disableLink(member, mdc, uuid);
                         guild.removeRoleFromMember(member, Roles.MinecraftConnected.role).queue();
                         notified.resetNotified();
                     }
@@ -443,8 +443,11 @@ public class Task_MemberOrganize implements Job {
             return kicked;
         }
 
-        private void disableLink(MinecraftDiscordConnection mdc, UUID uuid) {
+        private void disableLink(Member member, MinecraftDiscordConnection mdc, UUID uuid) {
             PermissionGroup group = getPermissionGroup(uuid);
+            if (JavajaotanLibrary.isGrantedRole(member, Roles.CommunityRegular.role)) {
+                group = PermissionGroup.COMMUNITYREGULAR;
+            }
             try (PreparedStatement stmt = conn.prepareStatement("UPDATE discordlink SET disabled = ?, dead_perm = ?, dead_at = CURRENT_TIMESTAMP WHERE uuid = ? AND disabled = ?")) {
                 stmt.setBoolean(1, true);
                 stmt.setString(2, group != null ? group.name() : null);
@@ -482,6 +485,7 @@ public class Task_MemberOrganize implements Job {
             ADMIN,
             MODERATOR,
             REGULAR,
+            COMMUNITYREGULAR,
             VERIFIED,
             DEFAULT,
             UNKNOWN

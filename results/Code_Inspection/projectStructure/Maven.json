@@ -265,12 +265,12 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: org.slf4j:slf4j-api:2.0.0-alpha6",
+      "ideaName": "Maven: org.slf4j:slf4j-api:2.0.0-alpha7",
       "unresolved": false,
       "groupId": "org.slf4j",
       "artifactId": "slf4j-api",
-      "version": "2.0.0-alpha6",
-      "baseVersion": "2.0.0-alpha6",
+      "version": "2.0.0-alpha7",
+      "baseVersion": "2.0.0-alpha7",
       "type": "jar",
       "optional": false,
       "scope": "compile"

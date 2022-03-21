@@ -155,12 +155,12 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: org.json:json:20211205",
+      "ideaName": "Maven: org.json:json:20220320",
       "unresolved": false,
       "groupId": "org.json",
       "artifactId": "json",
-      "version": "20211205",
-      "baseVersion": "20211205",
+      "version": "20220320",
+      "baseVersion": "20220320",
       "type": "jar",
       "optional": false,
       "scope": "compile"

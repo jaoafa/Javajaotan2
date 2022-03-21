@@ -85,7 +85,7 @@
           "type": "Library"
         },
         {
-          "name": "Maven: org.json:json:20211205",
+          "name": "Maven: org.json:json:20220320",
           "type": "Library"
         },
         {

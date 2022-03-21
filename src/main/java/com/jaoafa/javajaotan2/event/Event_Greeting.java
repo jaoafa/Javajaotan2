@@ -30,6 +30,9 @@ public class Event_Greeting extends ListenerAdapter {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
+        if (Main.getJDA().getSelfUser().getIdLong() == event.getAuthor().getIdLong()) {
+            return;
+        }
         if (Channels.greeting.getChannelId() != event.getChannel().getIdLong()) {
             return;
         }

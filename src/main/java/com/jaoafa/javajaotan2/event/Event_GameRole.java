@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.GameRole;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -53,36 +54,47 @@ public class Event_GameRole extends ListenerAdapter {
         }
         Guild guild = event.getGuild();
         Role role = guild.getRoleById(gameRoleId);
-        if (role == null) {
+
+        PrivateChannel dm = user.openPrivateChannel().complete();
+        if (dm == null || !dm.canTalk()) {
             channel
-                .sendMessage(user.getAsMention() + " 指定された絵文字のロールは見つかりません。")
+                .sendMessage(user.getAsMention() + " ダイレクトメッセージの送信に失敗しました。")
                 .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
                 .flatMap(Message::delete)
                 .queue();
+            return;
+        }
+
+        if (role == null) {
+            dm.sendMessageEmbeds(new EmbedBuilder()
+                .setTitle("ゲームロール付与失敗")
+                .setDescription("指定された絵文字のロールが見つからなかったため、ゲームロール付与に失敗しました。")
+                .setColor(0xFF0000)
+                .build()).queue();
             return;
         }
         Member member = guild.retrieveMember(user).complete();
         if (member == null) {
-            channel
-                .sendMessage(user.getAsMention() + " メンバー情報の取得に失敗しました。")
-                .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
-                .flatMap(Message::delete)
-                .queue();
+            dm.sendMessageEmbeds(new EmbedBuilder()
+                .setTitle("ゲームロール付与失敗")
+                .setDescription("メンバー情報の取得に失敗したため、ゲームロール付与に失敗しました。")
+                .setColor(0xFF0000)
+                .build()).queue();
             return;
         }
         if (member.getRoles().contains(role)) {
-            channel
-                .sendMessage(user.getAsMention() + " 既にあなたはロール「" + role.getName() + "」が付与されています。")
-                .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
-                .flatMap(Message::delete)
-                .queue();
+            dm.sendMessageEmbeds(new EmbedBuilder()
+                .setTitle("ゲームロール付与失敗")
+                .setDescription("既にあなたにはロール「" + role.getName() + "」が付与されているため、ゲームロール付与に失敗しました。")
+                .setColor(0xFFFF00)
+                .build()).queue();
             return;
         }
         guild.addRoleToMember(member, role).queue();
-        channel
-            .sendMessage(user.getAsMention() + " ロール「" + role.getName() + "」が付与されました。")
-            .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
-            .flatMap(Message::delete)
-            .queue();
+        dm.sendMessageEmbeds(new EmbedBuilder()
+            .setTitle("ゲームロール付与成功")
+            .setDescription("ロール「" + role.getName() + "」が付与されました。")
+            .setColor(0x008000)
+            .build()).queue();
     }
 }

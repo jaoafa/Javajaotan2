@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -29,6 +29,7 @@ public class JavajaotanConfig {
     String customSearchCX;
     String gasTranslateAPIUrl;
     String detectLanguageAPIToken;
+    String githubAPIToken;
 
     public JavajaotanConfig() throws RuntimeException {
         logger = Main.getLogger();
@@ -53,6 +54,7 @@ public class JavajaotanConfig {
             customSearchCX = config.optString("customSearchCX");
             gasTranslateAPIUrl = config.optString("gasTranslateAPIUrl");
             detectLanguageAPIToken = config.optString("detectLanguageAPIToken");
+            githubAPIToken = config.optString("githubAPIToken");
 
             // -- データベース関連
             if (config.has("main_database")) {
@@ -130,7 +132,13 @@ public class JavajaotanConfig {
         return gasTranslateAPIUrl;
     }
 
+    @Nullable
     public String getDetectLanguageAPIToken() {
         return detectLanguageAPIToken;
+    }
+
+    @Nullable
+    public String getGitHubAPIToken() {
+        return githubAPIToken;
     }
 }

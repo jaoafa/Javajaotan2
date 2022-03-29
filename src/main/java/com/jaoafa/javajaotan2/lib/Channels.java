@@ -22,6 +22,7 @@ public enum Channels {
     invite_checker(893166232772161577L),
     c659(621632815599190016L), // 最初を数字にできない…
     meeting_vote(597423974816808970L),
+    development(597765518501478401L),
     vc_speech_log(927666435336056862L);
 
     private long channel_id;

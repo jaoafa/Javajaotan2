@@ -111,10 +111,13 @@ public class Event_BugReaction extends ListenerAdapter {
             messages.add("");
         }
         messages.add(":bug: リアクションにより、不具合の報告がなされました。");
+        messages.add("投稿者、または報告者は不具合内容についての説明（何が不具合と思ったのか、期待される動作など）をお願いします。");
+        messages.add("");
         messages.add(mainMessage);
         if (responseType == JavajaotanLibrary.IssueResponseType.SUCCESS) {
             messages.add("Issue: https://github.com/jaoafa/jao-Minecraft-Server/issues/" + issueNumber);
         }
+        messages.add("<@959313488113717298>");
 
         String threadTitle = (responseType == JavajaotanLibrary.IssueResponseType.SUCCESS ? "*" + issueNumber + " " : "") + title;
         ThreadChannel thread = developmentChannel.createThreadChannel(threadTitle).complete();

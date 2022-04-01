@@ -14,11 +14,15 @@ package com.jaoafa.javajaotan2.event;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -110,18 +114,26 @@ public class Event_BugReaction extends ListenerAdapter {
             messages.add("[LINKED-ISSUE:jaoafa/jao-Minecraft-Server#" + issueNumber + "]");
             messages.add("");
         }
-        messages.add(":bug: リアクションにより、不具合の報告がなされました。");
-        messages.add("投稿者、または報告者は不具合内容についての説明（何が不具合と思ったのか、期待される動作など）をお願いします。");
-        messages.add("");
-        messages.add(mainMessage);
+        messages.add("<@&959313488113717298> / " + user.getAsMention() + " / " + message.getAuthor().getAsMention());
+
+        EmbedBuilder embed = new EmbedBuilder()
+            .setTitle(":bug: リアクションによる不具合の報告")
+            .addField("不具合と思われるメッセージ (または報告)", "%s に送信された %s による %s でのメッセージ\n\n%s".formatted(createdAt.format(formatter), message.getAuthor().getAsMention(), message.getChannel().getAsMention(), message.getJumpUrl()), false)
+            .addField("不具合報告者", user.getAsMention(), false)
+            .setTimestamp(Instant.now())
+            .setFooter("投稿者、または報告者は不具合内容についての説明（何が不具合と思ったのか、期待される動作など）をお願いします。")
+            .setColor(Color.YELLOW);
+
         if (responseType == JavajaotanLibrary.IssueResponseType.SUCCESS) {
-            messages.add("Issue: https://github.com/jaoafa/jao-Minecraft-Server/issues/" + issueNumber);
+            embed.addField("Issue Url", "https://github.com/jaoafa/jao-Minecraft-Server/issues/" + issueNumber, false);
         }
-        messages.add("<@959313488113717298>");
 
         String threadTitle = (responseType == JavajaotanLibrary.IssueResponseType.SUCCESS ? "*" + issueNumber + " " : "") + title;
         ThreadChannel thread = developmentChannel.createThreadChannel(threadTitle).complete();
-        thread.sendMessage(String.join("\n", messages)).queue();
+        thread.sendMessage(new MessageBuilder()
+            .setContent(String.join("\n", messages))
+            .setEmbeds(embed.build())
+            .build()).queue();
 
         message.addReaction(targetReaction).queue();
     }

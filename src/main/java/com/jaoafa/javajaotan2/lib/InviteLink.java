@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.lib;
 
+import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.User;
@@ -30,6 +31,7 @@ public record InviteLink(Guild guild) {
     }
 
     public boolean fetchInvites() {
+        Main.getLogger().info("Fetching Invite Links...");
         List<GuildInvite> newInvites = new ArrayList<>();
         try {
             guild
@@ -41,6 +43,7 @@ public record InviteLink(Guild guild) {
                 });
 
             invites.put(guild.getIdLong(), newInvites);
+            Main.getLogger().info("Fetched Invite Links: %s -> %d count".formatted(guild.getName(), newInvites.size()));
             return true;
         } catch (Exception e) {
             return false;

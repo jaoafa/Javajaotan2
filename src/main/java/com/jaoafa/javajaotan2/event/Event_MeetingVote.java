@@ -40,6 +40,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -617,7 +618,7 @@ public class Event_MeetingVote extends ListenerAdapter {
     void remind(Message message, List<User> good, List<User> bad, List<User> white) {
         // 一度リマインドしたらそれ以降はリマインドしないこと
         // リマインドの判定は絵文字？
-        List<User> remindUsers = VoteReaction.REMIND.getUsers(message);
+        List<User> remindUsers = VoteReaction.REMIND.getUsersIncludeBot(message);
 
         // リマインド済み
         if (remindUsers.stream()
@@ -687,6 +688,19 @@ public class Event_MeetingVote extends ListenerAdapter {
                 .stream()
                 .filter(u -> !u.isBot())
                 .collect(Collectors.toList());
+        }
+
+        /**
+         * リアクションを付けたユーザーのうち、Botを除外していないリストを返します。
+         *
+         * @param message メッセージ
+         *
+         * @return リアクションを付けたユーザーのうち、Botを除外していないリスト
+         */
+        public List<User> getUsersIncludeBot(@NotNull Message message) {
+            return new ArrayList<>(message
+                .retrieveReactionUsers(getUnicode())
+                .complete());
         }
 
         /**

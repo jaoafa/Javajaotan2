@@ -166,23 +166,23 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: mysql:mysql-connector-java:8.0.28",
+      "ideaName": "Maven: mysql:mysql-connector-java:8.0.29",
       "unresolved": false,
       "groupId": "mysql",
       "artifactId": "mysql-connector-java",
-      "version": "8.0.28",
-      "baseVersion": "8.0.28",
+      "version": "8.0.29",
+      "baseVersion": "8.0.29",
       "type": "jar",
       "optional": false,
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: com.google.protobuf:protobuf-java:3.11.4",
+      "ideaName": "Maven: com.google.protobuf:protobuf-java:3.19.4",
       "unresolved": false,
       "groupId": "com.google.protobuf",
       "artifactId": "protobuf-java",
-      "version": "3.11.4",
-      "baseVersion": "3.11.4",
+      "version": "3.19.4",
+      "baseVersion": "3.19.4",
       "type": "jar",
       "optional": false,
       "scope": "compile"

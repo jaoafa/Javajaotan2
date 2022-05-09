@@ -91,15 +91,15 @@
       ]
     },
     {
-      "name": "Maven: mysql:mysql-connector-java:8.0.28",
+      "name": "Maven: mysql:mysql-connector-java:8.0.29",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar!/"
+        "jar://$MAVEN_REPOSITORY$/mysql/mysql-connector-java/8.0.29/mysql-connector-java-8.0.29.jar!/"
       ]
     },
     {
-      "name": "Maven: com.google.protobuf:protobuf-java:3.11.4",
+      "name": "Maven: com.google.protobuf:protobuf-java:3.19.4",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/3.11.4/protobuf-java-3.11.4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar!/"
       ]
     },
     {

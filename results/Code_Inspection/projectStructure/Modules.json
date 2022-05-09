@@ -7,13 +7,13 @@
           "path": "file://$PROJECT_DIR$",
           "sourceFolders": [
             {
-              "path": "file://$PROJECT_DIR$/src/main/java",
-              "type": "Source",
+              "path": "file://$PROJECT_DIR$/src/main/resources",
+              "type": "Resource",
               "packagePrefix": ""
             },
             {
-              "path": "file://$PROJECT_DIR$/src/main/resources",
-              "type": "Resource",
+              "path": "file://$PROJECT_DIR$/src/main/java",
+              "type": "Source",
               "packagePrefix": ""
             }
           ]
@@ -89,11 +89,11 @@
           "type": "Library"
         },
         {
-          "name": "Maven: mysql:mysql-connector-java:8.0.28",
+          "name": "Maven: mysql:mysql-connector-java:8.0.29",
           "type": "Library"
         },
         {
-          "name": "Maven: com.google.protobuf:protobuf-java:3.11.4",
+          "name": "Maven: com.google.protobuf:protobuf-java:3.19.4",
           "type": "Library"
         },
         {

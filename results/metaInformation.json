@@ -1,13 +1,13 @@
 {
-  "total": 72,
+  "total": 71,
   "tools inspection": {
-    "Code Inspection": 72
+    "Code Inspection": 71
   },
   "attributes": {
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/jaoafa/Javajaotan2",
-        "revisionId": "b7efc9b54318c799e6e77d64b438794019d29f36",
+        "revisionId": "7dfd388ac4f2861a358c14d6746332588d265cd7",
         "branch": "master"
       }
     },

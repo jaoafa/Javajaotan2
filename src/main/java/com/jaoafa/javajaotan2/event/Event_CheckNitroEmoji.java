@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -94,6 +94,7 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
+        Main.getLogger().info("Emote added (Cache refresh): " + event.getEmote().getName());
         event.getGuild().retrieveEmotes().queue(
             emojis -> guildEmojis = emojis,
             Throwable::printStackTrace
@@ -105,6 +106,7 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
+        Main.getLogger().info("Emote removed (Cache refresh): " + event.getEmote().getName());
         event.getGuild().retrieveEmotes().queue(
             emojis -> guildEmojis = emojis,
             Throwable::printStackTrace

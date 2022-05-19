@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.event;
 
+import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import com.jaoafa.javajaotan2.lib.MySQLDBManager;
 import net.dv8tion.jda.api.entities.User;
@@ -26,6 +27,10 @@ public class Event_UserDedDB extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
         User user = event.getUser();
+
+        if (event.getGuild().getIdLong() != Main.getConfig().getGuildId()) {
+            return;
+        }
 
         MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
         try {

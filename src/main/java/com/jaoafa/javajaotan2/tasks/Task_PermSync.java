@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -265,20 +265,20 @@ public class Task_PermSync implements Job {
             if (isMinecraftConnected && uuid != null) {
                 // MinecraftConnected役職がついている場合、Verified, Regularの役職に応じて役職を付与する
 
-                PermissionGroup group = getPermissionGroup(uuid);
-                if (group == null) {
+                PermissionGroupResult result = getPermissionGroup(uuid);
+                if (result == null) {
                     logger.info("[%s] Minecraft Group: グループの取得に失敗".formatted(
                         member.getUser().getAsTag()));
                     return;
                 }
                 logger.info("[%s] Minecraft Group: %s".formatted(
-                    member.getUser().getAsTag(), group.name()));
+                    member.getUser().getAsTag(), result.permissionGroup.name()));
 
-                if (!isVerified && group == PermissionGroup.VERIFIED) {
+                if (!isVerified && result.permissionGroup == PermissionGroup.VERIFIED) {
                     notifyConnection(member, "Verified役職付与", "Minecraft鯖内の権限に基づき、Verified役職を付与しました。", Color.CYAN, mdc);
                     if (!dryRun) guild.addRoleToMember(member, Roles.Verified.role).queue();
                 }
-                if (!isRegular && group == PermissionGroup.REGULAR) {
+                if (!isRegular && result.permissionGroup == PermissionGroup.REGULAR) {
                     notifyConnection(member, "Regular役職付与", "Minecraft鯖内の権限に基づき、Regular役職を付与しました。", Color.CYAN, mdc);
                     if (!dryRun) guild.addRoleToMember(member, Roles.Regular.role).queue();
                 }
@@ -315,7 +315,7 @@ public class Task_PermSync implements Job {
             channel.sendMessageEmbeds(embed.build()).queue();
         }
 
-        private PermissionGroup getPermissionGroup(UUID uuid) {
+        private PermissionGroupResult getPermissionGroup(UUID uuid) {
             try {
                 try (PreparedStatement statement = conn.prepareStatement("SELECT * FROM permissions WHERE uuid = ?")) {
                     statement.setString(1, uuid.toString());
@@ -324,11 +324,13 @@ public class Task_PermSync implements Job {
                             return null;
                         }
                         String permissionGroup = res.getString("permission");
-                        return Arrays
+                        return new PermissionGroupResult(Arrays
                             .stream(PermissionGroup.values())
                             .filter(p -> p.name().equalsIgnoreCase(permissionGroup))
                             .findFirst()
-                            .orElse(PermissionGroup.UNKNOWN);
+                            .orElse(PermissionGroup.UNKNOWN),
+                            res.getTimestamp("expire_at") != null
+                        );
                     }
                 }
             } catch (SQLException e) {
@@ -350,6 +352,9 @@ public class Task_PermSync implements Job {
             VERIFIED,
             DEFAULT,
             UNKNOWN
+        }
+
+        record PermissionGroupResult(PermissionGroup permissionGroup, boolean isTemporary) {
         }
     }
 

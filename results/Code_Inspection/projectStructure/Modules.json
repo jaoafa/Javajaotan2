@@ -65,15 +65,15 @@
           "type": "Library"
         },
         {
-          "name": "Maven: cloud.commandframework:cloud-jda:1.6.2",
+          "name": "Maven: cloud.commandframework:cloud-jda:1.7.0",
           "type": "Library"
         },
         {
-          "name": "Maven: cloud.commandframework:cloud-core:1.6.2",
+          "name": "Maven: cloud.commandframework:cloud-core:1.7.0",
           "type": "Library"
         },
         {
-          "name": "Maven: cloud.commandframework:cloud-services:1.6.2",
+          "name": "Maven: cloud.commandframework:cloud-services:1.7.0",
           "type": "Library"
         },
         {
@@ -81,7 +81,11 @@
           "type": "Library"
         },
         {
-          "name": "Maven: org.checkerframework:checker-qual:3.21.0",
+          "name": "Maven: org.checkerframework:checker-qual:3.22.1",
+          "type": "Library"
+        },
+        {
+          "name": "Maven: org.apiguardian:apiguardian-api:1.1.2",
           "type": "Library"
         },
         {
@@ -186,10 +190,6 @@
         },
         {
           "name": "Maven: org.junit.platform:junit-platform-commons:1.9.0-SNAPSHOT",
-          "type": "Library"
-        },
-        {
-          "name": "Maven: org.apiguardian:apiguardian-api:1.1.2",
           "type": "Library"
         },
         {

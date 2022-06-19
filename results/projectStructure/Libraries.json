@@ -55,21 +55,21 @@
       ]
     },
     {
-      "name": "Maven: cloud.commandframework:cloud-jda:1.6.2",
+      "name": "Maven: cloud.commandframework:cloud-jda:1.7.0",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/cloud/commandframework/cloud-jda/1.6.2/cloud-jda-1.6.2.jar!/"
+        "jar://$MAVEN_REPOSITORY$/cloud/commandframework/cloud-jda/1.7.0/cloud-jda-1.7.0.jar!/"
       ]
     },
     {
-      "name": "Maven: cloud.commandframework:cloud-core:1.6.2",
+      "name": "Maven: cloud.commandframework:cloud-core:1.7.0",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/cloud/commandframework/cloud-core/1.6.2/cloud-core-1.6.2.jar!/"
+        "jar://$MAVEN_REPOSITORY$/cloud/commandframework/cloud-core/1.7.0/cloud-core-1.7.0.jar!/"
       ]
     },
     {
-      "name": "Maven: cloud.commandframework:cloud-services:1.6.2",
+      "name": "Maven: cloud.commandframework:cloud-services:1.7.0",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/cloud/commandframework/cloud-services/1.6.2/cloud-services-1.6.2.jar!/"
+        "jar://$MAVEN_REPOSITORY$/cloud/commandframework/cloud-services/1.7.0/cloud-services-1.7.0.jar!/"
       ]
     },
     {
@@ -79,9 +79,15 @@
       ]
     },
     {
-      "name": "Maven: org.checkerframework:checker-qual:3.21.0",
+      "name": "Maven: org.checkerframework:checker-qual:3.22.1",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/3.21.0/checker-qual-3.21.0.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/3.22.1/checker-qual-3.22.1.jar!/"
+      ]
+    },
+    {
+      "name": "Maven: org.apiguardian:apiguardian-api:1.1.2",
+      "roots": [
+        "jar://$MAVEN_REPOSITORY$/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar!/"
       ]
     },
     {
@@ -219,13 +225,13 @@
     {
       "name": "Maven: org.junit.jupiter:junit-jupiter:5.9.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter/5.9.0-SNAPSHOT/junit-jupiter-5.9.0-20220515.182506-177.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter/5.9.0-SNAPSHOT/junit-jupiter-5.9.0-20220619.131907-188.jar!/"
       ]
     },
     {
       "name": "Maven: org.junit.jupiter:junit-jupiter-api:5.9.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-api/5.9.0-SNAPSHOT/junit-jupiter-api-5.9.0-20220515.182506-177.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-api/5.9.0-SNAPSHOT/junit-jupiter-api-5.9.0-20220619.131907-188.jar!/"
       ]
     },
     {
@@ -237,31 +243,25 @@
     {
       "name": "Maven: org.junit.platform:junit-platform-commons:1.9.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-commons/1.9.0-SNAPSHOT/junit-platform-commons-1.9.0-20220515.182506-177.jar!/"
-      ]
-    },
-    {
-      "name": "Maven: org.apiguardian:apiguardian-api:1.1.2",
-      "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-commons/1.9.0-SNAPSHOT/junit-platform-commons-1.9.0-20220619.131907-188.jar!/"
       ]
     },
     {
       "name": "Maven: org.junit.jupiter:junit-jupiter-params:5.9.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-params/5.9.0-SNAPSHOT/junit-jupiter-params-5.9.0-20220515.182506-177.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-params/5.9.0-SNAPSHOT/junit-jupiter-params-5.9.0-20220619.131907-188.jar!/"
       ]
     },
     {
       "name": "Maven: org.junit.jupiter:junit-jupiter-engine:5.9.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-engine/5.9.0-SNAPSHOT/junit-jupiter-engine-5.9.0-20220515.182506-177.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-engine/5.9.0-SNAPSHOT/junit-jupiter-engine-5.9.0-20220619.131907-188.jar!/"
       ]
     },
     {
       "name": "Maven: org.junit.platform:junit-platform-engine:1.9.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-engine/1.9.0-SNAPSHOT/junit-platform-engine-1.9.0-20220515.182506-177.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-engine/1.9.0-SNAPSHOT/junit-platform-engine-1.9.0-20220619.131907-188.jar!/"
       ]
     },
     {

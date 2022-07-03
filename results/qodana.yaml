@@ -1,6 +1,7 @@
-version: 1.0
-failThreshold: 100
+version: "1.0"
+linter: jetbrains/qodana-jvm-community:2022.1
 profile:
   name: qodana.recommended
+failThreshold: 100
 exclude:
   - name: AssignmentToStaticFieldFromInstanceMethod

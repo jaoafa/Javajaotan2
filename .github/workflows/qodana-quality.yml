@@ -26,7 +26,7 @@ jobs:
           distribution: adopt
 
       - name: Qodana Scan
-        uses: JetBrains/qodana-action@v5.1.0
+        uses: JetBrains/qodana-action@v2022.1.1
         with:
           linter: jetbrains/qodana-jvm-community
           fail-threshold: 100

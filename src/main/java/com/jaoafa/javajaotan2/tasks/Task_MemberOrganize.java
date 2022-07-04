@@ -317,8 +317,12 @@ public class Task_MemberOrganize implements Job {
                 long checkDays = loginDate != null ? ChronoUnit.DAYS.between(checkTS.toLocalDateTime(), now) : -1;
                 logger.info("[%s] checkDays: %s".formatted(member.getUser().getAsTag(), checkDays));
 
+                if (checkDays < 60 && notified.is2MonthNotified()) {
+                    notified.resetNotified();
+                }
+
                 // 最終ログインから2ヶ月(60日)が経過している場合、警告リプライを#generalで送信する
-                if (checkDays >= 60 && checkDays < 90 && !notified.isNotified(Notified.NotifiedType.MONTH2)) {
+                if (checkDays >= 60 && checkDays < 90 && !notified.is2MonthNotified()) {
                     notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。(isExpiredDate: " + isExpiredDate + ")", Color.MAGENTA, mdc);
                     if (!dryRun) {
                         EmbedBuilder embed = new EmbedBuilder()
@@ -337,7 +341,7 @@ public class Task_MemberOrganize implements Job {
                             .setContent("<@%s>".formatted(member.getId()))
                             .build()
                         ).queue();
-                        notified.setNotified(Notified.NotifiedType.MONTH2);
+                        notified.set2MonthNotified();
                     }
                 }
 
@@ -507,15 +511,15 @@ public class Task_MemberOrganize implements Job {
                 this.memberId = member.getId();
             }
 
-            private boolean isNotified(NotifiedType type) {
+            private boolean is2MonthNotified() {
                 JSONObject object = load();
-                return object.has(memberId) && object.getJSONArray(memberId).toList().contains(type.name());
+                return object.has(memberId) && object.getJSONArray(memberId).toList().contains(NotifiedType.MONTH2.name());
             }
 
-            private void setNotified(NotifiedType type) {
+            private void set2MonthNotified() {
                 JSONObject object = load();
                 JSONArray userObject = object.has(memberId) ? object.getJSONArray(memberId) : new JSONArray();
-                userObject.put(type.name());
+                userObject.put(NotifiedType.MONTH2.name());
                 object.put(memberId, userObject);
                 try {
                     Files.writeString(path, object.toString());
@@ -526,7 +530,7 @@ public class Task_MemberOrganize implements Job {
 
             private void resetNotified() {
                 JSONObject object = load();
-                object.put(memberId, new JSONArray());
+                object.remove(memberId);
                 try {
                     Files.writeString(path, object.toString());
                 } catch (IOException e) {

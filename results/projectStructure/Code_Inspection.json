@@ -93,7 +93,7 @@
           "type": "Library"
         },
         {
-          "name": "Maven: mysql:mysql-connector-java:8.0.29",
+          "name": "Maven: mysql:mysql-connector-java:8.0.30",
           "type": "Library"
         },
         {

@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -32,7 +32,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Cmd_ToRandJa implements CommandPremise {
     @Override
@@ -62,7 +61,7 @@ public class Cmd_ToRandJa implements CommandPremise {
         List<Translate.Language> ignoreAutoUnknown = Arrays.stream(Translate.Language.values())
             .filter(l -> l != Translate.Language.AUTO)
             .filter(l -> l != Translate.Language.UNKNOWN)
-            .collect(Collectors.toList());
+            .toList();
         Translate.Language lang1 = ignoreAutoUnknown.get(new Random().nextInt(ignoreAutoUnknown.size()));
         Translate.Language lang2 = Translate.Language.JA;
 

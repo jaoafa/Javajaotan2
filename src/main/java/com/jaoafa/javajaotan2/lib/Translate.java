@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -42,12 +42,14 @@ public class Translate {
                 MediaType.parse("application/json; charset=utf-8")
             );
             Request request = new Request.Builder().url(url).post(requestBody).build();
-            Response response = client.newCall(request).execute();
-            ResponseBody body = response.body();
-            if (body == null) {
-                return null;
+            JSONObject object;
+            try (Response response = client.newCall(request).execute()) {
+                ResponseBody body = response.body();
+                if (body == null) {
+                    return null;
+                }
+                object = new JSONObject(body.string());
             }
-            JSONObject object = new JSONObject(body.string());
             return new TranslateResult(
                 object.getJSONObject("response").getString("result"),
                 before,
@@ -211,7 +213,7 @@ public class Translate {
         ZU("ズールー語"),
         UNKNOWN(null);
 
-        String language_name;
+        final String language_name;
 
         Language(String language_name) {
             this.language_name = language_name;

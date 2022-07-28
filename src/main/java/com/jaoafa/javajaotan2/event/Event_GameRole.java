@@ -15,6 +15,8 @@ import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.GameRole;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -23,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Event_GameRole extends ListenerAdapter {
-    long SERVER_ID = GameRole.getServerId();
+    final long SERVER_ID = GameRole.getServerId();
 
     @Override
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
@@ -35,7 +37,7 @@ public class Event_GameRole extends ListenerAdapter {
             return;
         }
 
-        TextChannel channel = event.getTextChannel();
+        MessageChannelUnion channel = event.getChannel();
         Message message = event.retrieveMessage().complete();
         if (!GameRole.isGameRoleMessage(message)) {
             return;
@@ -43,12 +45,16 @@ public class Event_GameRole extends ListenerAdapter {
         MessageReaction reaction = event.getReaction();
         reaction.removeReaction(user).queue();
 
-        List<String> emojis = GameRole.getUsedGameEmojis();
-        if (!emojis.contains(reaction.getReactionEmote().getId())) {
+        if (reaction.getEmoji().getType() != Emoji.Type.CUSTOM) {
             return;
         }
 
-        String gameRoleId = GameRole.getGameEmojiFromRoleId(reaction.getReactionEmote().getId());
+        List<String> emojis = GameRole.getUsedGameEmojis();
+        if (!emojis.contains(reaction.getEmoji().asCustom().getId())) {
+            return;
+        }
+
+        String gameRoleId = GameRole.getGameEmojiFromRoleId(reaction.getEmoji().asCustom().getId());
         if (gameRoleId == null) {
             return;
         }

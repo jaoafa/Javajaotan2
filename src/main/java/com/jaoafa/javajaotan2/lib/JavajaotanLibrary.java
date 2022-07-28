@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.lib;
 
 import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -102,7 +103,7 @@ public class JavajaotanLibrary {
 
     public static String getContentDisplay(Message message, String raw) {
         String tmp = raw;
-        for (User user : message.getMentionedUsers()) {
+        for (User user : message.getMentions().getUsers()) {
             String name;
             if (message.isFromGuild() && message.getGuild().isMember(user)) {
                 Member member = message.getGuild().getMember(user);
@@ -113,13 +114,13 @@ public class JavajaotanLibrary {
             }
             tmp = tmp.replaceAll("<@!?" + Pattern.quote(user.getId()) + '>', '@' + Matcher.quoteReplacement(name));
         }
-        for (Emote emote : message.getEmotes()) {
+        for (CustomEmoji emote : message.getMentions().getCustomEmojis()) {
             tmp = tmp.replace(emote.getAsMention(), ":" + emote.getName() + ":");
         }
-        for (TextChannel mentionedChannel : message.getMentionedChannels()) {
+        for (GuildChannel mentionedChannel : message.getMentions().getChannels()) {
             tmp = tmp.replace(mentionedChannel.getAsMention(), '#' + mentionedChannel.getName());
         }
-        for (Role mentionedRole : message.getMentionedRoles()) {
+        for (Role mentionedRole : message.getMentions().getRoles()) {
             tmp = tmp.replace(mentionedRole.getAsMention(), '@' + mentionedRole.getName());
         }
         return tmp;

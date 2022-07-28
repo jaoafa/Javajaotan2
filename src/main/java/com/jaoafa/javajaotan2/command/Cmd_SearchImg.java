@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -98,12 +98,14 @@ public class Cmd_SearchImg implements CommandPremise {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder().url(url).build();
-            Response response = client.newCall(request).execute();
-            ResponseBody body = response.body();
-            if (body == null) {
-                return null;
+            JSONObject object;
+            try (Response response = client.newCall(request).execute()) {
+                ResponseBody body = response.body();
+                if (body == null) {
+                    return null;
+                }
+                object = new JSONObject(body.string());
             }
-            JSONObject object = new JSONObject(body.string());
             if (!object.has("searchInformation") || !object.has("items")) {
                 return null;
             }

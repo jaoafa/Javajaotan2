@@ -27,11 +27,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GameRole {
-    static Path path = Path.of("gameRoles.json");
-    static Path pathMessages = Path.of("gameRoleMessages.json");
-    static Pattern emojiPattern = Pattern.compile("<:.+?:(\\d+)>");
-    static long SERVER_ID = 597378876556967936L;
-    static long GAME_ROLE_BORDER_ID = 911556139496374293L;
+    static final Path path = Path.of("gameRoles.json");
+    static final Path pathMessages = Path.of("gameRoleMessages.json");
+    static final Pattern emojiPattern = Pattern.compile("<:.+?:(\\d+)>");
+    static final long SERVER_ID = 597378876556967936L;
+    static final long GAME_ROLE_BORDER_ID = 911556139496374293L;
 
     public static long getServerId() {
         return SERVER_ID;

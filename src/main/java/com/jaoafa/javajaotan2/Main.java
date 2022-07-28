@@ -62,7 +62,7 @@ public class Main {
     static boolean isGuildDevelopMode = false;
     static long developUserId;
     static long developGuildId;
-    static Logger logger = LoggerFactory.getLogger("Javajaotan2");
+    static final Logger logger = LoggerFactory.getLogger("Javajaotan2");
     static JavajaotanConfig config;
     static JDA jda;
     static JSONArray commands;
@@ -110,7 +110,7 @@ public class Main {
         try {
             JDABuilder jdabuilder = JDABuilder.createDefault(config.getToken())
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.GUILD_EMOJIS)
+                    GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
                 .setAutoReconnect(true)
                 .setBulkDeleteSplittingEnabled(false)
                 .setContextEnabled(false);
@@ -316,13 +316,12 @@ public class Main {
                     commands.put(details);
 
                     getLogger().info(String.format("%s: コマンドの登録に成功しました。", commandName));
-                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                         InvocationTargetException e) {
                     getLogger().warn(String.format("%s: コマンドの登録に失敗しました。", commandName));
                     e.printStackTrace();
                 }
             }
-
-            System.out.println(manager.getCommands());
         } catch (InterruptedException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -351,7 +350,8 @@ public class Main {
                 jdaBuilder.addEventListeners(instance);
                 getLogger().info(String.format("%s: イベントの登録に成功しました。", eventName));
             }
-        } catch (ClassNotFoundException | IOException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (ClassNotFoundException | IOException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException | InvocationTargetException e) {
             getLogger().error("イベントの登録に失敗しました。");
             e.printStackTrace();
         }

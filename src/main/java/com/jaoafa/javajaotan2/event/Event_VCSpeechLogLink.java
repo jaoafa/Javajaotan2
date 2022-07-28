@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -25,14 +25,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Event_VCSpeechLogLink extends ListenerAdapter {
-    final Pattern messageUrlPattern = Pattern.compile("^https://.*?discord\\.com/channels/([0-9]+)/([0-9]+)/([0-9]+)\\??(.*)$", Pattern.CASE_INSENSITIVE);
+    final Pattern messageUrlPattern = Pattern.compile("^https://.*?discord\\.com/channels/(\\d+)/(\\d+)/(\\d+)\\??(.*)$", Pattern.CASE_INSENSITIVE);
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (!event.isFromType(ChannelType.TEXT)) {
             return;
         }
-        TextChannel channel = event.getTextChannel();
+        MessageChannelUnion channel = event.getChannel();
         Message message = event.getMessage();
         String content = message.getContentRaw();
         Matcher match = messageUrlPattern.matcher(content);

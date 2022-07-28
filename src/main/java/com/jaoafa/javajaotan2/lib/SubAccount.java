@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -12,10 +12,7 @@
 package com.jaoafa.javajaotan2.lib;
 
 import com.jaoafa.javajaotan2.Main;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,7 +82,7 @@ public class SubAccount {
         } catch (SQLException e) {
             return false;
         }
-        jMSGuild.addRoleToMember(user.getId(), SubAccountRole).queue();
+        jMSGuild.addRoleToMember(UserSnowflake.fromId(user.getId()), SubAccountRole).queue();
         return true;
     }
 
@@ -104,7 +101,7 @@ public class SubAccount {
         } catch (SQLException e) {
             return false;
         }
-        jMSGuild.removeRoleFromMember(user.getId(), SubAccountRole).queue();
+        jMSGuild.removeRoleFromMember(UserSnowflake.fromId(user.getId()), SubAccountRole).queue();
         return true;
     }
 

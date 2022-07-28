@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -183,14 +183,14 @@ public class Task_SyncOtherServerPerm implements Job {
     }
 
     static class GuildMember {
-        List<String> roles;
-        String nick;
-        ZonedDateTime joined_at;
-        String user_id;
-        String user_name;
-        String user_avatar;
-        String user_discriminator;
-        int user_public_flags;
+        final List<String> roles;
+        final String nick;
+        final ZonedDateTime joined_at;
+        final String user_id;
+        final String user_name;
+        final String user_avatar;
+        final String user_discriminator;
+        final int user_public_flags;
 
         private GuildMember(JSONObject object) {
             this.roles = object.getJSONArray("roles")

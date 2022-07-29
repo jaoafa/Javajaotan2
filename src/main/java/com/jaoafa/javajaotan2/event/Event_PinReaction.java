@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -28,17 +30,17 @@ public class Event_PinReaction extends ListenerAdapter {
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         Message message = event.retrieveMessage().complete();
         MessageReaction reaction = event.getReaction();
-        MessageReaction.ReactionEmote reactionEmote = reaction.getReactionEmote();
-        if (!reactionEmote.isEmoji()) {
+        EmojiUnion reactionEmote = reaction.getEmoji();
+        if (reactionEmote.getType() != EmojiUnion.Type.UNICODE) {
             return;
         }
-        if (!reactionEmote.getEmoji().equals("📌")) {
+        if (!reactionEmote.getName().equals("📌")) {
             return;
         }
         if (message.isPinned()) {
             return;
         }
-        List<User> users = message.retrieveReactionUsers("📌").complete();
+        List<User> users = message.retrieveReactionUsers(Emoji.fromUnicode("📌")).complete();
         if (users.size() < 2) {
             return;
         }
@@ -50,7 +52,7 @@ public class Event_PinReaction extends ListenerAdapter {
             return;
         }
         message.pin().queue(
-            s -> message.addReaction("📌").queue(),
+            s -> message.addReaction(Emoji.fromUnicode("📌")).queue(),
             e -> event
                 .getChannel()
                 .sendMessage("<@" + member.getId() + "> Failed to pin message: " + e.getMessage())

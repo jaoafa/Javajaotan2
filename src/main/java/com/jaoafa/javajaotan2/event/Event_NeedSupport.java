@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -14,6 +14,7 @@ package com.jaoafa.javajaotan2.event;
 import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -58,6 +59,6 @@ public class Event_NeedSupport extends ListenerAdapter {
             return;
         }
         guild.addRoleToMember(member, needSupport).queue();
-        message.addReaction("\uD83D\uDC40").queue(); // :eyes:
+        message.addReaction(Emoji.fromUnicode("\uD83D\uDC40")).queue(); // :eyes:
     }
 }

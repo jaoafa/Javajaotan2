@@ -15,8 +15,10 @@ import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.emote.EmoteAddedEvent;
-import net.dv8tion.jda.api.events.emote.EmoteRemovedEvent;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
+import net.dv8tion.jda.api.events.emoji.EmojiRemovedEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Event_CheckNitroEmoji extends ListenerAdapter {
-    List<ListedEmote> guildEmojis = null;
+    List<RichCustomEmoji> guildEmojis = null;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -45,14 +47,14 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
         }
         Guild guild = event.getGuild();
         if (guildEmojis == null) {
-            guildEmojis = guild.retrieveEmotes().complete();
+            guildEmojis = guild.retrieveEmojis().complete();
         }
 
-        List<Emote> emotes = message.getEmotes();
+        List<CustomEmoji> emojis = message.getMentions().getCustomEmojis();
         // GIF絵文字を使用しているか
-        boolean usingAnimated = emotes.stream().anyMatch(Emote::isAnimated);
+        boolean usingAnimated = emojis.stream().anyMatch(CustomEmoji::isAnimated);
         // いずれかの絵文字が、このGuildにはない絵文字を利用しているかどうか
-        boolean isOtherGuildEmoji = emotes
+        boolean isOtherGuildEmoji = emojis
             .stream()
             .anyMatch(e -> guildEmojis
                 .stream()
@@ -90,24 +92,24 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
     }
 
     @Override
-    public void onEmoteAdded(@NotNull EmoteAddedEvent event) {
+    public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
-        Main.getLogger().info("Emote added (Cache refresh): " + event.getEmote().getName());
-        event.getGuild().retrieveEmotes().queue(
+        Main.getLogger().info("Emoji added (Cache refresh): " + event.getEmoji().getName());
+        event.getGuild().retrieveEmojis().queue(
             emojis -> guildEmojis = emojis,
             Throwable::printStackTrace
         );
     }
 
     @Override
-    public void onEmoteRemoved(@NotNull EmoteRemovedEvent event) {
+    public void onEmojiRemoved(@NotNull EmojiRemovedEvent event) {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
-        Main.getLogger().info("Emote removed (Cache refresh): " + event.getEmote().getName());
-        event.getGuild().retrieveEmotes().queue(
+        Main.getLogger().info("Emoji removed (Cache refresh): " + event.getEmoji().getName());
+        event.getGuild().retrieveEmojis().queue(
             emojis -> guildEmojis = emojis,
             Throwable::printStackTrace
         );

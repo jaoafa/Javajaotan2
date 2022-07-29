@@ -15,6 +15,8 @@ import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -42,7 +44,7 @@ public class Event_Greeting extends ListenerAdapter {
         JDA jda = event.getJDA();
         Message message = event.getMessage();
         Guild guild = event.getGuild();
-        TextChannel channel = event.getTextChannel();
+        MessageChannelUnion channel = event.getChannel();
         String content = message.getContentRaw();
         Member member = event.getMember();
         if (member == null) {
@@ -60,19 +62,19 @@ public class Event_Greeting extends ListenerAdapter {
         if (content.equals("jao")) {
             List<Role> roles = member.getRoles().stream().filter(_role -> _role.getIdLong() == role.getIdLong()).toList();
             if (roles.size() == 0) {
-                message.addReaction("\u2753").queue(); // ?
+                message.addReaction(Emoji.fromUnicode("\u2753")).queue(); // ?
                 jaoPlayers.add(member.getIdLong());
             } else {
-                message.addReaction("\u274C").queue(); // x
+                message.addReaction(Emoji.fromUnicode("\u274C")).queue(); // x
             }
             return;
         }
         if (!jaoPlayers.contains(member.getIdLong())) {
-            message.addReaction("\u274C").queue(); // x
+            message.addReaction(Emoji.fromUnicode("\u274C")).queue(); // x
             return;
         }
         guild.addRoleToMember(member, role).queue();
-        message.addReaction("\u2B55").queue(); // o
+        message.addReaction(Emoji.fromUnicode("\u2B55")).queue(); // o
         message.reply("""
             あいさつしていただきありがとうございます！これにより、多くのチャンネルを閲覧できるようになりました。
             このあとは<#597419057251090443>などで__**「`/link`」を実行(投稿)して、MinecraftアカウントとDiscordアカウントを連携**__しましょう！

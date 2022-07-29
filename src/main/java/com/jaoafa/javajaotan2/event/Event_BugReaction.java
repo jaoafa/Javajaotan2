@@ -16,7 +16,13 @@ import com.jaoafa.javajaotan2.lib.Channels;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +37,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Event_BugReaction extends ListenerAdapter {
-    String targetReaction = "\uD83D\uDC1B"; // :bug:
-    String repo = "jaoafa/jao-Minecraft-Server";
+    final String targetReaction = "\uD83D\uDC1B"; // :bug:
+    final String repo = "jaoafa/jao-Minecraft-Server";
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
@@ -43,19 +49,19 @@ public class Event_BugReaction extends ListenerAdapter {
         if (user == null) user = event.retrieveUser().complete();
         if (user.isBot()) return;
 
-        MessageReaction.ReactionEmote emote = event.getReactionEmote();
+        EmojiUnion emoji = event.getEmoji();
 
-        if (!emote.isEmoji()) return;
-        if (!emote.getEmoji().equals(targetReaction)) return;
+        if (emoji.getType() != Emoji.Type.UNICODE) return;
+        if (!emoji.asUnicode().getName().equals(targetReaction)) return;
 
         Message message = event.retrieveMessage().complete();
-        List<User> users = message.retrieveReactionUsers(targetReaction).complete();
+        List<User> users = message.retrieveReactionUsers(Emoji.fromUnicode(targetReaction)).complete();
 
         if (users.size() != 1) {
             // 1人以外 = 0もしくは2人以上 = 既に報告済み
             return;
         }
-        TextChannel channel = event.getTextChannel();
+        MessageChannelUnion channel = event.getChannel();
 
         // Issueを作成する
         ZonedDateTime createdAt = message.getTimeCreated().atZoneSameInstant(ZoneId.of("Asia/Tokyo"));
@@ -93,22 +99,6 @@ public class Event_BugReaction extends ListenerAdapter {
             return;
         }
 
-        String mainMessage = """
-            ## 不具合と思われるメッセージ (または報告)
-                        
-            %s
-                        
-            URL: %s
-                        
-            ## 不具合報告者
-                        
-            %s
-            """.formatted(
-            createdAt.format(formatter) + " に送信された " + message.getAuthor().getAsMention() + " による " + message.getChannel().getAsMention() + " でのメッセージ",
-            message.getJumpUrl(),
-            user.getAsMention()
-        );
-
         List<String> messages = new ArrayList<>();
         if (responseType == JavajaotanLibrary.IssueResponseType.SUCCESS) {
             messages.add("[LINKED-ISSUE:jaoafa/jao-Minecraft-Server#" + issueNumber + "]");
@@ -135,6 +125,6 @@ public class Event_BugReaction extends ListenerAdapter {
             .setEmbeds(embed.build())
             .build()).queue();
 
-        message.addReaction(targetReaction).queue();
+        message.addReaction(Emoji.fromUnicode(targetReaction)).queue();
     }
 }

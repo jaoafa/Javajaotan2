@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -13,7 +13,11 @@ package com.jaoafa.javajaotan2.lib;
 
 import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -156,9 +160,9 @@ public class WatchEmojis {
 
         private List<String> getEmojiList(Guild guild) {
             return guild
-                .getEmotes()
+                .getEmojis()
                 .stream()
-                .sorted(Comparator.comparing(Emote::getName))
+                .sorted(Comparator.comparing(RichCustomEmoji::getName))
                 .map(e -> String.format("%s = `:%s:`", e.getAsMention(), e.getName()))
                 .collect(Collectors.toList());
         }

@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -18,24 +18,30 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.emote.EmoteAddedEvent;
-import net.dv8tion.jda.api.events.emote.EmoteRemovedEvent;
-import net.dv8tion.jda.api.events.emote.update.EmoteUpdateNameEvent;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
+import net.dv8tion.jda.api.events.emoji.EmojiRemovedEvent;
+import net.dv8tion.jda.api.events.emoji.update.EmojiUpdateNameEvent;
+import net.dv8tion.jda.api.events.emoji.update.EmojiUpdateRolesEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Event_WatchEmojis extends ListenerAdapter {
     @Override
-    public void onEmoteAdded(@NotNull EmoteAddedEvent event) {
+    public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         JDA jda = event.getJDA();
         Guild guild = event.getGuild();
-        Emote emote = event.getEmote();
-        ListedEmote listedEmote = event.getGuild().retrieveEmoteById(emote.getIdLong()).complete();
-        User user = listedEmote.getUser();
+        RichCustomEmoji emoji = event.getGuild().retrieveEmoji(event.getEmoji()).complete();
+        User user = emoji.getOwner();
+        if (user == null) {
+            Main.getLogger().warn("EmojiAddedEvent#onEmojiAdded: User is null");
+            return;
+        }
 
         Optional<WatchEmojis.EmojiGuild> optGuild = Main.getWatchEmojis().getEmojiGuild(guild);
         if (optGuild.isEmpty()) {
@@ -50,8 +56,8 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
         MessageEmbed embed = new EmbedBuilder()
             .setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl())
-            .setTitle(String.format(":new:NEW EMOJI : %s (`:%s:`)", emote.getAsMention(), emote.getName()))
-            .setThumbnail(emote.getImageUrl())
+            .setTitle(String.format(":new:NEW EMOJI : %s (`:%s:`)", emoji.getAsMention(), emoji.getName()))
+            .setThumbnail(emoji.getImageUrl())
             .setTimestamp(Instant.now())
             .build();
         log_channel.sendMessageEmbeds(embed).queue();
@@ -60,10 +66,84 @@ public class Event_WatchEmojis extends ListenerAdapter {
     }
 
     @Override
-    public void onEmoteUpdateName(@NotNull EmoteUpdateNameEvent event) {
+    public void onEmojiUpdateName(@NotNull EmojiUpdateNameEvent event) {
+        onEmojiUpdate(
+            event.getJDA(),
+            event.getGuild(),
+            event.getEmoji(),
+            new EmojiUpdateRecord(
+                EmojiUpdateType.NAME,
+                event.getOldName(),
+                event.getNewName()
+            )
+        );
+    }
+
+    @Override
+    public void onEmojiUpdateRoles(@NotNull EmojiUpdateRolesEvent event) {
+        onEmojiUpdate(
+            event.getJDA(),
+            event.getGuild(),
+            event.getEmoji(),
+            new EmojiUpdateRecord(
+                EmojiUpdateType.ROLES,
+                rolesToString(event.getOldRoles()),
+                rolesToString(event.getNewRoles())
+            )
+        );
+    }
+
+    String rolesToString(List<Role> roles) {
+        return roles
+            .stream()
+            .map(Role::getName)
+            .collect(Collectors.joining(", "));
+    }
+
+    void onEmojiUpdate(JDA jda, Guild guild, RichCustomEmoji emoji, EmojiUpdateRecord record) {
+        Optional<WatchEmojis.EmojiGuild> optGuild = Main.getWatchEmojis().getEmojiGuild(guild);
+        if (optGuild.isEmpty()) {
+            return;
+        }
+
+        WatchEmojis.EmojiGuild emojiGuild = optGuild.get();
+        long log_channel_id = emojiGuild.getLogChannelId();
+        TextChannel log_channel = jda.getTextChannelById(log_channel_id);
+        if (log_channel == null) {
+            return;
+        }
+
+        List<AuditLogEntry> entries = guild.retrieveAuditLogs().type(ActionType.EMOJI_UPDATE).limit(5).complete();
+        User user = null;
+        if (!entries.isEmpty()) {
+            for (AuditLogEntry entry : entries) {
+                if (entry.getTargetIdLong() != emoji.getIdLong()) {
+                    continue;
+                }
+                user = entry.getUser();
+            }
+        }
+
+        EmbedBuilder builder = new EmbedBuilder()
+            .setTitle(":repeat:UPDATED EMOJI(%s) : %s".formatted(record.type.name(), emoji.getAsMention()))
+            .setThumbnail(emoji.getImageUrl())
+            .addField("Old", record.oldValue, true)
+            .addField("New", record.newValue, true)
+            .setTimestamp(Instant.now());
+
+        if (user != null) {
+            builder.setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl());
+        }
+        log_channel.sendMessageEmbeds(builder.build()).queue();
+
+        emojiGuild.generateEmojiList(jda);
+    }
+
+    @Override
+    public void onEmojiRemoved(@NotNull EmojiRemovedEvent event) {
         JDA jda = event.getJDA();
         Guild guild = event.getGuild();
-        Emote emote = event.getEmote();
+        RichCustomEmoji emoji = event.getEmoji();
 
         Optional<WatchEmojis.EmojiGuild> optGuild = Main.getWatchEmojis().getEmojiGuild(guild);
         if (optGuild.isEmpty()) {
@@ -77,11 +157,11 @@ public class Event_WatchEmojis extends ListenerAdapter {
             return;
         }
 
-        List<AuditLogEntry> entries = guild.retrieveAuditLogs().type(ActionType.EMOTE_UPDATE).limit(5).complete();
+        List<AuditLogEntry> entries = guild.retrieveAuditLogs().type(ActionType.EMOJI_DELETE).limit(5).complete();
         User user = null;
         if (!entries.isEmpty()) {
             for (AuditLogEntry entry : entries) {
-                if (entry.getTargetIdLong() != emote.getIdLong()) {
+                if (entry.getTargetIdLong() != emoji.getIdLong()) {
                     continue;
                 }
                 user = entry.getUser();
@@ -89,10 +169,10 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
 
         EmbedBuilder embed = new EmbedBuilder()
-            .setTitle(String.format(":repeat:CHANGE EMOJI : %s (`:%s:` -> `:%s:`)", emote.getAsMention(), event.getOldName(), event.getNewName()))
-            .setThumbnail(emote.getImageUrl())
+            .setTitle(String.format(":wave:DELETED EMOJI : (`:%s:`)", emoji.getName()))
+            .setThumbnail(emoji.getImageUrl())
             .setTimestamp(Instant.now());
-        if(user != null) {
+        if (user != null) {
             embed.setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl());
         }
         log_channel.sendMessageEmbeds(embed.build()).queue();
@@ -100,44 +180,15 @@ public class Event_WatchEmojis extends ListenerAdapter {
         emojiGuild.generateEmojiList(jda);
     }
 
-    @Override
-    public void onEmoteRemoved(@NotNull EmoteRemovedEvent event) {
-        JDA jda = event.getJDA();
-        Guild guild = event.getGuild();
-        Emote emote = event.getEmote();
+    record EmojiUpdateRecord(
+        EmojiUpdateType type,
+        String oldValue,
+        String newValue
+    ) {
+    }
 
-        Optional<WatchEmojis.EmojiGuild> optGuild = Main.getWatchEmojis().getEmojiGuild(guild);
-        if (optGuild.isEmpty()) {
-            return;
-        }
-
-        WatchEmojis.EmojiGuild emojiGuild = optGuild.get();
-        long log_channel_id = emojiGuild.getLogChannelId();
-        TextChannel log_channel = jda.getTextChannelById(log_channel_id);
-        if (log_channel == null) {
-            return;
-        }
-
-        List<AuditLogEntry> entries = guild.retrieveAuditLogs().type(ActionType.EMOTE_DELETE).limit(5).complete();
-        User user = null;
-        if (!entries.isEmpty()) {
-            for (AuditLogEntry entry : entries) {
-                if (entry.getTargetIdLong() != emote.getIdLong()) {
-                    continue;
-                }
-                user = entry.getUser();
-            }
-        }
-
-        EmbedBuilder embed = new EmbedBuilder()
-            .setTitle(String.format(":wave:DELETED EMOJI : (`:%s:`)", emote.getName()))
-            .setThumbnail(emote.getImageUrl())
-            .setTimestamp(Instant.now());
-        if(user != null) {
-            embed.setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl());
-        }
-        log_channel.sendMessageEmbeds(embed.build()).queue();
-
-        emojiGuild.generateEmojiList(jda);
+    enum EmojiUpdateType {
+        NAME,
+        ROLES
     }
 }

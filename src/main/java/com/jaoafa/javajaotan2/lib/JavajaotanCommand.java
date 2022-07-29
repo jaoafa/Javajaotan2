@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class JavajaotanCommand {
     public static String permRoles(List<Roles> roles) {
-        if(roles == null) return null;
+        if (roles == null) return null;
         return roles.stream()
             .map(Roles::getRoleId)
             .map(Object::toString).collect(Collectors.joining("|"));
@@ -101,7 +101,7 @@ public class JavajaotanCommand {
     }
 
     public static class Cmd {
-        Command<JDACommandSender>[] commands;
+        final Command<JDACommandSender>[] commands;
 
         @SafeVarargs
         public Cmd(@NonNull Command<JDACommandSender>... commands) {

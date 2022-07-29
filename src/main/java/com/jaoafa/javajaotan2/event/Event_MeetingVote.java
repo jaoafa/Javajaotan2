@@ -20,6 +20,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -98,11 +101,11 @@ public class Event_MeetingVote extends ListenerAdapter {
     /** clubjaoafa からの自治体関連リクエストプレフィックス */
     static final String API_CITIES_PREFIX = "[API-CITIES-";
     /** 自治体新規作成リクエスト管理テキストパターン */
-    static final Pattern CITIES_CREATE_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CREATE-WAITING:([0-9]+)]");
+    static final Pattern CITIES_CREATE_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CREATE-WAITING:(\\d+)]");
     /** 自治体範囲変更リクエスト管理テキストパターン */
-    static final Pattern CITIES_CORNERS_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CHANGE-CORNERS-WAITING:([0-9]+)]");
+    static final Pattern CITIES_CORNERS_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CHANGE-CORNERS-WAITING:(\\d+)]");
     /** 自治体情報変更リクエスト管理テキストパターン */
-    static final Pattern CITIES_CHANGE_OTHER_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CHANGE-OTHER-WAITING:([0-9]+)]");
+    static final Pattern CITIES_CHANGE_OTHER_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CHANGE-OTHER-WAITING:(\\d+)]");
 
     public void initChannels(JDA jda) {
         this.logger = Main.getLogger();
@@ -122,7 +125,7 @@ public class Event_MeetingVote extends ListenerAdapter {
         if (!event.isFromType(ChannelType.TEXT)) return;
 
         User author = event.getAuthor();
-        TextChannel channel = event.getTextChannel();
+        MessageChannelUnion channel = event.getChannel();
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
@@ -179,12 +182,12 @@ public class Event_MeetingVote extends ListenerAdapter {
         if (user == null) user = event.retrieveUser().complete();
         if (user.isBot()) return;
 
-        MessageReaction.ReactionEmote emote = event.getReactionEmote();
+        EmojiUnion emoji = event.getEmoji();
 
-        if (!emote.isEmoji()) return;
-        if (!emote.getEmoji().equals(VoteReaction.GOOD.getUnicode())
-            && !emote.getEmoji().equals(VoteReaction.BAD.getUnicode())
-            && !emote.getEmoji().equals(VoteReaction.WHITE.getUnicode()))
+        if (emoji.getType() != Emoji.Type.UNICODE) return;
+        if (!emoji.asUnicode().getName().equals(VoteReaction.GOOD.getUnicode())
+            && !emoji.asUnicode().getName().equals(VoteReaction.BAD.getUnicode())
+            && !emoji.asUnicode().getName().equals(VoteReaction.WHITE.getUnicode()))
             return;
 
         Message message = event.retrieveMessage().complete();
@@ -671,7 +674,7 @@ public class Event_MeetingVote extends ListenerAdapter {
          * @param message メッセージ
          */
         public void addReaction(@NotNull Message message) {
-            message.addReaction(getUnicode()).queue();
+            message.addReaction(Emoji.fromUnicode(getUnicode())).queue();
         }
 
         /**
@@ -683,7 +686,7 @@ public class Event_MeetingVote extends ListenerAdapter {
          */
         public List<User> getUsers(@NotNull Message message) {
             return message
-                .retrieveReactionUsers(getUnicode())
+                .retrieveReactionUsers(Emoji.fromUnicode(getUnicode()))
                 .complete()
                 .stream()
                 .filter(u -> !u.isBot())
@@ -699,7 +702,7 @@ public class Event_MeetingVote extends ListenerAdapter {
          */
         public List<User> getUsersIncludeBot(@NotNull Message message) {
             return new ArrayList<>(message
-                .retrieveReactionUsers(getUnicode())
+                .retrieveReactionUsers(Emoji.fromUnicode(getUnicode()))
                 .complete());
         }
 
@@ -713,7 +716,7 @@ public class Event_MeetingVote extends ListenerAdapter {
          */
         public boolean isReacted(Message message, User user) {
             return message
-                .retrieveReactionUsers(getUnicode())
+                .retrieveReactionUsers(Emoji.fromUnicode(getUnicode()))
                 .stream()
                 .anyMatch(u -> u.getIdLong() == user.getIdLong());
         }
@@ -748,7 +751,7 @@ public class Event_MeetingVote extends ListenerAdapter {
      * メッセージテキストと白票数から投票ボーダーを算出
      */
     int getVoteBorderFromContent(String content, int white_count) {
-        Matcher m = Pattern.compile("\\[Border:([0-9]+)]").matcher(content);
+        Matcher m = Pattern.compile("\\[Border:(\\d+)]").matcher(content);
 
         if (m.find() && JavajaotanLibrary.isInt(m.group(1)))
             return Integer.parseInt(m.group(1));

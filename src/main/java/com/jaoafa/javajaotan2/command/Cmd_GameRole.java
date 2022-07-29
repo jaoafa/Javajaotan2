@@ -21,6 +21,7 @@ import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,11 +38,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Cmd_GameRole implements CommandPremise {
-    Path path = GameRole.getPath();
-    Path pathMessages = GameRole.getPathMessages();
-    Pattern emojiPattern = GameRole.getEmojiPattern();
-    long SERVER_ID = GameRole.getServerId();
-    long GAME_ROLE_BORDER_ID = GameRole.getGameRoleBorderId();
+    final Path path = GameRole.getPath();
+    final Path pathMessages = GameRole.getPathMessages();
+    final Pattern emojiPattern = GameRole.getEmojiPattern();
+    final long SERVER_ID = GameRole.getServerId();
+    final long GAME_ROLE_BORDER_ID = GameRole.getGameRoleBorderId();
 
     @Override
     public JavajaotanCommand.Detail details() {
@@ -301,12 +302,12 @@ public class Cmd_GameRole implements CommandPremise {
         sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n");
         sb.append("ロールの剥奪（解除）は運営側では対応しません。`/gamerole take <GAMENAME>`（GAMENAMEはゲーム名）で解除できます。\n\n");
         List<String> usedEmojis = GameRole.getUsedGameEmojis();
-        List<String> emoteIds = guild.getEmotes()
+        List<String> emojiIds = guild.getEmojis()
             .stream()
-            .map(Emote::getId)
+            .map(RichCustomEmoji::getId)
             .filter(s -> !usedEmojis.contains(s))
-            .collect(Collectors.toList());
-        List<Emote> emotes = new ArrayList<>();
+            .toList();
+        List<RichCustomEmoji> emojis = new ArrayList<>();
 
         for (String gameId : games) {
             Role role = guild.getRoleById(gameId);
@@ -315,10 +316,10 @@ public class Cmd_GameRole implements CommandPremise {
             }
             String gameName = role.getName();
             String gameEmoji = GameRole.getGameEmoji(gameId);
-            while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmoteById(gameEmoji) == null) {
-                gameEmoji = emoteIds.get(new Random().nextInt(emoteIds.size()));
+            while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmojiById(gameEmoji) == null) {
+                gameEmoji = emojiIds.get(new Random().nextInt(emojiIds.size()));
             }
-            Emote emoji = jda.getEmoteById(gameEmoji);
+            RichCustomEmoji emoji = jda.getEmojiById(gameEmoji);
             if (emoji == null) {
                 continue;
             }
@@ -327,12 +328,12 @@ public class Cmd_GameRole implements CommandPremise {
                 .append(" ")
                 .append(gameName)
                 .append("\n");
-            emotes.add(emoji);
+            emojis.add(emoji);
         }
 
         Message postMessage = channel.sendMessage(sb.toString()).complete();
-        for (Emote emote : emotes) {
-            postMessage.addReaction(emote).queue();
+        for (RichCustomEmoji emoji : emojis) {
+            postMessage.addReaction(emoji).queue();
         }
         addMessage(postMessage);
     }
@@ -371,7 +372,7 @@ public class Cmd_GameRole implements CommandPremise {
         if (matcher.matches()) {
             emojiId = matcher.group(1);
         }
-        Emote emoji = jda.getEmoteById(emojiId);
+        RichCustomEmoji emoji = jda.getEmojiById(emojiId);
         if (emoji == null) {
             message.reply("指定された絵文字が見つかりませんでした。").queue();
             return;
@@ -498,12 +499,12 @@ public class Cmd_GameRole implements CommandPremise {
         sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n");
         sb.append("ロールの剥奪（解除）は運営側では対応しません。`/gamerole take <GAMENAME>`（GAMENAMEはゲーム名）で解除できます。\n\n");
         List<String> usedEmojis = GameRole.getUsedGameEmojis();
-        List<String> emoteIds = guild.getEmotes()
+        List<String> emojiIds = guild.getEmojis()
             .stream()
-            .map(Emote::getId)
+            .map(RichCustomEmoji::getId)
             .filter(s -> !usedEmojis.contains(s))
-            .collect(Collectors.toList());
-        List<Emote> emotes = new ArrayList<>();
+            .toList();
+        List<RichCustomEmoji> emojis = new ArrayList<>();
 
         for (String gameId : gameRoles) {
             Role role = guild.getRoleById(gameId);
@@ -512,10 +513,10 @@ public class Cmd_GameRole implements CommandPremise {
             }
             String gameName = role.getName();
             String gameEmoji = GameRole.getGameEmoji(gameId);
-            while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmoteById(gameEmoji) == null) {
-                gameEmoji = emoteIds.get(new Random().nextInt(emoteIds.size()));
+            while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmojiById(gameEmoji) == null) {
+                gameEmoji = emojiIds.get(new Random().nextInt(emojiIds.size()));
             }
-            Emote emoji = jda.getEmoteById(gameEmoji);
+            RichCustomEmoji emoji = jda.getEmojiById(gameEmoji);
             if (emoji == null) {
                 continue;
             }
@@ -524,7 +525,7 @@ public class Cmd_GameRole implements CommandPremise {
                 .append(" ")
                 .append(gameName)
                 .append("\n");
-            emotes.add(emoji);
+            emojis.add(emoji);
         }
         JSONArray messages = games.getJSONArray("messages");
         for (int i = 0; i < messages.length(); i++) {
@@ -538,8 +539,8 @@ public class Cmd_GameRole implements CommandPremise {
             String content = sb.toString();
             Message message = channel.editMessageById(messageId, content).complete();
             message.clearReactions().complete();
-            for (Emote emote : emotes) {
-                message.addReaction(emote).queue();
+            for (RichCustomEmoji emoji : emojis) {
+                message.addReaction(emoji).queue();
             }
         }
     }

@@ -29,7 +29,7 @@
           "type": "Own sources"
         },
         {
-          "name": "Maven: net.dv8tion:JDA:5.0.0-alpha.9",
+          "name": "Maven: net.dv8tion:JDA:5.0.0-alpha.17",
           "type": "Library"
         },
         {
@@ -37,7 +37,7 @@
           "type": "Library"
         },
         {
-          "name": "Maven: org.jetbrains:annotations:16.0.1",
+          "name": "Maven: org.jetbrains:annotations:23.0.0",
           "type": "Library"
         },
         {
@@ -45,7 +45,7 @@
           "type": "Library"
         },
         {
-          "name": "Maven: org.apache.commons:commons-collections4:4.1",
+          "name": "Maven: org.apache.commons:commons-collections4:4.4",
           "type": "Library"
         },
         {
@@ -53,15 +53,15 @@
           "type": "Library"
         },
         {
-          "name": "Maven: com.fasterxml.jackson.core:jackson-databind:2.10.1",
+          "name": "Maven: com.fasterxml.jackson.core:jackson-core:2.13.2",
           "type": "Library"
         },
         {
-          "name": "Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.1",
+          "name": "Maven: com.fasterxml.jackson.core:jackson-databind:2.13.2.2",
           "type": "Library"
         },
         {
-          "name": "Maven: com.fasterxml.jackson.core:jackson-core:2.10.1",
+          "name": "Maven: com.fasterxml.jackson.core:jackson-annotations:2.13.2",
           "type": "Library"
         },
         {

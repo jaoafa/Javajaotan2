@@ -1,12 +1,12 @@
 {
   "libraries": [
     {
-      "ideaName": "Maven: net.dv8tion:JDA:5.0.0-alpha.9",
+      "ideaName": "Maven: net.dv8tion:JDA:5.0.0-alpha.17",
       "unresolved": false,
       "groupId": "net.dv8tion",
       "artifactId": "JDA",
-      "version": "5.0.0-alpha.9",
-      "baseVersion": "5.0.0-alpha.9",
+      "version": "5.0.0-alpha.17",
+      "baseVersion": "5.0.0-alpha.17",
       "type": "jar",
       "optional": false,
       "scope": "compile"
@@ -23,12 +23,12 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: org.jetbrains:annotations:16.0.1",
+      "ideaName": "Maven: org.jetbrains:annotations:23.0.0",
       "unresolved": false,
       "groupId": "org.jetbrains",
       "artifactId": "annotations",
-      "version": "16.0.1",
-      "baseVersion": "16.0.1",
+      "version": "23.0.0",
+      "baseVersion": "23.0.0",
       "type": "jar",
       "optional": false,
       "scope": "compile"
@@ -45,12 +45,12 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: org.apache.commons:commons-collections4:4.1",
+      "ideaName": "Maven: org.apache.commons:commons-collections4:4.4",
       "unresolved": false,
       "groupId": "org.apache.commons",
       "artifactId": "commons-collections4",
-      "version": "4.1",
-      "baseVersion": "4.1",
+      "version": "4.4",
+      "baseVersion": "4.4",
       "type": "jar",
       "optional": false,
       "scope": "compile"
@@ -67,34 +67,34 @@
       "scope": "runtime"
     },
     {
-      "ideaName": "Maven: com.fasterxml.jackson.core:jackson-databind:2.10.1",
-      "unresolved": false,
-      "groupId": "com.fasterxml.jackson.core",
-      "artifactId": "jackson-databind",
-      "version": "2.10.1",
-      "baseVersion": "2.10.1",
-      "type": "jar",
-      "optional": false,
-      "scope": "runtime"
-    },
-    {
-      "ideaName": "Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.1",
-      "unresolved": false,
-      "groupId": "com.fasterxml.jackson.core",
-      "artifactId": "jackson-annotations",
-      "version": "2.10.1",
-      "baseVersion": "2.10.1",
-      "type": "jar",
-      "optional": false,
-      "scope": "runtime"
-    },
-    {
-      "ideaName": "Maven: com.fasterxml.jackson.core:jackson-core:2.10.1",
+      "ideaName": "Maven: com.fasterxml.jackson.core:jackson-core:2.13.2",
       "unresolved": false,
       "groupId": "com.fasterxml.jackson.core",
       "artifactId": "jackson-core",
-      "version": "2.10.1",
-      "baseVersion": "2.10.1",
+      "version": "2.13.2",
+      "baseVersion": "2.13.2",
+      "type": "jar",
+      "optional": false,
+      "scope": "runtime"
+    },
+    {
+      "ideaName": "Maven: com.fasterxml.jackson.core:jackson-databind:2.13.2.2",
+      "unresolved": false,
+      "groupId": "com.fasterxml.jackson.core",
+      "artifactId": "jackson-databind",
+      "version": "2.13.2.2",
+      "baseVersion": "2.13.2.2",
+      "type": "jar",
+      "optional": false,
+      "scope": "runtime"
+    },
+    {
+      "ideaName": "Maven: com.fasterxml.jackson.core:jackson-annotations:2.13.2",
+      "unresolved": false,
+      "groupId": "com.fasterxml.jackson.core",
+      "artifactId": "jackson-annotations",
+      "version": "2.13.2",
+      "baseVersion": "2.13.2",
       "type": "jar",
       "optional": false,
       "scope": "runtime"

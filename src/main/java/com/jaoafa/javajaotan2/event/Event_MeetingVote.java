@@ -182,12 +182,12 @@ public class Event_MeetingVote extends ListenerAdapter {
         if (user == null) user = event.retrieveUser().complete();
         if (user.isBot()) return;
 
-        EmojiUnion emote = event.getEmoji();
+        EmojiUnion emoji = event.getEmoji();
 
-        if (emote.getType() != Emoji.Type.UNICODE) return;
-        if (!emote.asUnicode().getName().equals(VoteReaction.GOOD.getUnicode())
-            && !emote.asUnicode().getName().equals(VoteReaction.BAD.getUnicode())
-            && !emote.asUnicode().getName().equals(VoteReaction.WHITE.getUnicode()))
+        if (emoji.getType() != Emoji.Type.UNICODE) return;
+        if (!emoji.asUnicode().getName().equals(VoteReaction.GOOD.getUnicode())
+            && !emoji.asUnicode().getName().equals(VoteReaction.BAD.getUnicode())
+            && !emoji.asUnicode().getName().equals(VoteReaction.WHITE.getUnicode()))
             return;
 
         Message message = event.retrieveMessage().complete();

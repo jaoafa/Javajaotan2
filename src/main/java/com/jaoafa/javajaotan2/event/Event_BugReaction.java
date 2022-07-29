@@ -49,10 +49,10 @@ public class Event_BugReaction extends ListenerAdapter {
         if (user == null) user = event.retrieveUser().complete();
         if (user.isBot()) return;
 
-        EmojiUnion emote = event.getEmoji();
+        EmojiUnion emoji = event.getEmoji();
 
-        if (emote.getType() != Emoji.Type.UNICODE) return;
-        if (!emote.asUnicode().getName().equals(targetReaction)) return;
+        if (emoji.getType() != Emoji.Type.UNICODE) return;
+        if (!emoji.asUnicode().getName().equals(targetReaction)) return;
 
         Message message = event.retrieveMessage().complete();
         List<User> users = message.retrieveReactionUsers(Emoji.fromUnicode(targetReaction)).complete();

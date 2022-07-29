@@ -114,8 +114,8 @@ public class JavajaotanLibrary {
             }
             tmp = tmp.replaceAll("<@!?" + Pattern.quote(user.getId()) + '>', '@' + Matcher.quoteReplacement(name));
         }
-        for (CustomEmoji emote : message.getMentions().getCustomEmojis()) {
-            tmp = tmp.replace(emote.getAsMention(), ":" + emote.getName() + ":");
+        for (CustomEmoji emoji : message.getMentions().getCustomEmojis()) {
+            tmp = tmp.replace(emoji.getAsMention(), ":" + emoji.getName() + ":");
         }
         for (GuildChannel mentionedChannel : message.getMentions().getChannels()) {
             tmp = tmp.replace(mentionedChannel.getAsMention(), '#' + mentionedChannel.getName());

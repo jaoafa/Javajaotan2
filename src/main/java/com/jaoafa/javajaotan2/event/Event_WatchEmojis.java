@@ -36,8 +36,8 @@ public class Event_WatchEmojis extends ListenerAdapter {
     public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         JDA jda = event.getJDA();
         Guild guild = event.getGuild();
-        RichCustomEmoji emote = event.getGuild().retrieveEmoji(event.getEmoji()).complete();
-        User user = emote.getOwner();
+        RichCustomEmoji emoji = event.getGuild().retrieveEmoji(event.getEmoji()).complete();
+        User user = emoji.getOwner();
         if (user == null) {
             Main.getLogger().warn("EmojiAddedEvent#onEmojiAdded: User is null");
             return;
@@ -56,8 +56,8 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
         MessageEmbed embed = new EmbedBuilder()
             .setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl())
-            .setTitle(String.format(":new:NEW EMOJI : %s (`:%s:`)", emote.getAsMention(), emote.getName()))
-            .setThumbnail(emote.getImageUrl())
+            .setTitle(String.format(":new:NEW EMOJI : %s (`:%s:`)", emoji.getAsMention(), emoji.getName()))
+            .setThumbnail(emoji.getImageUrl())
             .setTimestamp(Instant.now())
             .build();
         log_channel.sendMessageEmbeds(embed).queue();
@@ -100,7 +100,7 @@ public class Event_WatchEmojis extends ListenerAdapter {
             .collect(Collectors.joining(", "));
     }
 
-    void onEmojiUpdate(JDA jda, Guild guild, RichCustomEmoji emote, EmojiUpdateRecord record) {
+    void onEmojiUpdate(JDA jda, Guild guild, RichCustomEmoji emoji, EmojiUpdateRecord record) {
         Optional<WatchEmojis.EmojiGuild> optGuild = Main.getWatchEmojis().getEmojiGuild(guild);
         if (optGuild.isEmpty()) {
             return;
@@ -117,7 +117,7 @@ public class Event_WatchEmojis extends ListenerAdapter {
         User user = null;
         if (!entries.isEmpty()) {
             for (AuditLogEntry entry : entries) {
-                if (entry.getTargetIdLong() != emote.getIdLong()) {
+                if (entry.getTargetIdLong() != emoji.getIdLong()) {
                     continue;
                 }
                 user = entry.getUser();
@@ -125,8 +125,8 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
 
         EmbedBuilder builder = new EmbedBuilder()
-            .setTitle(":repeat:UPDATED EMOJI(%s) : %s".formatted(record.type.name(), emote.getAsMention()))
-            .setThumbnail(emote.getImageUrl())
+            .setTitle(":repeat:UPDATED EMOJI(%s) : %s".formatted(record.type.name(), emoji.getAsMention()))
+            .setThumbnail(emoji.getImageUrl())
             .addField("Old", record.oldValue, true)
             .addField("New", record.newValue, true)
             .setTimestamp(Instant.now());
@@ -143,7 +143,7 @@ public class Event_WatchEmojis extends ListenerAdapter {
     public void onEmojiRemoved(@NotNull EmojiRemovedEvent event) {
         JDA jda = event.getJDA();
         Guild guild = event.getGuild();
-        RichCustomEmoji emote = event.getEmoji();
+        RichCustomEmoji emoji = event.getEmoji();
 
         Optional<WatchEmojis.EmojiGuild> optGuild = Main.getWatchEmojis().getEmojiGuild(guild);
         if (optGuild.isEmpty()) {
@@ -161,7 +161,7 @@ public class Event_WatchEmojis extends ListenerAdapter {
         User user = null;
         if (!entries.isEmpty()) {
             for (AuditLogEntry entry : entries) {
-                if (entry.getTargetIdLong() != emote.getIdLong()) {
+                if (entry.getTargetIdLong() != emoji.getIdLong()) {
                     continue;
                 }
                 user = entry.getUser();
@@ -169,8 +169,8 @@ public class Event_WatchEmojis extends ListenerAdapter {
         }
 
         EmbedBuilder embed = new EmbedBuilder()
-            .setTitle(String.format(":wave:DELETED EMOJI : (`:%s:`)", emote.getName()))
-            .setThumbnail(emote.getImageUrl())
+            .setTitle(String.format(":wave:DELETED EMOJI : (`:%s:`)", emoji.getName()))
+            .setThumbnail(emoji.getImageUrl())
             .setTimestamp(Instant.now());
         if (user != null) {
             embed.setAuthor(user.getAsTag(), "https://discord.com/users/" + user.getId(), user.getAvatarUrl());

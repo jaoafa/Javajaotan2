@@ -30,11 +30,11 @@ public class Event_PinReaction extends ListenerAdapter {
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         Message message = event.retrieveMessage().complete();
         MessageReaction reaction = event.getReaction();
-        EmojiUnion reactionEmote = reaction.getEmoji();
-        if (reactionEmote.getType() != EmojiUnion.Type.UNICODE) {
+        EmojiUnion emoji = reaction.getEmoji();
+        if (emoji.getType() != EmojiUnion.Type.UNICODE) {
             return;
         }
-        if (!reactionEmote.getName().equals("📌")) {
+        if (!emoji.getName().equals("📌")) {
             return;
         }
         if (message.isPinned()) {

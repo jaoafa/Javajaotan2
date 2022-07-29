@@ -50,11 +50,11 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
             guildEmojis = guild.retrieveEmojis().complete();
         }
 
-        List<CustomEmoji> emotes = message.getMentions().getCustomEmojis();
+        List<CustomEmoji> emojis = message.getMentions().getCustomEmojis();
         // GIF絵文字を使用しているか
-        boolean usingAnimated = emotes.stream().anyMatch(CustomEmoji::isAnimated);
+        boolean usingAnimated = emojis.stream().anyMatch(CustomEmoji::isAnimated);
         // いずれかの絵文字が、このGuildにはない絵文字を利用しているかどうか
-        boolean isOtherGuildEmoji = emotes
+        boolean isOtherGuildEmoji = emojis
             .stream()
             .anyMatch(e -> guildEmojis
                 .stream()
@@ -96,7 +96,7 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
-        Main.getLogger().info("Emote added (Cache refresh): " + event.getEmoji().getName());
+        Main.getLogger().info("Emoji added (Cache refresh): " + event.getEmoji().getName());
         event.getGuild().retrieveEmojis().queue(
             emojis -> guildEmojis = emojis,
             Throwable::printStackTrace
@@ -108,7 +108,7 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }
-        Main.getLogger().info("Emote removed (Cache refresh): " + event.getEmoji().getName());
+        Main.getLogger().info("Emoji removed (Cache refresh): " + event.getEmoji().getName());
         event.getGuild().retrieveEmojis().queue(
             emojis -> guildEmojis = emojis,
             Throwable::printStackTrace

@@ -302,12 +302,12 @@ public class Cmd_GameRole implements CommandPremise {
         sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n");
         sb.append("ロールの剥奪（解除）は運営側では対応しません。`/gamerole take <GAMENAME>`（GAMENAMEはゲーム名）で解除できます。\n\n");
         List<String> usedEmojis = GameRole.getUsedGameEmojis();
-        List<String> emoteIds = guild.getEmojis()
+        List<String> emojiIds = guild.getEmojis()
             .stream()
             .map(RichCustomEmoji::getId)
             .filter(s -> !usedEmojis.contains(s))
             .toList();
-        List<RichCustomEmoji> emotes = new ArrayList<>();
+        List<RichCustomEmoji> emojis = new ArrayList<>();
 
         for (String gameId : games) {
             Role role = guild.getRoleById(gameId);
@@ -317,7 +317,7 @@ public class Cmd_GameRole implements CommandPremise {
             String gameName = role.getName();
             String gameEmoji = GameRole.getGameEmoji(gameId);
             while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmojiById(gameEmoji) == null) {
-                gameEmoji = emoteIds.get(new Random().nextInt(emoteIds.size()));
+                gameEmoji = emojiIds.get(new Random().nextInt(emojiIds.size()));
             }
             RichCustomEmoji emoji = jda.getEmojiById(gameEmoji);
             if (emoji == null) {
@@ -328,11 +328,11 @@ public class Cmd_GameRole implements CommandPremise {
                 .append(" ")
                 .append(gameName)
                 .append("\n");
-            emotes.add(emoji);
+            emojis.add(emoji);
         }
 
         Message postMessage = channel.sendMessage(sb.toString()).complete();
-        for (RichCustomEmoji emoji : emotes) {
+        for (RichCustomEmoji emoji : emojis) {
             postMessage.addReaction(emoji).queue();
         }
         addMessage(postMessage);
@@ -499,12 +499,12 @@ public class Cmd_GameRole implements CommandPremise {
         sb.append("所持しているゲームの絵文字をこのメッセージにリアクションすると、ゲームロールが付与されます。\n");
         sb.append("ロールの剥奪（解除）は運営側では対応しません。`/gamerole take <GAMENAME>`（GAMENAMEはゲーム名）で解除できます。\n\n");
         List<String> usedEmojis = GameRole.getUsedGameEmojis();
-        List<String> emoteIds = guild.getEmojis()
+        List<String> emojiIds = guild.getEmojis()
             .stream()
             .map(RichCustomEmoji::getId)
             .filter(s -> !usedEmojis.contains(s))
             .toList();
-        List<RichCustomEmoji> emotes = new ArrayList<>();
+        List<RichCustomEmoji> emojis = new ArrayList<>();
 
         for (String gameId : gameRoles) {
             Role role = guild.getRoleById(gameId);
@@ -514,7 +514,7 @@ public class Cmd_GameRole implements CommandPremise {
             String gameName = role.getName();
             String gameEmoji = GameRole.getGameEmoji(gameId);
             while (gameEmoji == null || sb.toString().contains(gameEmoji) || jda.getEmojiById(gameEmoji) == null) {
-                gameEmoji = emoteIds.get(new Random().nextInt(emoteIds.size()));
+                gameEmoji = emojiIds.get(new Random().nextInt(emojiIds.size()));
             }
             RichCustomEmoji emoji = jda.getEmojiById(gameEmoji);
             if (emoji == null) {
@@ -525,7 +525,7 @@ public class Cmd_GameRole implements CommandPremise {
                 .append(" ")
                 .append(gameName)
                 .append("\n");
-            emotes.add(emoji);
+            emojis.add(emoji);
         }
         JSONArray messages = games.getJSONArray("messages");
         for (int i = 0; i < messages.length(); i++) {
@@ -539,8 +539,8 @@ public class Cmd_GameRole implements CommandPremise {
             String content = sb.toString();
             Message message = channel.editMessageById(messageId, content).complete();
             message.clearReactions().complete();
-            for (RichCustomEmoji emote : emotes) {
-                message.addReaction(emote).queue();
+            for (RichCustomEmoji emoji : emojis) {
+                message.addReaction(emoji).queue();
             }
         }
     }

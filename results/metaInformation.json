@@ -7,10 +7,12 @@
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/jaoafa/Javajaotan2",
-        "revisionId": "d042d0570f478f4365a1b6d2e6015f83c20096d1",
+        "revisionId": "13277294e09c051570cae347e12afc3a0dd0c60e",
         "branch": "master"
       }
     },
-    "deviceId": "200820300000000-b362-9f64-5532-6b94d291e06a"
+    "deviceId": "200820300000000-b362-9f64-5532-6b94d291e06a",
+    "jobUrl": "https://github.com/jaoafa/Javajaotan2/actions/runs/2791377754",
+    "repoUrl": "https://github.com/jaoafa/Javajaotan2"
   }
 }

@@ -109,9 +109,9 @@
       ]
     },
     {
-      "name": "Maven: org.xerial:sqlite-jdbc:3.36.0.3",
+      "name": "Maven: org.xerial:sqlite-jdbc:3.39.2.0",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/org/xerial/sqlite-jdbc/3.36.0.3/sqlite-jdbc-3.36.0.3.jar!/"
+        "jar://$MAVEN_REPOSITORY$/org/xerial/sqlite-jdbc/3.39.2.0/sqlite-jdbc-3.39.2.0.jar!/"
       ]
     },
     {

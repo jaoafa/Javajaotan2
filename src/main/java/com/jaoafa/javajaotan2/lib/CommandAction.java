@@ -11,6 +11,7 @@
 
 package com.jaoafa.javajaotan2.lib;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.util.List;
@@ -25,6 +26,25 @@ public class CommandAction {
     private final List<CommandAction> subActions;
     private final List<String> argNames;
 
+    /**
+     * CommandAction クラスを作成します。<br>
+     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandEvent, List)} を呼び出してください。<br>
+     * <br>
+     * このコンストラクタは、<b>名前付きの引数</b>を持たず、このアクションの下にサブコマンド（グループ）がない場合に利用します。<br>
+     * （名前付きの引数を用いず、位置引数で値を取得する場合はこのメソッドを使います。）<br>
+     * 例えば、次のようなコマンドを実装する場合です。<br>
+     * <ul>
+     *     <li><code>/play air-horn</code>: エアーホーンを再生する</li>
+     *     <li><code>/notify clear</code>: すべてのNotifyを削除する</li>
+     *     <li><code>/notify new &lt;Text...&gt;</code>: Notifyとして <i>Text...</i> を追加する。<br>
+     *     （{@link CommandArgument#getString(int)} で <i>Text...</i> の値を取得する場合に限る）</li>
+     * </ul>
+     *
+     * @param name   アクション名
+     * @param action 当該コマンド実行時の実行関数
+     *
+     * @see Command#execute(CommandEvent)
+     */
     public CommandAction(String name, Consumer<CommandEvent> action) {
         this.name = name;
         this.action = action;
@@ -33,6 +53,21 @@ public class CommandAction {
         this.argNames = null;
     }
 
+    /**
+     * CommandAction クラスを作成します。<br>
+     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandEvent, List)} を呼び出してください。<br>
+     * <br>
+     * このコンストラクタは、このアクションの下にサブコマンド（グループ）がある場合に利用します。このアクションの下には入れ子でグループを追加することもできます。<br>
+     * 例えば、次のようなコマンドを実装する場合です。<br>
+     * <ul>
+     *     <li><code>/messages management new &lt;Text...&gt;</code>: メッセージとして <i>Text...</i> を追加する</li>
+     * </ul>
+     *
+     * @param name       アクション名
+     * @param subActions サブコマンド（グループ）
+     *
+     * @see Command#execute(CommandEvent)
+     */
     public CommandAction(String name, List<CommandAction> subActions) {
         this.name = name;
         this.action = null;
@@ -41,6 +76,25 @@ public class CommandAction {
         this.argNames = null;
     }
 
+    /**
+     * CommandAction クラスを作成します。<br>
+     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandEvent, List)} を呼び出してください。<br>
+     * <br>
+     * このコンストラクタは、<b>名前付きの引数</b>を持ち、このアクションの下にサブコマンド（グループ）がない場合に利用します。<br>
+     * 例えば、次のようなコマンドを実装する場合です。<br>
+     * <ul>
+     *     <li><code>/notify new &lt;Text...&gt;</code>: Notifyとして <i>Text...</i> を追加する。<br>
+     *     （{@link CommandArgument#getString(String)} で <i>Text...</i> の値を取得する場合に限る）</li>
+     *     <li><code>/ban add &lt;UserId&gt;</code>: <i>UserId</i> のユーザーをBanする。<br>
+     *     （{@link CommandArgument#getString(String)} で <i>UserId</i> の値を取得する場合に限る）</li>
+     * </ul>
+     *
+     * @param name     アクション名
+     * @param action   当該コマンド実行時の実行関数
+     * @param argNames 引数の名前リスト
+     *
+     * @see Command#execute(CommandEvent)
+     */
     public CommandAction(String name, BiConsumer<CommandEvent, List<String>> action, List<String> argNames) {
         this.name = name;
         this.action = null;
@@ -49,26 +103,64 @@ public class CommandAction {
         this.argNames = argNames;
     }
 
+    /**
+     * このアクションの名前を取得します。
+     *
+     * @return このアクションの名前
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * このアクションの実行関数を取得します。<br>
+     * このアクションに名前付き引数がある場合や、サブコマンド（グループ）を持つ場合は null を返します。
+     *
+     * @return このアクションの実行関数
+     */
     public Consumer<CommandEvent> getAction() {
         return action;
     }
 
+    /**
+     * このアクションの実行関数を取得します。<br>
+     * このアクションに名前付き引数がない場合や、サブコマンド（グループ）を持つ場合は null を返します。
+     *
+     * @return このアクションの実行関数
+     */
     public BiConsumer<CommandEvent, List<String>> getNamedAction() {
         return namedAction;
     }
 
+    /**
+     * このアクションの下にあるサブコマンド（グループ）を取得します。<br>
+     * このアクションに名前付き引数がない場合や、サブコマンド（グループ）を持たない場合は null を返します。
+     *
+     * @return このアクションの下にあるサブコマンド（グループ）
+     */
     public List<CommandAction> getSubActions() {
         return subActions;
     }
 
+    /**
+     * このアクションの名前付き引数名リストを取得します。<br>
+     * このアクションに名前付き引数がない場合は null を返します。
+     *
+     * @return このアクションの名前付き引数名リスト
+     */
     public List<String> getArgumentNames() {
         return argNames;
     }
 
+    /**
+     * このアクションを実行します。<br>
+     * このメソッドは、{@link Command#execute(CommandEvent)} で呼び出す必要があります。
+     *
+     * @param event   CommandEvent
+     * @param actions CommandAction のリスト
+     *
+     * @return 実行できたかどうか
+     */
     public static boolean execute(CommandEvent event, List<CommandAction> actions) {
         return execute(event, 0, actions);
     }

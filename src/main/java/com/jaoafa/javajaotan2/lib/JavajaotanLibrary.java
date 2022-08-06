@@ -20,8 +20,6 @@ import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,31 +56,6 @@ public class JavajaotanLibrary {
         } catch (NumberFormatException e) {
             return false;
         }
-    }
-
-    /**
-     * Dateをyyyy/MM/dd HH:mm:ss形式でフォーマットします。
-     *
-     * @param date フォーマットするDate
-     *
-     * @return フォーマットされた結果文字列
-     */
-    public static String sdfFormat(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        return sdf.format(date);
-    }
-
-
-    /**
-     * DateをHH:mm:ss形式でフォーマットします。
-     *
-     * @param date フォーマットするDate
-     *
-     * @return フォーマットされた結果文字列
-     */
-    protected static String sdfTimeFormat(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        return sdf.format(date);
     }
 
     /**
@@ -180,54 +153,6 @@ public class JavajaotanLibrary {
     }
 
     public record CreateIssueResponse(IssueResponseType responseType, String message, int issueNumber) {
-    }
-
-    @Nonnull
-    public static CreateIssueCommentResponse createIssueComment(String repo, int issueNum, String body) {
-        String githubToken = Main.getConfig().getGitHubAPIToken();
-        if (githubToken == null || githubToken.isEmpty()) {
-            return new CreateIssueCommentResponse(
-                IssueResponseType.FAILED,
-                "GitHub API Token が設定されていません。"
-            );
-        }
-        String url = String.format("https://api.github.com/repos/%s/issues/%s/comments", repo, issueNum);
-        JSONObject json = new JSONObject()
-            .put("body", body);
-
-        try {
-            OkHttpClient client = new OkHttpClient();
-            RequestBody requestBody = RequestBody.create(json.toString(), MediaType.parse("application/json; charset=UTF-8"));
-            Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", String.format("token %s", githubToken))
-                .post(requestBody)
-                .build();
-            JSONObject obj;
-            try (Response response = client.newCall(request).execute()) {
-                if (response.code() != 201) {
-                    return new CreateIssueCommentResponse(
-                        IssueResponseType.FAILED,
-                        "Issue コメントの作成に失敗しました。"
-                    );
-                }
-                obj = new JSONObject(Objects.requireNonNull(response.body()).string());
-            }
-
-            return new CreateIssueCommentResponse(
-                IssueResponseType.SUCCESS,
-                "Issue コメントの作成に成功しました。"
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new CreateIssueCommentResponse(
-                IssueResponseType.FAILED,
-                "Issue コメントの作成に失敗しました。" + e.getMessage()
-            );
-        }
-    }
-
-    public record CreateIssueCommentResponse(IssueResponseType responseType, String message) {
     }
 
     public enum IssueResponseType {

@@ -18,8 +18,17 @@ Eclipse などでも開発できますが、開発のサポートは IntelliJ ID
 
 ## Project board
 
-プロジェクトのタスク管理ボードとして [GitHub の Project 機能](https://github.com/jaoafa/Javajaotan2/projects/1) を使用しています。  
-タスクが多い際は `Ctrl+F` や `F3` でページ内検索をすることをお勧めします。
+プロジェクトのタスク管理ボードとして [GitHub の Issue 機能](https://github.com/jaoafa/Javajaotan2/issues) と [GitHub の Project 機能](https://github.com/jaoafa/Javajaotan2/projects/1) を使用しています。  
+メインで使うのは Issue で、Project はほぼサブとしてしか使っていません（割り当てられていない Issue も多いです）。
+
+## How to develop
+
+このプロジェクトでは、以下のプロセスに則り開発を進めます。
+
+- 全ての開発作業は各ユーザーのフォークリポジトリで行います。
+- 実施した開発内容は動作テストを行い、期待通りにエラーなく動作することを確認してください。
+- 1 つのコマンド・1 つの機能を制作し終え、本番環境に反映しても構わない場合はオリジナルリポジトリである jaoafa/MyMaid4 にプルリクエストを送信してください。
+- 送信されたプルリクエストはコードオーナーによってコードをチェックされ、問題がなければマージされます。問題がある場合はプルリクエストのレビュー・コメントにて、その旨を記載しますので応答・修正して下さい。
 
 ## Development Process
 
@@ -51,12 +60,6 @@ Eclipse などでも開発できますが、開発のサポートは IntelliJ ID
 3. `upstream/master` をクリックし、「リベースを使用して現在のブランチにプル」を押す
 4. 成功したことが表示されれば完了
 
-## Test Process
-
-Javajaotan2 の動作確認（テスト）を行うためには、以下の手順を実施してください。
-
-**執筆中**
-
 ## Precautions for development
 
 開発にあたり、次の注意事項をご確認ください。
@@ -74,71 +77,80 @@ Javajaotan2 の動作確認（テスト）を行うためには、以下の手�
 - `config.json` で設定される設定情報は `JavajaotanConfig` にあり、 `Main.getJavajaotanConfig()` から取得できます。
 - 複数のクラスにわたって使用される変数は `JavajaotanData` に変数を作成し、 Getter と Setter を使用して管理してください。
 - 複数のクラスにわたって多く使用される関数は `JavajaotanLibrary` に関数を作成し、Javadoc を書いたうえで `extends JavajaotanLibrary` して利用してください。
-- データベースは jaoMain と ZakuroHat の二つがありますが、原則 jaoMain が使用されます。それぞれ `JavajaotanData.getMainMySQLDBManager` `JavajaotanData.getZKRHatMySQLDBManager` で取得できます。
+- データベースは jaoMain と ZakuroHat の二つがありますが、原則 jaoMain が使用されます。それぞれ `JavajaotanData.getMainMySQLDBManager()` `JavajaotanData.getZKRHatMySQLDBManager()` で取得できます。
 - コマンドによって Bot が送信しなければならないメッセージは原則 `Message.reply` によるリプライ形式でのメッセージ送信をお願いします。
 
 ### Command
 
-- 使用しているコマンドフレームワークは [Incendo/cloud](https://github.com/Incendo/cloud) です。
-  - ドキュメントは [こちら](https://incendo.github.io/cloud) です。
+- 使用しているコマンドフレームワークは [Chew/JDA-Chewtils](https://github.com/Chew/JDA-Chewtils) です。
 - 全てのコマンドは [`src/main/java/com/jaoafa/javajaotan2/command/Cmd_<CommandName>.java`](src/main/java/com/jaoafa/javajaotan2/command) に配置され、これらが自動で読み込まれます。
 - 同時に、クラス名は `Cmd_<CommandName>` でなければなりません。`<CommandName>` は大文字・小文字を問いません。
-- また、ここに配置されるコマンドクラスは `com.jaoafa.javajaotan2.lib.CommandPremise` インターフェースを実装する必要があります。（`implements CommandPremise`）
-- コマンドの情報（コマンド名・説明）は `details()` で定義します。
-- コマンドの内容は `register()` で定義します。このメソッドは Main クラスの `registerCommand` から呼び出され、コマンドが追加されます。
+- また、ここに配置されるコマンドクラスは `com.jagrosh.jdautilities.command.Command` を継承する必要があります。（`extends Command`）
+- コマンドの定義はコンストラクタにて行います。
+- Command クラスを継承したことにより、`void execute(CommandEvent)` メソッドを実行しなければなりません。
+  - 簡易なコマンド実装であればこの関数内に処理を記述します。複雑な実装の場合は `CommandAction` クラスの利用を検討してください。
+- コマンドの引数は独自で処理する必要があります。ダブルクォーテーションによるクォート引数や以降の引数を全部取得するメソッドを備えた `CommandArgument` クラスで処理することをおすすめします。後述する解説を参照ください。
 
 ### Event
 
 - 全てのイベント駆動の機能は [`src/main/java/com/jaoafa/javajaotan2/event/Event_<FuncName>.java`](src/main/java/com/jaoafa/javajaotan2/event) に配置され、これらが自動で読み込まれます。
 - 同時に、クラス名は `Event_<FuncName>` でなければなりません。
 - また、ここに配置されるコマンドクラスは `net.dv8tion.jda.api.hooks.ListenerAdapter` インターフェースを継承する必要があります。（`extends ListenerAdapter`）
-- イベントを受け取るためには、各イベントクラスを引数に取り、また関数名を `on<各イベントクラス名>` にしなければなりません。また、 `@Override` でオーバーライドしなければなりません。 (例: `@Override public void onGuildMessageReceivedEvent(GuildMessageReceivedEvent event)`)
+- イベントを受け取るためには、各イベントクラスを引数に取り、また関数名を `on<各イベントクラス名>` にしなければなりません。また、 `@Override` でオーバーライドしなければなりません。 (例: `@Override public void onGuildMessageReceived(GuildMessageReceivedEvent event)`)
 - `<FuncName>` は自由で構いません
 
 ## Git
+
+### General
+
+- `upstream` とは `jaoafa/MyMaid4` のことです（オリジナルリポジトリとも呼びます）。
+- フォークしている場合、`origin` とはあなたのアカウント以下にある MyMaid4 のフォークリポジトリのことです（フォークリポジトリとも呼びます）。
+- ローカルリポジトリとは、あなたのコンピュータ上にある MyMaid4 のリポジトリのことです。
 
 ### Commit
 
 - 発生しているエラーなどはコミット・プルリクエスト前にすべて修正してください。
 - コミットメッセージは **[CommitLint のルール](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional#rules) である以下に沿っていることを期待しますが、必須ではありません。**
-- 次の形式でコミットメッセージを指定してください: `type(scope): subject` (e.g. `fix(home): message`)
-  - `type`, `subject` は必須、 `scope` は必須ではありません
-- `type-enum`: `type` は必ず次のいずれかにしなければなりません
-  - `build`: ビルド関連
-  - `ci`: CI 関連
-  - `chore`: いろいろ
-  - `docs`: ドキュメント関連
-  - `feat`: 新機能
-  - `fix`: 修正
-  - `perf`: パフォーマンス改善
-  - `refactor`: リファクタリング
-  - `revert`: コミットの取り消し
-  - `style`: コードスタイルの修正
-  - `test`: テストコミット
-- `type-case`: `type` は必ず小文字でなければなりません (NG: `FIX` / OK: `fix`)
-- `type-empty`: `type` は必ず含めなければなりません (NG: `test message` / OK: `test: message`)
-- `scope-case`: `scope` は必ず小文字でなければなりません (NG: `fix(HOME): message` / OK: `fix:(home): message`)
-- `subject-case`: `subject` は必ず次のいずれかの書式でなければなりません `sentence-case`, `start-case`, `pascal-case`, `upper-case`
-- `subject-empty`: `subject` は必ず含めなければなりません (NG: `fix:` / OK: `fix: message`)
-- `subject-full-stop`: `subject` は `.` 以外で終えてください (NG: `fix: message.` / OK: `fix: message`)
+  - 次の形式でコミットメッセージを指定してください: `type(scope): subject` (e.g. `fix(home): message`)
+    - `type`, `subject` は必須、 `scope` は必須ではありません
+  - `type-enum`: `type` は必ず次のいずれかにしなければなりません
+    - `build`: ビルド関連
+    - `ci`: CI 関連
+    - `chore`: いろいろ
+    - `docs`: ドキュメント関連
+    - `feat`: 新機能
+    - `fix`: 修正
+    - `perf`: パフォーマンス改善
+    - `refactor`: リファクタリング
+    - `revert`: コミットの取り消し
+    - `style`: コードスタイルの修正
+    - `test`: テストコミット
+  - `type-case`: `type` は必ず小文字でなければなりません (NG: `FIX` / OK: `fix`)
+  - `type-empty`: `type` は必ず含めなければなりません (NG: `test message` / OK: `test: message`)
+  - `scope-case`: `scope` は必ず小文字でなければなりません (NG: `fix(HOME): message` / OK: `fix:(home): message`)
+  - `subject-case`: `subject` は必ず次のいずれかの書式でなければなりません `sentence-case`, `start-case`, `pascal-case`, `upper-case`
+  - `subject-empty`: `subject` は必ず含めなければなりません (NG: `fix:` / OK: `fix: message`)
+  - `subject-full-stop`: `subject` は `.` 以外で終えてください (NG: `fix: message.` / OK: `fix: message`)
 
 #### Branch rule
 
-- 基本的にはフォークして開発してください
-- 必要がある場合、ブランチは機能追加・修正などに応じて分けて作成してください
-- ブランチ名は機能追加・修正の内容を示す言葉で構成することをお勧めします（例: `add-test-command`, `fix-test-command-api-url`）
-- master ブランチへの直接コミットはできません
-- 全てのコード追加はプルリクエストを必要とします
-- Tomachi に限りセルフマージを可能とします
-- レビューはほぼすべてを Tomachi が行います
+- 必ずフォークして開発してください
+- ブランチは機能追加・修正などに応じて分けて作成してください。一つのプルリクエストに複数の変更事項をまとめるとレビュアーの負担が増えます。
+- ブランチ名は機能追加・修正の内容を示す言葉で構成することをお勧めします。（例: `feat/test-command`, `fix/test-command-api-url`）
+  - 開発者自身が自分で「何のために作ったブランチか」を把握できればどんな名前でも構いません。
+- upstream の master ブランチへの直接コミットはできません。
+- 全てのコード編集はプルリクエストを必要とします。
+- [Tomachi](https://github.com/book000) に限りセルフマージを可能とします（この際、jaotan がレビューします）。
+- マージにあたっては [Tomachi](https://github.com/book000) のレビュー承認が必要です。
+- レビュアーに指定されていなくても気になることがあればレビューして構いません。
 
 ### Publish
 
 master ブランチ = 本番環境動作ソースコード です。
 
-- コミットされると、GitHub Actions によってビルドが実施されます。失敗した場合、jMS Gamers Club `#github-notice` に通知が飛びます。
-- コミットされると、ZakuroHat でビルドされ DiscordBot jaotan にて本番環境下で動作します。
-- バージョン表記は本番環境でのビルド処理によって、`yyyy.mm.dd_hh.mm_最終コミットsha8桁` に変更されます。
+- コミットされると、GitHub Actions によってビルドが実施されます。ビルド成果物は [Release](https://github.com/jaoafa/Javajaotan2/releases/) でリリースされます。
+- リリースされると、ZakuroHat で成果物がダウンロードされ、 DiscordBot jaotan にて本番環境下で動作します。
+- バージョンは [Semantic Versioning 2.0.0](https://semver.org) に基づきコミットメッセージを元に自動で付与されます。
 
 ## Code Quality
 
@@ -151,8 +163,6 @@ master ブランチ = 本番環境動作ソースコード です。
   GitHub による依存パッケージ脆弱性管理サービスです。
 - [Renovate](https://www.whitesourcesoftware.com/free-developer-tools/renovate/): WhiteSource
   による依存パッケージバージョン管理ツールです。自動でアップデートを収集し、Pull Request を作成します。
-- [Qodana](https://www.jetbrains.com/ja-jp/qodana/): IntelliJ によるコード品質管理ツールです。Push / Pull Request 時にチェックされます。master
-  ブランチのレポートは [こちら](https://jaoafa.github.io/MyMaid4/) にあります。
 
 ## Other
 

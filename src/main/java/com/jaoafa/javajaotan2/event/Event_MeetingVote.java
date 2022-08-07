@@ -375,7 +375,7 @@ public class Event_MeetingVote extends ListenerAdapter {
                 stmt.setInt(1, id);
                 try (ResultSet res = stmt.executeQuery()) {
                     if (!res.next()) {
-                        System.out.println("processCreateWaiting(): res.next false");
+                        Main.getLogger().info("processCreateWaiting(): res.next false");
                         return;
                     }
                     discordUserId = res.getString("discord_userid");
@@ -433,7 +433,7 @@ public class Event_MeetingVote extends ListenerAdapter {
                 stmt.setInt(1, id);
                 try (ResultSet res = stmt.executeQuery()) {
                     if (!res.next()) {
-                        System.out.println("processChangeCorners(): res.next false");
+                        Main.getLogger().info("processChangeCorners(): res.next false");
                         return;
                     }
                     citiesId = res.getInt("cities_id");
@@ -505,7 +505,7 @@ public class Event_MeetingVote extends ListenerAdapter {
                 stmt.setInt(1, id);
                 try (ResultSet res = stmt.executeQuery()) {
                     if (!res.next()) {
-                        System.out.println("processChangeOther(): res.next false");
+                        Main.getLogger().info("processChangeOther(): res.next false");
                         return;
                     }
                     citiesId = res.getInt("cities_id");
@@ -528,7 +528,7 @@ public class Event_MeetingVote extends ListenerAdapter {
                     i++;
                 }
                 stmt.setInt(i, citiesId);
-                System.out.println("SQL: " + stmt);
+                Main.getLogger().info("SQL: " + stmt);
                 stmt.executeUpdate();
             }
 

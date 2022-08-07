@@ -219,6 +219,10 @@ public class Translate {
             this.language_name = language_name;
         }
 
+        public String getName() {
+            return language_name;
+        }
+
         @Override
         public String toString() {
             return language_name + "(" + name().replace("_", "-").toLowerCase(Locale.ROOT) + ")";

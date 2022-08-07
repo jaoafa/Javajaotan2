@@ -24,17 +24,17 @@ public class CommandArgumentTest {
     @Test
     void simpleParseTest() {
         CommandArgument args = new CommandArgument("arg1 arg2 arg3");
-        Assertions.assertArrayEquals(args.getArrayArgs(), new String[]{"arg1", "arg2", "arg3"});
-        Assertions.assertLinesMatch(args.getListArgs(), List.of("arg1", "arg2", "arg3"));
-        Assertions.assertLinesMatch(args.getStreamArgs().toList(), List.of("arg1", "arg2", "arg3"));
+        Assertions.assertArrayEquals(new String[]{"arg1", "arg2", "arg3"}, args.getArrayArgs());
+        Assertions.assertLinesMatch(List.of("arg1", "arg2", "arg3"), args.getListArgs());
+        Assertions.assertLinesMatch(List.of("arg1", "arg2", "arg3"), args.getStreamArgs().toList());
         Assertions.assertTrue(args.has(0));
         Assertions.assertTrue(args.has(1));
         Assertions.assertTrue(args.has(2));
         Assertions.assertFalse(args.has(3));
-        Assertions.assertEquals(args.size(), 3);
-        Assertions.assertEquals(args.getString(0), "arg1");
-        Assertions.assertEquals(args.getString(1), "arg2");
-        Assertions.assertEquals(args.getString(2), "arg3");
+        Assertions.assertEquals(3, args.size());
+        Assertions.assertEquals("arg1", args.getString(0));
+        Assertions.assertEquals("arg2", args.getString(1));
+        Assertions.assertEquals("arg3", args.getString(2));
 
         // 引数の範囲外インデックスを指定した場合はIllegalArgumentExceptionが発生しなければならない
         Assertions.assertThrows(IllegalArgumentException.class, () -> args.getString(3));
@@ -55,11 +55,11 @@ public class CommandArgumentTest {
     @Test
     void quotedParseTest() {
         CommandArgument args = new CommandArgument("arg1 \"a r g 2\" arg3");
-        Assertions.assertArrayEquals(args.getArrayArgs(), new String[]{"arg1", "a r g 2", "arg3"});
-        Assertions.assertEquals(args.size(), 3);
-        Assertions.assertEquals(args.getString(0), "arg1");
-        Assertions.assertEquals(args.getString(1), "a r g 2");
-        Assertions.assertEquals(args.getString(2), "arg3");
+        Assertions.assertArrayEquals(new String[]{"arg1", "a r g 2", "arg3"}, args.getArrayArgs());
+        Assertions.assertEquals(3, args.size());
+        Assertions.assertEquals("arg1", args.getString(0));
+        Assertions.assertEquals("a r g 2", args.getString(1));
+        Assertions.assertEquals("arg3", args.getString(2));
 
         // 引数の範囲外インデックスを指定した場合はIllegalArgumentExceptionが発生しなければならない
         Assertions.assertThrows(IllegalArgumentException.class, () -> args.getString(3));
@@ -80,11 +80,11 @@ public class CommandArgumentTest {
     @Test
     void invalidQuotedTest() {
         CommandArgument args = new CommandArgument("arg1 \"arg2 arg3");
-        Assertions.assertArrayEquals(args.getArrayArgs(), new String[]{"arg1", "\"arg2", "arg3"});
-        Assertions.assertEquals(args.size(), 3);
-        Assertions.assertEquals(args.getString(0), "arg1");
-        Assertions.assertEquals(args.getString(1), "\"arg2");
-        Assertions.assertEquals(args.getString(2), "arg3");
+        Assertions.assertArrayEquals(new String[]{"arg1", "\"arg2", "arg3"}, args.getArrayArgs());
+        Assertions.assertEquals(3, args.size());
+        Assertions.assertEquals("arg1", args.getString(0));
+        Assertions.assertEquals("\"arg2", args.getString(1));
+        Assertions.assertEquals("arg3", args.getString(2));
 
         // 引数の範囲外インデックスを指定した場合はIllegalArgumentExceptionが発生しなければならない
         Assertions.assertThrows(IllegalArgumentException.class, () -> args.getString(3));
@@ -102,7 +102,7 @@ public class CommandArgumentTest {
     @Test
     void greedyStringTest() {
         CommandArgument args = new CommandArgument("a r g u m e n t");
-        Assertions.assertEquals(args.getGreedyString(0), "a r g u m e n t");
+        Assertions.assertEquals("a r g u m e n t", args.getGreedyString(0));
     }
 
     /**
@@ -120,11 +120,11 @@ public class CommandArgumentTest {
     @Test
     void simpleNamedTest() {
         CommandArgument args = new CommandArgument("arg1 arg2 arg3", List.of("a", "b", "c"));
-        Assertions.assertArrayEquals(args.getArrayArgs(), new String[]{"arg1", "arg2", "arg3"});
-        Assertions.assertEquals(args.size(), 3);
-        Assertions.assertEquals(args.getString("a"), "arg1");
-        Assertions.assertEquals(args.getString("b"), "arg2");
-        Assertions.assertEquals(args.getString("c"), "arg3");
+        Assertions.assertArrayEquals(new String[]{"arg1", "arg2", "arg3"}, args.getArrayArgs());
+        Assertions.assertEquals(3, args.size());
+        Assertions.assertEquals("arg1", args.getString("a"));
+        Assertions.assertEquals("arg2", args.getString("b"));
+        Assertions.assertEquals("arg3", args.getString("c"));
 
         // 規定されていないキーを指定した場合はIllegalArgumentExceptionが発生しなければならない
         Assertions.assertThrows(IllegalArgumentException.class, () -> args.getString("d"));
@@ -142,7 +142,7 @@ public class CommandArgumentTest {
     @Test
     void greedyNamedTest() {
         CommandArgument args = new CommandArgument("a r g u m e n t", List.of("a", "b..."));
-        Assertions.assertEquals(args.getString("b..."), "a r g u m e n t");
+        Assertions.assertEquals("r g u m e n t", args.getString("b..."));
     }
 
     /**
@@ -165,10 +165,10 @@ public class CommandArgumentTest {
     @Test
     void specifiedTypeTest() {
         CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false");
-        Assertions.assertEquals(args.getString(0), "string");
-        Assertions.assertEquals(args.getInt(1), 0);
-        Assertions.assertEquals(args.getLong(2), 2147483648L);
-        Assertions.assertEquals(args.getDouble(3), 1.0);
+        Assertions.assertEquals("string", args.getString(0));
+        Assertions.assertEquals(0, args.getInt(1));
+        Assertions.assertEquals(2147483648L, args.getLong(2));
+        Assertions.assertEquals(1.0, args.getDouble(3));
         Assertions.assertTrue(args.getBoolean(4));
         Assertions.assertFalse(args.getBoolean(5));
 
@@ -176,23 +176,23 @@ public class CommandArgumentTest {
 
         // インデックス 0,2,4,5 の値はintとして扱えない
         for (int i : List.of(0, 2, 4, 5)) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getInt(i));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getInt(i), "index=" + i);
         }
 
         // インデックス 0,3,4,5 の値はlongとして扱えない
         for (int i : List.of(0, 3, 4, 5)) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getLong(i));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getLong(i), "index=" + i);
         }
 
-        // インデックス 0,2,4,5 の値はdoubleとして扱えない
-        for (int i : List.of(0, 1, 2, 4, 5)) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getDouble(i));
+        // インデックス 0,4,5 の値はdoubleとして扱えない
+        for (int i : List.of(0, 4, 5)) {
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getDouble(i), "index=" + i);
         }
 
         // booleanではない値の場合にはIllegalArgumentExceptionが発生しなければならない
         // インデックス 0,1,2,3 の値はbooleanとして扱えない
         for (int i : List.of(0, 1, 2, 3)) {
-            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getBoolean(i));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getBoolean(i), "index=" + i);
         }
     }
 
@@ -216,10 +216,10 @@ public class CommandArgumentTest {
     @Test
     void specifiedTypeNamedTest() {
         CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2"));
-        Assertions.assertEquals(args.getString("string"), "string");
-        Assertions.assertEquals(args.getInt("int"), 0);
-        Assertions.assertEquals(args.getLong("long"), 2147483648L);
-        Assertions.assertEquals(args.getDouble("double"), 1.0);
+        Assertions.assertEquals("string", args.getString("string"));
+        Assertions.assertEquals(0, args.getInt("int"));
+        Assertions.assertEquals(2147483648L, args.getLong("long"));
+        Assertions.assertEquals(1.0, args.getDouble("double"));
         Assertions.assertTrue(args.getBoolean("boolean1"));
         Assertions.assertFalse(args.getBoolean("boolean2"));
 
@@ -227,23 +227,23 @@ public class CommandArgumentTest {
 
         // キー string,double,boolean1,boolean2 の値はintとして扱えない
         for (String s : List.of("string", "double", "boolean1", "boolean2")) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getInt(s));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getInt(s), "key=" + s);
         }
 
         // キー string,double,boolean1,boolean2 の値はlongとして扱えない
         for (String s : List.of("string", "double", "boolean1", "boolean2")) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getLong(s));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getLong(s), "key=" + s);
         }
 
-        // キー string,long,boolean1,boolean2 の値はdoubleとして扱えない
-        for (String s : List.of("string", "long", "boolean1", "boolean2")) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getDouble(s));
+        // キー string,boolean1,boolean2 の値はdoubleとして扱えない
+        for (String s : List.of("string", "boolean1", "boolean2")) {
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getDouble(s), "key=" + s);
         }
 
         // booleanではない値の場合にはIllegalArgumentExceptionが発生しなければならない
         // キー string,int,long,double の値はbooleanとして扱えない
         for (String s : List.of("string", "int", "long", "double")) {
-            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getBoolean(s));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getBoolean(s), "key=" + s);
         }
     }
 
@@ -267,18 +267,18 @@ public class CommandArgumentTest {
         CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false");
 
         // 存在するインデックスの値を取得
-        Assertions.assertEquals(args.getOptionalString(0, "default"), "string");
-        Assertions.assertEquals(args.getOptionalInt(1, -1), 0);
-        Assertions.assertEquals(args.getOptionalLong(2, -2147483648L), 2147483648L);
-        Assertions.assertEquals(args.getOptionalDouble(3, -1.0), 1.0);
+        Assertions.assertEquals("string", args.getOptionalString(0, "default"));
+        Assertions.assertEquals(0, args.getOptionalInt(1, -1));
+        Assertions.assertEquals(2147483648L, args.getOptionalLong(2, -2147483648L));
+        Assertions.assertEquals(1.0, args.getOptionalDouble(3, -1.0));
         Assertions.assertTrue(args.getOptionalBoolean(4, false));
         Assertions.assertFalse(args.getOptionalBoolean(5, true));
 
         // 存在しないインデックスの値を取得
-        Assertions.assertEquals(args.getOptionalString(6, "default"), "default");
-        Assertions.assertEquals(args.getOptionalInt(6, -1), -1);
-        Assertions.assertEquals(args.getOptionalLong(6, -2147483648L), -2147483648L);
-        Assertions.assertEquals(args.getOptionalDouble(6, -1.0), -1.0);
+        Assertions.assertEquals("default", args.getOptionalString(6, "default"));
+        Assertions.assertEquals(-1, args.getOptionalInt(6, -1));
+        Assertions.assertEquals(-2147483648L, args.getOptionalLong(6, -2147483648L));
+        Assertions.assertEquals(-1.0, args.getOptionalDouble(6, -1.0));
         Assertions.assertFalse(args.getOptionalBoolean(6, false));
         Assertions.assertTrue(args.getOptionalBoolean(6, true));
 
@@ -286,23 +286,23 @@ public class CommandArgumentTest {
 
         // インデックス 0,2,4,5 の値はintとして扱えない
         for (int i : List.of(0, 2, 4, 5)) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalInt(i, -1));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalInt(i, -1), "index=" + i);
         }
 
         // インデックス 0,3,4,5 の値はlongとして扱えない
         for (int i : List.of(0, 3, 4, 5)) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalLong(i, -2147483648L));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalLong(i, -2147483648L), "index=" + i);
         }
 
-        // インデックス 0,2,4,5 の値はdoubleとして扱えない
-        for (int i : List.of(0, 1, 2, 4, 5)) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalDouble(i, -1.0));
+        // インデックス 0,4,5 の値はdoubleとして扱えない
+        for (int i : List.of(0, 4, 5)) {
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalDouble(i, -1.0), "index=" + i);
         }
 
         // booleanではない値の場合にはIllegalArgumentExceptionが発生しなければならない
         // インデックス 0,1,2,3 の値はbooleanとして扱えない
         for (int i : List.of(0, 1, 2, 3)) {
-            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getOptionalBoolean(i, false));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getOptionalBoolean(i, false), "index=" + i);
         }
     }
 
@@ -323,21 +323,21 @@ public class CommandArgumentTest {
      */
     @Test
     void optionalNamedArgumentTest() {
-        CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2"));
+        CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2", "nothing"));
 
         // 存在するインデックスの値を取得
-        Assertions.assertEquals(args.getOptionalString("string", "default"), "string");
-        Assertions.assertEquals(args.getOptionalInt("int", -1), 0);
-        Assertions.assertEquals(args.getOptionalLong("long", -2147483648L), 2147483648L);
-        Assertions.assertEquals(args.getOptionalDouble("double", -1.0), 1.0);
+        Assertions.assertEquals("string", args.getOptionalString("string", "default"));
+        Assertions.assertEquals(0, args.getOptionalInt("int", -1));
+        Assertions.assertEquals(2147483648L, args.getOptionalLong("long", -2147483648L));
+        Assertions.assertEquals(1.0, args.getOptionalDouble("double", -1.0));
         Assertions.assertTrue(args.getOptionalBoolean("boolean1", false));
         Assertions.assertFalse(args.getOptionalBoolean("boolean2", true));
 
         // 存在しないインデックスの値を取得
-        Assertions.assertEquals(args.getOptionalString("nothing", "default"), "default");
-        Assertions.assertEquals(args.getOptionalInt("nothing", -1), -1);
-        Assertions.assertEquals(args.getOptionalLong("nothing", -2147483648L), -2147483648L);
-        Assertions.assertEquals(args.getOptionalDouble("nothing", -1.0), -1.0);
+        Assertions.assertEquals("default", args.getOptionalString("nothing", "default"));
+        Assertions.assertEquals(-1, args.getOptionalInt("nothing", -1));
+        Assertions.assertEquals(-2147483648L, args.getOptionalLong("nothing", -2147483648L));
+        Assertions.assertEquals(-1.0, args.getOptionalDouble("nothing", -1.0));
         Assertions.assertFalse(args.getOptionalBoolean("nothing", false));
         Assertions.assertTrue(args.getOptionalBoolean("nothing", true));
 
@@ -346,23 +346,23 @@ public class CommandArgumentTest {
         // インデックス 0,2,4,5 の値はintとして扱えない
         // キー string,double,boolean1,boolean2 の値はintとして扱えない
         for (String s : List.of("string", "double", "boolean1", "boolean2")) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalInt(s, -1));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalInt(s, -1), "key=" + s);
         }
 
         // キー string,double,boolean1,boolean2 の値はlongとして扱えない
         for (String s : List.of("string", "double", "boolean1", "boolean2")) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalLong(s, -2147483648L));
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalLong(s, -2147483648L), "key=" + s);
         }
 
-        // キー string,long,boolean1,boolean2 の値はdoubleとして扱えない
-        for (String s : List.of("string", "long", "boolean1", "boolean2")) {
-            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalDouble(s, -1.0));
+        // キー string,boolean1,boolean2 の値はdoubleとして扱えない
+        for (String s : List.of("string", "boolean1", "boolean2")) {
+            Assertions.assertThrows(NumberFormatException.class, () -> args.getOptionalDouble(s, -1.0), "key=" + s);
         }
 
         // booleanではない値の場合にはIllegalArgumentExceptionが発生しなければならない
         // キー string,int,long,double の値はbooleanとして扱えない
         for (String s : List.of("string", "int", "long", "double")) {
-            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getOptionalBoolean(s, false));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> args.getOptionalBoolean(s, false), "key=" + s);
         }
     }
 }

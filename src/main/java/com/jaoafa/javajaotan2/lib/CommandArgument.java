@@ -22,18 +22,12 @@ public class CommandArgument {
     private final List<String> argNames;
 
     public CommandArgument(String command) {
-        this.args = Arrays
-            .stream(command.split(" "))
-            .filter(s -> !s.isEmpty())
-            .toArray(String[]::new);
+        this.args = parseArgument(command);
         this.argNames = Collections.emptyList();
     }
 
     public CommandArgument(String command, List<String> argNames) {
-        this.args = Arrays
-            .stream(command.split(" "))
-            .filter(s -> !s.isEmpty())
-            .toArray(String[]::new);
+        this.args = parseArgument(command);
         this.argNames = argNames;
     }
 
@@ -41,18 +35,21 @@ public class CommandArgument {
         List<String> args = new ArrayList<>();
         boolean isQuoting = false;
         StringBuilder quoting = new StringBuilder();
-        for (String arg : Arrays.stream(str.split(" "))
+        List<String> rawArgs = Arrays.stream(str.split(" "))
             .filter(s -> !s.isEmpty())
-            .toList()) {
+            .toList();
+        for (int i = 0; i < rawArgs.size(); i++) {
+            String arg = rawArgs.get(i);
             if (!isQuoting && arg.startsWith("\"")) {
                 if (arg.endsWith("\"")) {
                     args.add(arg.substring(1, arg.length() - 1));
+                } else if (rawArgs.stream().skip(i + 1).noneMatch(s -> s.endsWith("\""))) {
+                    args.add(arg);
                 } else {
                     isQuoting = true;
                     quoting.append(arg.substring(1));
                 }
-            }
-            if (isQuoting) {
+            } else if (isQuoting) {
                 if (arg.endsWith("\"")) {
                     quoting.append(" ");
                     quoting.append(arg, 0, arg.length() - 1);
@@ -129,8 +126,8 @@ public class CommandArgument {
         }
         return Stream.of(args)
             .skip(startIndex)
-            .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
-            .toString();
+            .reduce((a, b) -> a + " " + b)
+            .orElse("");
     }
 
     /**
@@ -312,9 +309,6 @@ public class CommandArgument {
      * @see #getOptionalString(int, String)
      */
     public String getOptionalString(String key, String defaultValue) {
-        if (!argNames.contains(key)) {
-            throw new IllegalArgumentException("Argument name not found: " + key);
-        }
         return getOptionalString(argNames.indexOf(key), defaultValue);
     }
 

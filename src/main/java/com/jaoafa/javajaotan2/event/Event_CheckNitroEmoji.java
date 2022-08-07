@@ -37,6 +37,7 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        if (!event.isFromGuild()) return;
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) {
             return;
         }

@@ -18,7 +18,7 @@ import com.jaoafa.javajaotan2.lib.Translate;
 import net.dv8tion.jda.api.entities.Message;
 
 public class Cmd_ToSw extends Command {
-    Translate.Language translateTo;
+    final Translate.Language translateTo;
 
     public Cmd_ToSw() {
         this.name = "tosw";

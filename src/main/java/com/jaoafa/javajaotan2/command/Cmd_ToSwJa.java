@@ -22,7 +22,7 @@ import java.awt.*;
 import java.time.Instant;
 
 public class Cmd_ToSwJa extends Command {
-    Translate.Language[] translateTo;
+    final Translate.Language[] translateTo;
 
     public Cmd_ToSwJa() {
         this.name = "toswja";

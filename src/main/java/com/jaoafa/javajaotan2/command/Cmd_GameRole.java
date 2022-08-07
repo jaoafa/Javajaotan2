@@ -533,5 +533,4 @@ public class Cmd_GameRole extends CommandWithActions {
             }
         }
     }
-
 }

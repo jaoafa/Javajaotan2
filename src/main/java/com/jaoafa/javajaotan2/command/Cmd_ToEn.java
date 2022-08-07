@@ -47,4 +47,3 @@ public class Cmd_ToEn extends Command {
         ));
     }
 }
-

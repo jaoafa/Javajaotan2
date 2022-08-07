@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("unused")
 public class Cmd_GenText extends Command {
     public Cmd_GenText() {
         this.name = "gentext";

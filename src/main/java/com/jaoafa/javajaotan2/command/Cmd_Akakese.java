@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import java.io.InputStream;
 
-@SuppressWarnings("unused")
+
 public class Cmd_Akakese extends Command {
     public Cmd_Akakese() {
         this.name = "akakese";

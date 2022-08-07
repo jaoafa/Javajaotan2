@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.User;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("unused")
 public class Cmd_Bassline extends Command {
     public Cmd_Bassline() {
         this.name = "bassline";

@@ -39,7 +39,7 @@ public class Event_UserDedDB extends ListenerAdapter {
             stmt.setString(1, user.getId());
             boolean bool = stmt.execute();
             if (!bool) {
-                System.out.println("Event_UserDedDB: dead_at update failed");
+                Main.getLogger().info("Event_UserDedDB: dead_at update failed");
             }
         } catch (SQLException e) {
             e.printStackTrace();

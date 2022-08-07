@@ -11,6 +11,8 @@
 
 package com.jaoafa.javajaotan2.lib;
 
+import com.jaoafa.javajaotan2.Main;
+
 import java.sql.*;
 
 public class MySQLDBManager {
@@ -40,7 +42,7 @@ public class MySQLDBManager {
                 if (diff < WAIT_TIMEOUT) {
                     return conn;
                 } else {
-                    System.out.println("MySQL TIMEOUT! WAIT_TIMEOUT: " + WAIT_TIMEOUT + " / DIFF: " + diff);
+                    Main.getLogger().info("MySQL TIMEOUT! WAIT_TIMEOUT: " + WAIT_TIMEOUT + " / DIFF: " + diff);
                 }
             }
             LAST_PACKET = System.currentTimeMillis();
@@ -63,7 +65,7 @@ public class MySQLDBManager {
             ResultSet res = statement.executeQuery();
             if (res.next()) {
                 WAIT_TIMEOUT = res.getInt("Value");
-                System.out.println("MySQL WAIT_TIMEOUT: " + WAIT_TIMEOUT);
+                Main.getLogger().info("MySQL WAIT_TIMEOUT: " + WAIT_TIMEOUT);
             } else {
                 WAIT_TIMEOUT = -1;
             }

@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 public class Event_NeedSupport extends ListenerAdapter {
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        if (!event.isFromGuild()) return;
         JDA jda = event.getJDA();
         Guild guild = event.getGuild();
         Message message = event.getMessage();

@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,77 +11,56 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArrayArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jaoafa.javajaotan2.lib.CommandArgument;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Cmd_Alpha implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "alpha",
-            "アルファになったオレをします。"
-        );
+@SuppressWarnings("unused")
+public class Cmd_Alpha extends Command {
+    public Cmd_Alpha() {
+        this.name = "alpha";
+        this.help = "アルファになったオレをします。";
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "アルファになったオレをします。")
-                .argument(StringArrayArgument.optional("OreArray", (c, l) -> new ArrayList<>()))
-                .handler(context -> execute(context, this::oreAlpha))
-                .build()
-        );
-    }
+    protected void execute(CommandEvent event) {
+        CommandArgument args = new CommandArgument(event.getArgs());
+        boolean isRandom = args
+            .getStreamArgs()
+            .anyMatch(s -> s.equalsIgnoreCase("random"));
+        List<String> input = args
+            .getStreamArgs()
+            .filter(s -> !s.equalsIgnoreCase("random"))
+            .toList();
 
-    private void oreAlpha(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        //ユーザーアルファ
-        String[] oreArray = context.getOrDefault("OreArray", null);
-        boolean isRandom = false;
-        if (oreArray != null) {
-            List<String> oreRandomOperationArray = new ArrayList<>(Arrays.asList(oreArray));
-            //randomがあったら削除&booleanに記録
-            isRandom = oreRandomOperationArray.remove("random");
-            oreArray = oreRandomOperationArray.toArray(new String[0]);
+        String[] array = {
+            input.size() > 0 ? input.get(0) : "アルファ",
+            input.size() > 1 ? input.get(1) : "ふぁぼら",
+            input.size() > 2 ? input.get(2) : "エゴサ",
+            input.size() > 3 ? input.get(3) : "人気",
+            input.size() > 4 ? input.get(4) : "クソアルファ",
+            input.size() > 5 ? input.get(5) : "エビフィレオ",
+        };
+
+        if (isRandom) {
+            List<String> list = Arrays.asList(array);
+            Collections.shuffle(list);
+            array = list.toArray(new String[0]);
         }
 
-        //ユーザーアルファに不足分のデフォルトアルファを補足
-        String[] oreMergedArray = getMargedArray(oreArray, new String[]{"アルファ", "ふぁぼら", "エゴサ", "人気", "クソアルファ", "エビフィレオ"});
-        message.reply(getOreAlpha(oreMergedArray, isRandom)).queue();
-    }
-
-    private String getOreAlpha(String[] oreArray, boolean isRandom) {
-        //randomだったらシャッフル
-        if (isRandom) Collections.shuffle(Arrays.asList(oreArray));
-        return String.format(
-            "オ、オオwwwwwwwwオレ%swwwwwwww最近めっちょ%sれてんねんオレwwwwwwww%sとかかけるとめっちょ%sやねんwwwwァァァァァァァwww%sを見下しながら食べる%sは一段とウメェなァァァァwwwwwwww",
-            oreArray[0], oreArray[1], oreArray[2], oreArray[3], oreArray[4], oreArray[5]
-        );
-    }
-
-    private String[] getMargedArray(String[] oreArray, String[] oreDefaultArray) {
-        if (oreArray == null) return oreDefaultArray;
-        int replaceCount = 0;
-        for (String oreStr : oreArray) {
-            if (replaceCount > 5) break;
-            oreDefaultArray[replaceCount] = oreStr;
-            replaceCount++;
-        }
-        return oreDefaultArray;
+        MessageChannel channel = event.getChannel();
+        channel.sendMessage("オ、オオwwwwwwwwオレ%swwwwwwww最近めっちょ%sれてんねんオレwwwwwwww%sとかかけるとめっちょ%sやねんwwwwァァァァァァァwww%sを見下しながら食べる%sは一段とウメェなァァァァwwwwwwww".formatted(
+            array[0],
+            array[1],
+            array[2],
+            array[3],
+            array[4],
+            array[5]
+        )).queue();
     }
 }

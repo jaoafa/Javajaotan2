@@ -103,7 +103,7 @@ public class Main {
         // ログイン
         try {
             JDABuilder jdabuilder = JDABuilder.createDefault(config.getToken())
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.MESSAGE_CONTENT,
                     GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
                 .setAutoReconnect(true)
                 .setBulkDeleteSplittingEnabled(false)
@@ -138,19 +138,24 @@ public class Main {
     static CommandClient getCommandClient() {
         CommandClientBuilder builder = new CommandClientBuilder();
 
-        builder.setPrefix("/");
+        final String prefix = "/";
+        builder.setPrefix(prefix);
+        builder.setActivity(null);
+        builder.setOwnerId(config.getOwnerId());
+
         Reflections reflections = new Reflections("com.jaoafa.javajaotan2.command");
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
         List<Command> commands = new ArrayList<>();
 
         for (Class<? extends Command> theClass : subTypes) {
-            if (!theClass.getName().startsWith("com.jaoafa.javajaotan2.event.Cmd_")) {
+
+            if (!theClass.getName().startsWith("com.jaoafa.javajaotan2.command.Cmd_")) {
                 continue;
             }
             if (theClass.getName().contains("SubCommand") || theClass.getName().contains("SlashCommand")) {
                 continue;
             }
-            String cmdName = theClass.getName().substring("com.jaoafa.javajaotan2.event.Cmd_".length());
+            String cmdName = theClass.getName().substring("com.jaoafa.javajaotan2.command.Cmd_".length());
 
             try {
                 commands.add(theClass.getDeclaredConstructor().newInstance());
@@ -161,6 +166,8 @@ public class Main {
             }
         }
         builder.addCommands(commands.toArray(new Command[0]));
+
+        builder.useHelpBuilder(false);
 
         // とりあえずスラッシュコマンドはサポートしない
 

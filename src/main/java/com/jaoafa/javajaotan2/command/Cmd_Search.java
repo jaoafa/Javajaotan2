@@ -11,24 +11,16 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.CommandArgument;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -39,34 +31,29 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Cmd_Search implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "search",
-            "Google検索を用いて検索を行います。"
-        );
+@SuppressWarnings("unused")
+public class Cmd_Search extends Command {
+    public Cmd_Search() {
+        this.name = "search";
+        this.help = "Google検索を用いて検索を行います。";
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "Google検索を用いて検索を行います。")
-                .argument(StringArgument.greedy("text"))
-                .handler(context -> execute(context, this::search))
-                .build()
-        );
-    }
+    protected void execute(CommandEvent event) {
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs());
+        if (args.has(0)) {
+            message.reply("検索する文字列を指定してください。").queue();
+            return;
+        }
 
-    private void search(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
         String gcpKey = Main.getConfig().getGCPKey();
         String cx = Main.getConfig().getCustomSearchCX();
         if (gcpKey == null || cx == null) {
             message.reply("Google Cloud Platform Key または Custom Search 検索エンジン API が定義されていないため、このコマンドを使用できません。").queue();
             return;
         }
-        String text = context.get("text");
+        String text = args.getString(0);
         SearchResult result = customSearch(gcpKey, cx, text);
         if (result == null) {
             message.reply("検索に失敗しました。").queue();

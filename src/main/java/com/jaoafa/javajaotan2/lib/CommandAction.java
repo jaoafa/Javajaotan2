@@ -13,7 +13,9 @@ package com.jaoafa.javajaotan2.lib;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.entities.Message;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -28,7 +30,7 @@ public class CommandAction {
 
     /**
      * CommandAction クラスを作成します。<br>
-     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandEvent, List)} を呼び出してください。<br>
+     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandWithActions, CommandEvent)} を呼び出してください。<br>
      * <br>
      * このコンストラクタは、<b>名前付きの引数</b>を持たず、このアクションの下にサブコマンド（グループ）がない場合に利用します。<br>
      * （名前付きの引数を用いず、位置引数で値を取得する場合はこのメソッドを使います。）<br>
@@ -55,7 +57,7 @@ public class CommandAction {
 
     /**
      * CommandAction クラスを作成します。<br>
-     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandEvent, List)} を呼び出してください。<br>
+     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandWithActions, CommandEvent)} を呼び出してください。<br>
      * <br>
      * このコンストラクタは、このアクションの下にサブコマンド（グループ）がある場合に利用します。このアクションの下には入れ子でグループを追加することもできます。<br>
      * 例えば、次のようなコマンドを実装する場合です。<br>
@@ -78,7 +80,7 @@ public class CommandAction {
 
     /**
      * CommandAction クラスを作成します。<br>
-     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandEvent, List)} を呼び出してください。<br>
+     * このクラスを利用する場合、{@link Command#execute(CommandEvent)} で {@link CommandAction#execute(CommandWithActions, CommandEvent)} を呼び出してください。<br>
      * <br>
      * このコンストラクタは、<b>名前付きの引数</b>を持ち、このアクションの下にサブコマンド（グループ）がない場合に利用します。<br>
      * 例えば、次のようなコマンドを実装する場合です。<br>
@@ -156,17 +158,30 @@ public class CommandAction {
      * このアクションを実行します。<br>
      * このメソッドは、{@link Command#execute(CommandEvent)} で呼び出す必要があります。
      *
-     * @param event   CommandEvent
-     * @param actions CommandAction のリスト
+     * @param cmd   呼び出し元のコマンド定義（this）
+     * @param event CommandEvent
      *
      * @return 実行できたかどうか
      */
-    public static boolean execute(CommandEvent event, List<CommandAction> actions) {
-        return execute(event, 0, actions);
+    public static void execute(CommandWithActions cmd, CommandEvent event) {
+        Message message = event.getMessage();
+        if (!execute(event, 0, cmd.getActions())) {
+            message.reply(("""
+                指定されたコマンドのアクションが見つかりませんでした。
+                利用可能なアクションは次の通りです：```
+                - /%s %s
+                ```""").formatted(
+                cmd.getName(),
+                String.join("\n- /%s ".formatted(cmd.getName()), getActionNames(cmd.getActions()))
+            )).queue();
+        }
     }
 
     private static boolean execute(CommandEvent event, int index, List<CommandAction> actions) {
         CommandArgument args = new CommandArgument(event.getArgs());
+        if (!args.has(index)) {
+            return false;
+        }
         String name = args.getString(index);
         Optional<CommandAction> match = actions
             .stream()
@@ -184,5 +199,19 @@ public class CommandAction {
             execute(event, index + 1, action.getSubActions());
         }
         return true;
+    }
+
+    private static List<String> getActionNames(List<CommandAction> actions) {
+        return actions
+            .stream()
+            .map(action -> {
+                if (action.getSubActions() != null) {
+                    return getActionNames(action.getSubActions()).stream().map(name -> action.getName() + " " + name).toList();
+                } else {
+                    return List.of(action.getName());
+                }
+            })
+            .flatMap(Collection::stream)
+            .toList();
     }
 }

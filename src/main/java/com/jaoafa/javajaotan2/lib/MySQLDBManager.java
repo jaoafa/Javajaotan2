@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -25,7 +25,7 @@ public class MySQLDBManager {
 
     public MySQLDBManager(String hostname, int port,
                           String username, String password, String database) throws ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName("com.mysql.cj.jdbc.Driver");
         this.hostname = hostname;
         this.port = port;
         this.username = username;

@@ -120,6 +120,7 @@ public class Event_MeetingVote extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+        if (!event.isFromGuild()) return;
         if (Main.getConfig().getGuildId() != event.getGuild().getIdLong()) return;
         if (event.getChannel().getIdLong() != Channels.meeting_vote.getChannelId()) return;
         if (!event.isFromType(ChannelType.TEXT)) return;

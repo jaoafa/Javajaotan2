@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class Cmd_Alpha extends Command {
     public Cmd_Alpha() {
         this.name = "alpha";

@@ -32,7 +32,6 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("unused")
 public class Cmd_GameRole extends CommandWithActions {
     final Path path = GameRole.getPath();
     final Path pathMessages = GameRole.getPathMessages();

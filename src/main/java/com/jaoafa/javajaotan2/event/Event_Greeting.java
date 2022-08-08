@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.Channels;
+import com.jaoafa.javajaotan2.lib.Roles;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -55,7 +56,7 @@ public class Event_Greeting extends ListenerAdapter {
             message.delete().queue();
             return;
         }
-        Role role = jda.getRoleById(597421078817669121L);
+        Role role = Roles.MailVerified.getRole();
         if (role == null) {
             channel.sendMessage("<@221991565567066112> ROLE IS NOT FOUND").queue();
             return;
@@ -78,8 +79,11 @@ public class Event_Greeting extends ListenerAdapter {
         message.addReaction(Emoji.fromUnicode("\u2B55")).queue(); // o
         message.reply("""
             あいさつしていただきありがとうございます！これにより、多くのチャンネルを閲覧できるようになりました。
-            このあとは<#597419057251090443>などで__**「`/link`」を実行(投稿)して、MinecraftアカウントとDiscordアカウントを連携**__しましょう！
-            **<#706818240759988224>に記載されているメッセージもお読みください！**""").queue();
+            このあとは<#597419057251090443>などで**「`/link`」を実行(投稿)して、MinecraftアカウントとDiscordアカウントを連携**しましょう！
+            **<#706818240759988224>に記載されているメッセージもお読みください！**
+                        
+            jMS Gamers ClubではDiscordサービス利用規約に基づき**13歳未満の利用を禁止**しています。あなたが13歳以上でない場合は当サーバから退出してください。
+            """).queue();
         jaoPlayers.remove(member.getIdLong());
     }
 }

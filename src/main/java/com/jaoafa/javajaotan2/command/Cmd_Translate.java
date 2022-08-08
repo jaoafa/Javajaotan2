@@ -31,7 +31,7 @@ public class Cmd_Translate extends Command {
 
         String from_raw = args.getString(0);
         String to_raw = args.getString(1);
-        String text = args.getString(2);
+        String text = args.getGreedyString(2);
         String displayText = JavajaotanLibrary.getContentDisplay(message, text);
 
         Translate.Language from = Translate.getLanguage(from_raw);

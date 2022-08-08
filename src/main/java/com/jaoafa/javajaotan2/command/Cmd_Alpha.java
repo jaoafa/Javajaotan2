@@ -37,13 +37,14 @@ public class Cmd_Alpha extends Command {
             .filter(s -> !s.equalsIgnoreCase("random"))
             .toList();
 
+        int argsSize = input.size();
         String[] array = {
-            input.size() > 0 ? input.get(0) : "アルファ",
-            input.size() > 1 ? input.get(1) : "ふぁぼら",
-            input.size() > 2 ? input.get(2) : "エゴサ",
-            input.size() > 3 ? input.get(3) : "人気",
-            input.size() > 4 ? input.get(4) : "クソアルファ",
-            input.size() > 5 ? input.get(5) : "エビフィレオ",
+            argsSize > 0 ? input.get(0) : "アルファ",
+            argsSize > 1 ? input.get(1) : "ふぁぼら",
+            argsSize > 2 ? input.get(2) : "エゴサ",
+            argsSize > 3 ? input.get(3) : "人気",
+            argsSize > 4 ? input.get(4) : "クソアルファ",
+            argsSize > 5 ? input.get(5) : "エビフィレオ",
         };
 
         if (isRandom) {

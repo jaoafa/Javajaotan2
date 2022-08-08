@@ -22,6 +22,8 @@ import java.sql.*;
 import java.util.List;
 
 public class Cmd_UserKey extends CommandWithActions {
+    private final MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
+
     public Cmd_UserKey() {
         this.name = "userkey";
         this.help = "ユーザーキーに関する処理を行います。（運営のみ利用可能）";
@@ -37,19 +39,11 @@ public class Cmd_UserKey extends CommandWithActions {
     }
 
     private void info(CommandEvent event, List<String> argNames) {
+        if (checkStatusFailed(event)) return;
+
         Message message = event.getMessage();
-        Member member = event.getMember();
-        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole()) && !JavajaotanLibrary.isGrantedRole(member, Roles.Moderator.getRole())) {
-            message.reply("このコマンドは運営のみ使用できます。").queue();
-            return;
-        }
         CommandArgument args = new CommandArgument(event.getArgs(), argNames);
         String key = args.getString("key");
-        MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
-        if (manager == null) {
-            message.reply("データベースへの接続が確立されていません。").queue();
-            return;
-        }
 
         UserKeyResult result = getUserKey(manager, key);
         if (!result.status()) {
@@ -73,19 +67,12 @@ public class Cmd_UserKey extends CommandWithActions {
     }
 
     private void use(CommandEvent event, List<String> argNames) {
+        if (checkStatusFailed(event)) return;
+
         Message message = event.getMessage();
-        Member member = event.getMember();
-        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole()) && !JavajaotanLibrary.isGrantedRole(member, Roles.Moderator.getRole())) {
-            message.reply("このコマンドは運営のみ使用できます。").queue();
-            return;
-        }
         CommandArgument args = new CommandArgument(event.getArgs(), argNames);
         String key = args.getString("key");
-        MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
-        if (manager == null) {
-            message.reply("データベースへの接続が確立されていません。").queue();
-            return;
-        }
+
         try {
             UserKeyResult result = getUserKey(manager, key);
             if (!result.status()) {
@@ -165,4 +152,18 @@ public class Cmd_UserKey extends CommandWithActions {
         }
     }
 
+    private boolean checkStatusFailed(CommandEvent event) {
+        Message message = event.getMessage();
+        Member member = event.getMember();
+        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole()) && !JavajaotanLibrary.isGrantedRole(member, Roles.Moderator.getRole())) {
+            message.reply("このコマンドは運営のみ使用できます。").queue();
+            return true;
+        }
+        if (manager == null) {
+            message.reply("データベースへの接続が確立されていません。").queue();
+            return true;
+        }
+
+        return false;
+    }
 }

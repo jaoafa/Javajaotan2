@@ -103,8 +103,14 @@ public class Main {
         // ログイン
         try {
             JDABuilder jdabuilder = JDABuilder.createDefault(config.getToken())
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.MESSAGE_CONTENT,
-                    GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+                .enableIntents(
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_PRESENCES,
+                    GatewayIntent.MESSAGE_CONTENT,
+                    GatewayIntent.GUILD_MESSAGE_TYPING,
+                    GatewayIntent.DIRECT_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS
+                )
                 .setAutoReconnect(true)
                 .setBulkDeleteSplittingEnabled(false)
                 .setContextEnabled(false);
@@ -143,19 +149,19 @@ public class Main {
         builder.setActivity(null);
         builder.setOwnerId(config.getOwnerId());
 
-        Reflections reflections = new Reflections("com.jaoafa.javajaotan2.command");
+        final String commandPackage = "com.jaoafa.javajaotan2.command";
+        Reflections reflections = new Reflections(commandPackage);
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
         List<Command> commands = new ArrayList<>();
 
         for (Class<? extends Command> theClass : subTypes) {
-
-            if (!theClass.getName().startsWith("com.jaoafa.javajaotan2.command.Cmd_")) {
+            if (!theClass.getName().startsWith("%s.Cmd_".formatted(commandPackage))) {
                 continue;
             }
             if (theClass.getName().contains("SubCommand") || theClass.getName().contains("SlashCommand")) {
                 continue;
             }
-            String cmdName = theClass.getName().substring("com.jaoafa.javajaotan2.command.Cmd_".length());
+            String cmdName = theClass.getName().substring(("%s.Cmd_".formatted(commandPackage)).length());
 
             try {
                 commands.add(theClass.getDeclaredConstructor().newInstance());
@@ -175,10 +181,11 @@ public class Main {
     }
 
     static void registerEvent(JDABuilder jdaBuilder) {
-        Reflections reflections = new Reflections("com.jaoafa.javajaotan2.event");
+        final String eventPackage = "com.jaoafa.javajaotan2.event";
+        Reflections reflections = new Reflections(eventPackage);
         Set<Class<? extends ListenerAdapter>> subTypes = reflections.getSubTypesOf(ListenerAdapter.class);
         for (Class<? extends ListenerAdapter> clazz : subTypes) {
-            if (!clazz.getName().startsWith("com.jaoafa.javajaotan2.event.Event_")) {
+            if (!clazz.getName().startsWith("%s.Event_".formatted(eventPackage))) {
                 continue;
             }
             if (clazz.getEnclosingClass() != null) {
@@ -187,7 +194,7 @@ public class Main {
             if (clazz.getName().contains("$")) {
                 continue;
             }
-            String eventName = clazz.getName().substring("com.jaoafa.javajaotan2.event.Event_".length());
+            String eventName = clazz.getName().substring(("%s.Event_".formatted(eventPackage)).length());
             try {
                 Constructor<?> construct = clazz.getConstructor();
                 Object instance = construct.newInstance();

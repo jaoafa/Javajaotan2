@@ -71,8 +71,8 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をStringとして返す。<br>
-     * キーが「...」で終わる場合、greedyなキーと判断し対応するインデックス以降の値をStringとして返す。
+     * 指定されたキーに対応するインデックスの値をStringとして返します。<br>
+     * キーが「...」で終わる場合、greedyなキーと判断し対応するインデックス以降の値をStringとして返します。
      *
      * @param key キー
      *
@@ -95,7 +95,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をStringとして返す。
+     * 指定されたインデックスの値をStringとして返します。
      *
      * @param index 取得するインデックス
      *
@@ -114,7 +114,7 @@ public class CommandArgument {
     }
 
     /**
-     * 引数配列から、指定されたインデックス以降の値をStringとして返す。
+     * 引数配列から、指定されたインデックス以降の値をStringとして返します。
      *
      * @param startIndex 取得開始するインデックス
      *
@@ -131,7 +131,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をIntegerとして返す。
+     * 指定されたキーに対応するインデックスの値をIntegerとして返します。
      *
      * @param key キー
      *
@@ -151,7 +151,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をintとして返す。
+     * 指定されたインデックスの値をintとして返します。
      *
      * @param index 取得するインデックス
      *
@@ -171,7 +171,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をLongとして返す。
+     * 指定されたキーに対応するインデックスの値をLongとして返します。
      *
      * @param key キー
      *
@@ -191,7 +191,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をlongとして返す。
+     * 指定されたインデックスの値をlongとして返します。
      *
      * @param index 取得するインデックス
      *
@@ -211,7 +211,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をDoubleとして返す。
+     * 指定されたキーに対応するインデックスの値をDoubleとして返します。
      *
      * @param key キー
      *
@@ -231,7 +231,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をdoubleとして返す。
+     * 指定されたインデックスの値をdoubleとして返します。
      *
      * @param index 取得するインデックス
      *
@@ -251,7 +251,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をBooleanとして返す。
+     * 指定されたキーに対応するインデックスの値をBooleanとして返します。
      *
      * @param key キー
      *
@@ -270,7 +270,7 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をbooleanとして返す。
+     * 指定されたインデックスの値をbooleanとして返します。
      *
      * @param index 取得するインデックス
      *
@@ -295,11 +295,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をStringとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたキーに対応するインデックスの値をStringとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -313,11 +313,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をStringとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたインデックスの値をStringとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -330,11 +330,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をintとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたキーに対応するインデックスの値をintとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -351,11 +351,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をintとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたインデックスの値をintとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -368,11 +368,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をlongとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたキーに対応するインデックスの値をlongとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -389,11 +389,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をlongとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたインデックスの値をlongとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -406,11 +406,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をdoubleとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたキーに対応するインデックスの値をdoubleとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -427,11 +427,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をdoubleとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたインデックスの値をdoubleとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -444,11 +444,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたキーに対応するインデックスの値をbooleanとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたキーに対応するインデックスの値をbooleanとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -465,11 +465,11 @@ public class CommandArgument {
     }
 
     /**
-     * 指定されたインデックスの値をbooleanとして返す。<br>
-     * 値がない場合は指定されたデフォルト値を返す。
+     * 指定されたインデックスの値をbooleanとして返します。<br>
+     * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返すデフォルト値
+     * @param defaultValue 値がない場合に返しますデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -485,7 +485,7 @@ public class CommandArgument {
     }
 
     /**
-     * 引数の配列を返す。
+     * 引数の配列を返します。
      *
      * @return 引数の配列
      *
@@ -497,7 +497,7 @@ public class CommandArgument {
     }
 
     /**
-     * 引数のリストを返す。
+     * 引数のリストを返します。
      *
      * @return 引数のリスト
      *
@@ -509,7 +509,7 @@ public class CommandArgument {
     }
 
     /**
-     * 引数のストリームを返す。
+     * 引数のストリームを返します。
      *
      * @return 引数のストリーム
      *
@@ -521,7 +521,7 @@ public class CommandArgument {
     }
 
     /**
-     * 引数の数を返す。
+     * 引数の数を返します。
      *
      * @return 引数の数
      */
@@ -530,7 +530,7 @@ public class CommandArgument {
     }
 
     /**
-     * 引数が存在するかどうかを返す。
+     * 引数が存在するかどうかを返します。
      *
      * @return 引数が存在する場合はtrue、そうでない場合はfalse
      */

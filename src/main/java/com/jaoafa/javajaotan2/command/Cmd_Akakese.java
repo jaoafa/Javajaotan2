@@ -30,8 +30,11 @@ public class Cmd_Akakese extends Command {
     @Override
     protected void execute(CommandEvent event) {
         Message message = event.getMessage();
-        MessageReference ref = event.getMessage().getMessageReference();
-        IMentionable user = getUser(ref != null && ref.getMessage() != null ? ref.getMessage().getAuthor() : event.getAuthor(), event.getArgs());
+        MessageReference ref = message.getMessageReference();
+        IMentionable user = getUser(
+            ref != null && ref.getMessage() != null ? ref.getMessage().getAuthor() : event.getAuthor(),
+            event.getArgs()
+        );
         if (user == null) {
             message.reply("ユーザー情報を取得できませんでした。").queue();
             return;

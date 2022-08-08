@@ -41,11 +41,7 @@ public class Cmd_Translate extends Command {
             message.reply("翻訳先の言語が不明です。").queue();
             return;
         }
-        Translate.TranslateResult result = Translate.translate(
-            from,
-            to,
-            displayText
-        );
+        Translate.TranslateResult result = Translate.translate(from, to, displayText);
         if (result == null) {
             message.reply("翻訳に失敗しました。").queue();
             return;

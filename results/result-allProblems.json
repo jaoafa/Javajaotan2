@@ -1,201 +1,5 @@
 {"version":"3","listProblem":[{
   "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
-      "language": "JAVA",
-      "line": 377,
-      "offset": 25,
-      "length": 10,
-      "code": {
-        "startLine": 375,
-        "length": 10,
-        "offset": 123,
-        "surroundingCode": "                try (ResultSet res = stmt.executeQuery()) {\n                    if (!res.next()) {\n                        System.out.println(\"processCreateWaiting(): res.next false\");\n                        return;\n                    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "cd952e0988ca936cdb918e3a76d123f17ad58b69896c055fe8b09b161c4aad16"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
-      "language": "JAVA",
-      "line": 507,
-      "offset": 25,
-      "length": 10,
-      "code": {
-        "startLine": 505,
-        "length": 10,
-        "offset": 123,
-        "surroundingCode": "                try (ResultSet res = stmt.executeQuery()) {\n                    if (!res.next()) {\n                        System.out.println(\"processChangeOther(): res.next false\");\n                        return;\n                    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "a74e12f106e62a348e920b61eb08fad1b6d96ce9e3e26129a4833140adcc3591"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
-      "language": "JAVA",
-      "line": 530,
-      "offset": 17,
-      "length": 10,
-      "code": {
-        "startLine": 528,
-        "length": 10,
-        "offset": 76,
-        "surroundingCode": "                }\n                stmt.setInt(i, citiesId);\n                System.out.println(\"SQL: \" + stmt);\n                stmt.executeUpdate();\n            }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "c670b302745f0ee7d3565b75090e2fb0f4947359be5eac4a3f0475014249b4aa"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
-      "language": "JAVA",
-      "line": 435,
-      "offset": 25,
-      "length": 10,
-      "code": {
-        "startLine": 433,
-        "length": 10,
-        "offset": 123,
-        "surroundingCode": "                try (ResultSet res = stmt.executeQuery()) {\n                    if (!res.next()) {\n                        System.out.println(\"processChangeCorners(): res.next false\");\n                        return;\n                    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "e4de8d39e65694f24648706f1a7b0af7b48e608900d0cd758e7c7aef36b4ed15"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_UserDedDB.java",
-      "language": "JAVA",
-      "line": 42,
-      "offset": 17,
-      "length": 10,
-      "code": {
-        "startLine": 40,
-        "length": 10,
-        "offset": 84,
-        "surroundingCode": "            boolean bool = stmt.execute();\n            if (!bool) {\n                System.out.println(\"Event_UserDedDB: dead_at update failed\");\n            }\n        } catch (SQLException e) {"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "8654d9f1bb8bec39024813a34e3ce4ae8a4cb5b68553d3332b73734da4947971"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/MySQLDBManager.java",
-      "language": "JAVA",
-      "line": 66,
-      "offset": 17,
-      "length": 10,
-      "code": {
-        "startLine": 64,
-        "length": 10,
-        "offset": 98,
-        "surroundingCode": "            if (res.next()) {\n                WAIT_TIMEOUT = res.getInt(\"Value\");\n                System.out.println(\"MySQL WAIT_TIMEOUT: \" + WAIT_TIMEOUT);\n            } else {\n                WAIT_TIMEOUT = -1;"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "12f52a2ff57d50324e06cda72ca5f76b0b97b0920b387f52f5d633c5217dd4af"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Use of 'System.out' or 'System.err'",
-  "severity": "High",
-  "comment": "Uses of 'System.out' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports usages of `System.out` or `System.err`.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code, or replaced by a more robust\nlogging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/MySQLDBManager.java",
-      "language": "JAVA",
-      "line": 43,
-      "offset": 21,
-      "length": 10,
-      "code": {
-        "startLine": 41,
-        "length": 10,
-        "offset": 78,
-        "surroundingCode": "                    return conn;\n                } else {\n                    System.out.println(\"MySQL TIMEOUT! WAIT_TIMEOUT: \" + WAIT_TIMEOUT + \" / DIFF: \" + diff);\n                }\n            }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "SystemOutErr"
-  },
-  "hash": "8533dfb3b092cf71bf04d2f199de78cd195679129daf326fd77554f90d420cb0"
-},{
-  "tool": "Code Inspection",
   "category": "Class",
   "type": "Exception class name does not end with 'Exception'",
   "severity": "High",
@@ -206,11 +10,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/lib/Translate.java",
       "language": "JAVA",
-      "line": 80,
+      "line": 153,
       "offset": 18,
       "length": 24,
       "code": {
-        "startLine": 78,
+        "startLine": 151,
         "length": 24,
         "offset": 24,
         "surroundingCode": "    }\n\n    static class UndefinedTranslateAPIUrl extends RuntimeException {\n        public UndefinedTranslateAPIUrl() {\n            super(\"Translate API URL is not defined.\");"
@@ -221,35 +25,7 @@
     "module": "project",
     "inspectionName": "ExceptionNameDoesntEndWithException"
   },
-  "hash": "1ea901812fafb90a27bbd783665e5283d1007c5ef5f5d8dc26b304f36a1af33e"
-},{
-  "tool": "Code Inspection",
-  "category": "Performance",
-  "type": "Field can be made 'static'",
-  "severity": "High",
-  "comment": "Field 'repo' may be 'static'",
-  "detailsInfo": "Reports instance variables that can safely be made `static`. A field can be static if it is declared `final` and initialized with a constant.\n\n**Example:**\n\n\n      public final String str = \"sample\";\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_BugReaction.java",
-      "language": "JAVA",
-      "line": 41,
-      "offset": 18,
-      "length": 4,
-      "code": {
-        "startLine": 39,
-        "length": 4,
-        "offset": 133,
-        "surroundingCode": "public class Event_BugReaction extends ListenerAdapter {\n    final String targetReaction = \"\\uD83D\\uDC1B\"; // :bug:\n    final String repo = \"jaoafa/jao-Minecraft-Server\";\n\n    @Override"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "FieldMayBeStatic"
-  },
-  "hash": "8b3b079977e3cc17bbf7e4e5b001fdbd3f56714f32cc54575c454dad83c399e1"
+  "hash": "bdf60d2a62bd977f2dc8be48bc31ad62c6370b6506e1034ed1155abb0d95540c"
 },{
   "tool": "Code Inspection",
   "category": "Performance",
@@ -278,6 +54,34 @@
     "inspectionName": "FieldMayBeStatic"
   },
   "hash": "1387e173f70a7c165ea29148973991f7c1abda5bfc1671f16859431caf2c8cdb"
+},{
+  "tool": "Code Inspection",
+  "category": "Performance",
+  "type": "Field can be made 'static'",
+  "severity": "High",
+  "comment": "Field 'repo' may be 'static'",
+  "detailsInfo": "Reports instance variables that can safely be made `static`. A field can be static if it is declared `final` and initialized with a constant.\n\n**Example:**\n\n\n      public final String str = \"sample\";\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_BugReaction.java",
+      "language": "JAVA",
+      "line": 41,
+      "offset": 18,
+      "length": 4,
+      "code": {
+        "startLine": 39,
+        "length": 4,
+        "offset": 133,
+        "surroundingCode": "public class Event_BugReaction extends ListenerAdapter {\n    final String targetReaction = \"\\uD83D\\uDC1B\"; // :bug:\n    final String repo = \"jaoafa/jao-Minecraft-Server\";\n\n    @Override"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "FieldMayBeStatic"
+  },
+  "hash": "8b3b079977e3cc17bbf7e4e5b001fdbd3f56714f32cc54575c454dad83c399e1"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -318,14 +122,14 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/lib/GameRole.java",
       "language": "JAVA",
-      "line": 72,
+      "line": 61,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 70,
+        "startLine": 59,
         "length": 15,
         "offset": 162,
-        "surroundingCode": "            roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return null;\n        }"
+        "surroundingCode": "            roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return false;\n        }"
       }
     }
   ],
@@ -333,63 +137,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "35c88c2c850e269cfd92e9d51cd5c08b310fccfd2f533db06a89d7a971bca7d5"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/GameRole.java",
-      "language": "JAVA",
-      "line": 141,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 139,
-        "length": 15,
-        "offset": 180,
-        "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return false;\n        }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "f203e59ed206b8fbc762e685ea31d04b2983221dc80b314c99beb6909a69e653"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/GameRole.java",
-      "language": "JAVA",
-      "line": 84,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 82,
-        "length": 15,
-        "offset": 180,
-        "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return new ArrayList<>();\n        }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "ef81532897b87069e7494eac3cbbb969857d79b43eb00541e9de1ad5251f9950"
+  "hash": "ff4ec29c4bb2334a1d5f50227e1975bc97982f9627f0130bdf1e14dd1855553f"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -430,14 +178,14 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/lib/GameRole.java",
       "language": "JAVA",
-      "line": 61,
+      "line": 84,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 59,
+        "startLine": 82,
         "length": 15,
-        "offset": 162,
-        "surroundingCode": "            roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return false;\n        }"
+        "offset": 180,
+        "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return new ArrayList<>();\n        }"
       }
     }
   ],
@@ -445,7 +193,63 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "ff4ec29c4bb2334a1d5f50227e1975bc97982f9627f0130bdf1e14dd1855553f"
+  "hash": "ef81532897b87069e7494eac3cbbb969857d79b43eb00541e9de1ad5251f9950"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/lib/GameRole.java",
+      "language": "JAVA",
+      "line": 141,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 139,
+        "length": 15,
+        "offset": 180,
+        "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return false;\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "f203e59ed206b8fbc762e685ea31d04b2983221dc80b314c99beb6909a69e653"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/lib/GameRole.java",
+      "language": "JAVA",
+      "line": 72,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 70,
+        "length": 15,
+        "offset": 162,
+        "surroundingCode": "            roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return null;\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "35c88c2c850e269cfd92e9d51cd5c08b310fccfd2f533db06a89d7a971bca7d5"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -458,11 +262,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_SearchImg.java",
       "language": "JAVA",
-      "line": 128,
+      "line": 113,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 126,
+        "startLine": 111,
         "length": 15,
         "offset": 63,
         "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return null;\n        }"
@@ -473,7 +277,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "5eaba9db54b913596de783ab316e85c27f5ce589db9b08277fb9955892e9a116"
+  "hash": "0b6310f0dcc032d63727b9f0e06431c3543231de9884cc6beb8d40d3bc5e0391"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -486,11 +290,67 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
       "language": "JAVA",
-      "line": 585,
+      "line": 479,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 583,
+        "startLine": 477,
+        "length": 15,
+        "offset": 63,
+        "surroundingCode": "            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n        }\n    }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "63482942dfbc50a65386d4c4c7941a642b14feaa280a607147bc45cf78cea5f5"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
+      "language": "JAVA",
+      "line": 564,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 562,
+        "length": 15,
+        "offset": 63,
+        "surroundingCode": "            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n        }\n    }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "d21adefe0cb49f00225829186f0031e0b6f4def12817cd824494d99222e3c97d"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
+      "language": "JAVA",
+      "line": 586,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 584,
         "length": 15,
         "offset": 63,
         "surroundingCode": "            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n            return null;\n        }"
@@ -501,7 +361,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "49b924ff1dd54927bf6a5e0676d59dc1cba9229adcb106122df2518fe60456c9"
+  "hash": "1491c7729da454edd47fd438f5631b6336ca9008a605918fcd101b53069330e9"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -514,11 +374,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
       "language": "JAVA",
-      "line": 416,
+      "line": 417,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 414,
+        "startLine": 415,
         "length": 15,
         "offset": 63,
         "surroundingCode": "            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n        }\n    }"
@@ -529,63 +389,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "eb4424afd18de4747d972a89244861d589936c7d20939d7fcefb219eaec363c9"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
-      "language": "JAVA",
-      "line": 563,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 561,
-        "length": 15,
-        "offset": 63,
-        "surroundingCode": "            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n        }\n    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "11354fc915e0e4c83b0b165f527f60491770854ff8c38a7bb048526503762980"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_MeetingVote.java",
-      "language": "JAVA",
-      "line": 478,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 476,
-        "length": 15,
-        "offset": 63,
-        "surroundingCode": "            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n        }\n    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "b111b3d3dbcc50fc48dbda3f0207df08752ec1b84c64c0cbb4b3165d7d431113"
+  "hash": "71ddfe1d2d357fdc32f2ce0fe6ac240f795172ebc94f107eb55f2a5a4405a341"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -598,67 +402,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/lib/Translate.java",
       "language": "JAVA",
-      "line": 59,
+      "line": 163,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 57,
-        "length": 15,
-        "offset": 63,
-        "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return null;\n        }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "1d1f5deddae7fc75961f69dc4323b3bdf5d8603c8230df48718d256869eddb16"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/Translate.java",
-      "language": "JAVA",
-      "line": 75,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 73,
-        "length": 15,
-        "offset": 87,
-        "surroundingCode": "            return getLanguage(language);\n        } catch (APIError e) {\n            e.printStackTrace();\n            return Language.UNKNOWN;\n        }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "8fa732e15176edfc5de90d9b9348da6803d7a3f984ee68e45957882f7ca368b3"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/Translate.java",
-      "language": "JAVA",
-      "line": 90,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 88,
+        "startLine": 161,
         "length": 15,
         "offset": 151,
         "surroundingCode": "            return Language.valueOf(language.replace(\"-\", \"_\").toUpperCase(Locale.ROOT));\n        } catch (IllegalArgumentException e) {\n            e.printStackTrace();\n            return Language.UNKNOWN;\n        }"
@@ -669,7 +417,63 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "c7989f56aa6557b0a5d68ccbc0f54ed77e693bad1fcf50e91c9277997cfb7631"
+  "hash": "60cfc24d39f51ace6f8c5b4185e93ccf1ad0f8b16e873e1094e27d0dd95e2885"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/lib/Translate.java",
+      "language": "JAVA",
+      "line": 148,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 146,
+        "length": 15,
+        "offset": 87,
+        "surroundingCode": "            return getLanguage(language);\n        } catch (APIError e) {\n            e.printStackTrace();\n            return Language.UNKNOWN;\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "62ae6028b6575aa545fb627d588dbb19dd7888fa5254084e61a41422fe5e9b8c"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/lib/Translate.java",
+      "language": "JAVA",
+      "line": 64,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 62,
+        "length": 15,
+        "offset": 63,
+        "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return null;\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "d7fbe56ff5f3290b957b8f49599fec6b8933d69ab574fc968184f70367984032"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -682,11 +486,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/lib/JavajaotanConfig.java",
       "language": "JAVA",
-      "line": 95,
+      "line": 97,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 93,
+        "startLine": 95,
         "length": 15,
         "offset": 129,
         "surroundingCode": "        } catch (IOException e) {\n            logger.warn(\"コンフィグファイル config.json を読み取れませんでした: \" + e.getMessage());\n            e.printStackTrace();\n            throw new RuntimeException();\n        } catch (JSONException e) {"
@@ -697,7 +501,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "6083392fb29a7a69f4243ee117b14ae1063cf800b6e6642d9b1a1986bd02d473"
+  "hash": "e6225c9962d8bfa698c0461cf4d411c1c0d18b84e7b52553e18d863578c7ec61"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -710,11 +514,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/lib/JavajaotanConfig.java",
       "language": "JAVA",
-      "line": 99,
+      "line": 101,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 97,
+        "startLine": 99,
         "length": 15,
         "offset": 138,
         "surroundingCode": "        } catch (JSONException e) {\n            logger.warn(\"コンフィグファイル config.json の JSON 形式が正しくありません: \" + e.getMessage());\n            e.printStackTrace();\n            throw new RuntimeException();\n        }"
@@ -725,7 +529,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "d7c2348690941cc757401e4cb0444d484f3b0e2a16b62f5ebcb1f80397be5d09"
+  "hash": "181bafb1f3ecfe07c04b313605017c2195b2966779572bff231e16e816ae9e29"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -738,11 +542,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/event/Event_CheckNitroEmoji.java",
       "language": "JAVA",
-      "line": 90,
+      "line": 91,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 88,
+        "startLine": 89,
         "length": 15,
         "offset": 104,
         "surroundingCode": "            Files.writeString(path, object.toString());\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }"
@@ -753,7 +557,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "1541208e648751eb625feb8b127acca4d6f045754c8020372bb473ec27c200df"
+  "hash": "6f19e5f73f8b993f56eccb005b22bb7b5db401d24fd75b54bb4bcc14d1366e7f"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -766,11 +570,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_UserKey.java",
       "language": "JAVA",
-      "line": 125,
+      "line": 108,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 123,
+        "startLine": 106,
         "length": 15,
         "offset": 105,
         "surroundingCode": "            message.replyEmbeds(embed.build()).queue();\n        } catch (SQLException e) {\n            e.printStackTrace();\n            message.reply(\"SQLException: \" + e.getMessage()).queue();\n        }"
@@ -781,7 +585,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "3e8ab49746d50647b269095fcfd3c3e8abc04f5f9eabdf9a6a5488445d303455"
+  "hash": "86997dbf81a184a831b8fbf3b479015a61ea1dbfde9c9ea22b3a975c830bbf0b"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -850,11 +654,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 456,
+      "line": 426,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 454,
+        "startLine": 424,
         "length": 15,
         "offset": 180,
         "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return;\n        }"
@@ -865,7 +669,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "5daf9bd0139fa5d317b91cef459dc451174046b84eab6b785897dad7e4a69079"
+  "hash": "6bf29efe07db3981331417ebdbe07ff88efaa3bb8fdbbc10ce74a0bb016b401f"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -878,11 +682,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 469,
+      "line": 437,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 467,
+        "startLine": 435,
         "length": 15,
         "offset": 111,
         "surroundingCode": "            Files.writeString(pathMessages, games.toString());\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }"
@@ -893,7 +697,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "c83a7dde8bb90edb0b26100dbc800f17b5c677b6d42988ba0c1fb9e5654353bc"
+  "hash": "d1a1a7a768e9e8eea52b53967c025dd0fa269f5bcba6cab4c4af38976d401f17"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -906,11 +710,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 391,
+      "line": 381,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 389,
+        "startLine": 379,
         "length": 15,
         "offset": 162,
         "surroundingCode": "            roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            message.reply(\n                \"ロールの作成に失敗しました: `%s`\".formatted(e.getMessage())"
@@ -921,7 +725,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "22bcb1f73dd535d01725238b6671f701b524750eb63cf3d11e64ae6a3d1e0db7"
+  "hash": "e40b1555135fb8099ea6e4430f009bb28799fa0251f3dd3e9873a1f1b3213537"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -934,11 +738,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 419,
+      "line": 409,
       "offset": 27,
       "length": 15,
       "code": {
-        "startLine": 417,
+        "startLine": 407,
         "length": 15,
         "offset": 139,
         "surroundingCode": "                        Files.writeString(path, roles.toString());\n                    } catch (IOException e) {\n                        e.printStackTrace();\n                    }\n                },"
@@ -949,7 +753,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "0d2b08727191a7d2a11fb3a4908ad2f1d0ee71d5ac45efb8afd7efe4a1458229"
+  "hash": "e18dd1a168c1de5ee2c99083d3eb8eebe84bac646460892d78d3e7e0dae38454"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -962,11 +766,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 426,
+      "line": 416,
       "offset": 23,
       "length": 15,
       "code": {
-        "startLine": 424,
+        "startLine": 414,
         "length": 15,
         "offset": 125,
         "surroundingCode": "                        \"ロールの作成に失敗しました: `%s`\".formatted(e.getMessage())\n                    ).queue();\n                    e.printStackTrace();\n                }\n            );"
@@ -977,7 +781,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "2732d0fce050f90a532806016da32b7fa1ccd8d692b7e864f81175117a03840b"
+  "hash": "396ae5748efbedab066233bb57a8be958c1441b873e76df4bf5d1764dde3b3d6"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -990,11 +794,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 478,
+      "line": 468,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 476,
+        "startLine": 466,
         "length": 15,
         "offset": 180,
         "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return;\n        }"
@@ -1005,7 +809,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "8ee3049a7068e68ebb3c23cdc7c5be7a4f6deb391991217325c66d6e5fd34051"
+  "hash": "cdfc223270bbf49a8a28b3d13f125dfdc5edcbc3372b773c7fefb5979934774f"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1018,11 +822,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 436,
+      "line": 446,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 434,
+        "startLine": 444,
         "length": 15,
         "offset": 180,
         "surroundingCode": "            games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();\n        } catch (IOException | JSONException e) {\n            e.printStackTrace();\n            return;\n        }"
@@ -1033,7 +837,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "c98f0ad85b82c5cf18be3219abc2d5785ff5535a54d3034619f76bd910aa6967"
+  "hash": "a60c90db3c39cf7ec6c79387a826286d74e80ddf2d354ae2d114c0a993418363"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1046,11 +850,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GameRole.java",
       "language": "JAVA",
-      "line": 447,
+      "line": 459,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 445,
+        "startLine": 457,
         "length": 15,
         "offset": 111,
         "surroundingCode": "            Files.writeString(pathMessages, games.toString());\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }"
@@ -1061,7 +865,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "2fc5468908a529c83ec301bebe3df3ef2fc0d97e261b0b2064dfd7fb28115a07"
+  "hash": "f3f61b1b0b73130b9da7255b1481ccf8e51d1edac2b128e2460e418b89a89588"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1074,11 +878,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GenText.java",
       "language": "JAVA",
-      "line": 71,
+      "line": 62,
       "offset": 23,
       "length": 15,
       "code": {
-        "startLine": 69,
+        "startLine": 60,
         "length": 15,
         "offset": 120,
         "surroundingCode": "            error -> {\n                channel.sendMessage(\"メッセージの生成に失敗しました。再度お試しください。\").queue();\n                error.printStackTrace();\n            }\n        );"
@@ -1089,7 +893,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "ee929111840fb843ab39acc2a1c0c302e15e9123273b8c73d634241dba0e350d"
+  "hash": "2024a03771149fdfb74459021c4d8711c16d1620e69a0f9c84256f14611d8158"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1102,39 +906,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GenText.java",
       "language": "JAVA",
-      "line": 88,
-      "offset": 23,
-      "length": 15,
-      "code": {
-        "startLine": 86,
-        "length": 15,
-        "offset": 120,
-        "surroundingCode": "            error -> {\n                channel.sendMessage(\"メッセージの生成に失敗しました。再度お試しください。\").queue();\n                error.printStackTrace();\n            }\n        );"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "1563e0cb964c061561c1bdb0a90abc5e0226099e9e5616e92ca1e8b2d363b405"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_GenText.java",
-      "language": "JAVA",
-      "line": 131,
+      "line": 132,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 129,
+        "startLine": 130,
         "length": 15,
         "offset": 95,
         "surroundingCode": "            reply.editMessage(output).queue();\n        } catch (IOException e) {\n            e.printStackTrace();\n            reply.editMessage(String.format(\"Error: IOエラーが発生 (%s)\", e.getMessage())).queue();\n        }"
@@ -1145,63 +921,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "6c65d5c2c2ed450a483cc09695b2d3d24e92ed0c5d86bcddcacea20c1fc74332"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_MemberOrganize.java",
-      "language": "JAVA",
-      "line": 97,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 95,
-        "length": 15,
-        "offset": 93,
-        "surroundingCode": "            conn = manager.getConnection();\n        } catch (SQLException e) {\n            e.printStackTrace();\n            return;\n        }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "d0cbfb2a15d93183cbf22892bf2c05ffd7536e956b96f2c3324a7ae2430d3ba1"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_MemberOrganize.java",
-      "language": "JAVA",
-      "line": 483,
-      "offset": 19,
-      "length": 15,
-      "code": {
-        "startLine": 481,
-        "length": 15,
-        "offset": 75,
-        "surroundingCode": "                }\n            } catch (SQLException e) {\n                e.printStackTrace();\n                return null;\n            }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "cb91c0125c29c811315cc7defa9f0b91bb907ca06b09ad7156f2b86b6fde87f5"
+  "hash": "b5f77acae7bba3489679785a5b09d86c7cfec75c43d28e2add5bc5e36ec7bd19"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1268,6 +988,62 @@
   "sources": [
     {
       "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_MemberOrganize.java",
+      "language": "JAVA",
+      "line": 97,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 95,
+        "length": 15,
+        "offset": 93,
+        "surroundingCode": "            conn = manager.getConnection();\n        } catch (SQLException e) {\n            e.printStackTrace();\n            return;\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "d0cbfb2a15d93183cbf22892bf2c05ffd7536e956b96f2c3324a7ae2430d3ba1"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_MemberOrganize.java",
+      "language": "JAVA",
+      "line": 483,
+      "offset": 19,
+      "length": 15,
+      "code": {
+        "startLine": 481,
+        "length": 15,
+        "offset": 75,
+        "surroundingCode": "                }\n            } catch (SQLException e) {\n                e.printStackTrace();\n                return null;\n            }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "cb91c0125c29c811315cc7defa9f0b91bb907ca06b09ad7156f2b86b6fde87f5"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_SyncOtherServerPerm.java",
       "language": "JAVA",
       "line": 180,
@@ -1286,62 +1062,6 @@
     "inspectionName": "ThrowablePrintStackTrace"
   },
   "hash": "04d894207637ad041b8bf06f31d30f12f77058ee221773ad86f730494a71a936"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_PermSync.java",
-      "language": "JAVA",
-      "line": 83,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 81,
-        "length": 15,
-        "offset": 93,
-        "surroundingCode": "            conn = manager.getConnection();\n        } catch (SQLException e) {\n            e.printStackTrace();\n            return;\n        }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "7a76e612a3c4eba0903a67eb2417cc168c2338d508b559454aa6b4ddffdef26c"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_PermSync.java",
-      "language": "JAVA",
-      "line": 108,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 106,
-        "length": 15,
-        "offset": 62,
-        "surroundingCode": "            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "336003d0b1b556222d16e494f628828637ab8582210d5c1977e4173964610e0e"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1398,6 +1118,62 @@
     "inspectionName": "ThrowablePrintStackTrace"
   },
   "hash": "0049121a0c6755d411b7fb8eee04230bc829532b607cca8ee9eeff01e1bd472e"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_PermSync.java",
+      "language": "JAVA",
+      "line": 83,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 81,
+        "length": 15,
+        "offset": 93,
+        "surroundingCode": "            conn = manager.getConnection();\n        } catch (SQLException e) {\n            e.printStackTrace();\n            return;\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "7a76e612a3c4eba0903a67eb2417cc168c2338d508b559454aa6b4ddffdef26c"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/tasks/Task_PermSync.java",
+      "language": "JAVA",
+      "line": 108,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 106,
+        "length": 15,
+        "offset": 62,
+        "surroundingCode": "            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "336003d0b1b556222d16e494f628828637ab8582210d5c1977e4173964610e0e"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1481,7 +1257,35 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "e511f8ae4aa29990fc79e47634b0cbe4f2b6370d61d9b6896df0ae79b77ade74"
+  "hash": "90d57b00dfd9d0aa737cc13b30efbc8acd4dc671681a461e3f3bf3c0b6192f13"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/lib/JavajaotanLibrary.java",
+      "language": "JAVA",
+      "line": 146,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 144,
+        "length": 15,
+        "offset": 63,
+        "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return new CreateIssueResponse(\n                IssueResponseType.FAILED,"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "259ef0c03426f15688af46e0d3c7f798c4b734dde3b17068bcfc53262ca37cd6"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1510,62 +1314,6 @@
     "inspectionName": "ThrowablePrintStackTrace"
   },
   "hash": "48304625b2118ad6e13b4464c71f6b8d51259c95814907479109f7220b32efd1"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/JavajaotanLibrary.java",
-      "language": "JAVA",
-      "line": 173,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 171,
-        "length": 15,
-        "offset": 63,
-        "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return new CreateIssueResponse(\n                IssueResponseType.FAILED,"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "aea58725ade45153707b6ea662c313bf0bfaaab09469951664fe73ba8670e3ac"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/JavajaotanLibrary.java",
-      "language": "JAVA",
-      "line": 222,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 220,
-        "length": 15,
-        "offset": 63,
-        "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return new CreateIssueCommentResponse(\n                IssueResponseType.FAILED,"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "d087708ad57b9cc6eb74e1ad71beb9be80e1e060d9c7378bcb9baaaac0b7f7f7"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1634,11 +1382,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
       "language": "JAVA",
-      "line": 446,
+      "line": 423,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 444,
+        "startLine": 421,
         "length": 15,
         "offset": 62,
         "surroundingCode": "            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }"
@@ -1649,7 +1397,63 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "385fd69d4364a68a0282ef47018e56ee77c71e35de61b9f11d0dd7fc91331d48"
+  "hash": "4cb8041d7082af5c4ab13efd2d11676e85ccf285c01fe9a4e1c4f6a8d333f0e2"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
+      "language": "JAVA",
+      "line": 388,
+      "offset": 15,
+      "length": 15,
+      "code": {
+        "startLine": 386,
+        "length": 15,
+        "offset": 62,
+        "surroundingCode": "            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "2103906d81460f41f1a6cbce5f6e5233c94ba715761285274f0d72bef9f42326"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
+      "language": "JAVA",
+      "line": 172,
+      "offset": 27,
+      "length": 15,
+      "code": {
+        "startLine": 170,
+        "length": 15,
+        "offset": 145,
+        "surroundingCode": "                getLogger().info(\"%s: コマンドの登録に成功しました\".formatted(cmdName));\n            } catch (Throwable throwable) {\n                throwable.printStackTrace();\n                getLogger().error(\"%s: コマンドの登録に失敗しました\".formatted(cmdName));\n            }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "5215c5705d2e18786da56d41c032bd97ba17abfef72d994bd226b9211697df59"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1668,8 +1472,8 @@
       "code": {
         "startLine": 354,
         "length": 15,
-        "offset": 137,
-        "surroundingCode": "                 IllegalAccessException | InvocationTargetException e) {\n            getLogger().error(\"イベントの登録に失敗しました。\");\n            e.printStackTrace();\n        }\n    }"
+        "offset": 69,
+        "surroundingCode": "            }\n        } catch (SchedulerException e) {\n            e.printStackTrace();\n        }\n    }"
       }
     }
   ],
@@ -1677,7 +1481,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "a3637e7967d57f7379dd096980586ee5e1bfddaf6af83ee972c3cb67bfaf9c30"
+  "hash": "23d48c44640f5831371f845e64628f4defde425baadc60c0b16165743755d0e5"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1690,11 +1494,39 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
       "language": "JAVA",
-      "line": 83,
+      "line": 297,
       "offset": 19,
       "length": 15,
       "code": {
-        "startLine": 81,
+        "startLine": 295,
+        "length": 15,
+        "offset": 174,
+        "surroundingCode": "                     IllegalAccessException | InvocationTargetException e) {\n                getLogger().error(\"%s: イベントの登録に失敗しました。\".formatted(eventName));\n                e.printStackTrace();\n            }\n        }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "ThrowablePrintStackTrace"
+  },
+  "hash": "d76120ef694fce9924ea16ff32efdb9711270c6cc26e7534804aa3590f9f4600"
+},{
+  "tool": "Code Inspection",
+  "category": "Code maturity",
+  "type": "Call to 'printStackTrace()'",
+  "severity": "High",
+  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
+  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
+      "language": "JAVA",
+      "line": 76,
+      "offset": 19,
+      "length": 15,
+      "code": {
+        "startLine": 74,
         "length": 15,
         "offset": 135,
         "surroundingCode": "                developUserId = Long.parseLong(config.getString(\"builderId\"));\n            } catch (IOException e) {\n                e.printStackTrace();\n            }\n        } else if (new File(\"this-server-is-development\").exists()) {"
@@ -1705,7 +1537,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "317bd5a2cb896f6767131a415319c7ef1847d9688cff6a2d42ba609ac888603f"
+  "hash": "f860fe74af53f4e4d0775dc310d246da3c518916ee5a21fab341897044f2bd15"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1718,11 +1550,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
       "language": "JAVA",
-      "line": 98,
+      "line": 91,
       "offset": 19,
       "length": 15,
       "code": {
-        "startLine": 96,
+        "startLine": 89,
         "length": 15,
         "offset": 135,
         "surroundingCode": "                developGuildId = Long.parseLong(config.getString(\"guild_id\"));\n            } catch (IOException e) {\n                e.printStackTrace();\n            }\n        }"
@@ -1733,7 +1565,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "05de8cc236cdbd128a3a1c232bcbc601b1a19e59a5304feef77db65bcf10391b"
+  "hash": "55bd63468a4e7d7e5431d67035171cea605bb9faab45c16f9c03eb06fd7e2e8b"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1746,11 +1578,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
       "language": "JAVA",
-      "line": 122,
+      "line": 125,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 120,
+        "startLine": 123,
         "length": 15,
         "offset": 97,
         "surroundingCode": "            jda = jdabuilder.build().awaitReady();\n        } catch (Exception e) {\n            e.printStackTrace();\n            return;\n        }"
@@ -1761,147 +1593,7 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "0614f5cdf13517f102a3b37c657cedb94eeb5a543d7ec23add5602db2dad36b9"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
-      "language": "JAVA",
-      "line": 227,
-      "offset": 19,
-      "length": 15,
-      "code": {
-        "startLine": 225,
-        "length": 15,
-        "offset": 264,
-        "surroundingCode": "            manager.registerExceptionHandler(CommandExecutionException.class, (c, e) -> {\n                logger.info(\"CommandExecutionException: \" + e.getMessage() + \" (From \" + c.getUser().getAsTag() + \" in \" + c.getChannel().getName() + \")\");\n                e.printStackTrace();\n                if (c.getEvent().isPresent()) {\n                    if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "aef1d09a45fc81369560a9cf7d874ff4bb348cd2ae68030177c488a5773ac9a4"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
-      "language": "JAVA",
-      "line": 322,
-      "offset": 23,
-      "length": 15,
-      "code": {
-        "startLine": 320,
-        "length": 15,
-        "offset": 167,
-        "surroundingCode": "                         InvocationTargetException e) {\n                    getLogger().warn(String.format(\"%s: コマンドの登録に失敗しました。\", commandName));\n                    e.printStackTrace();\n                }\n            }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "31d7b50205e9029864e6b0b9593c8eba4680d28c609e3793a84284590cc211f1"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
-      "language": "JAVA",
-      "line": 326,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 324,
-        "length": 15,
-        "offset": 110,
-        "surroundingCode": "            }\n        } catch (InterruptedException | IOException | ClassNotFoundException e) {\n            e.printStackTrace();\n        }\n    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "88f765bfd6729d5c752ba700b2e34147e158498f42bbee11bd173c971084aa88"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
-      "language": "JAVA",
-      "line": 481,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 479,
-        "length": 15,
-        "offset": 62,
-        "surroundingCode": "            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "2619cb17e499d4504ce16d1e8e3c4ab81aaf55364c2682522259b89dedbd03ba"
-},{
-  "tool": "Code Inspection",
-  "category": "Code maturity",
-  "type": "Call to 'printStackTrace()'",
-  "severity": "High",
-  "comment": "Call to 'printStackTrace()' should probably be replaced with more robust logging",
-  "detailsInfo": "Reports calls to `Throwable.printStackTrace()` without arguments.\n\nSuch statements are often used for temporary debugging and should be either removed from the production code\nor replaced with a more robust logging facility.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/Main.java",
-      "language": "JAVA",
-      "line": 414,
-      "offset": 15,
-      "length": 15,
-      "code": {
-        "startLine": 412,
-        "length": 15,
-        "offset": 69,
-        "surroundingCode": "            }\n        } catch (SchedulerException e) {\n            e.printStackTrace();\n        }\n    }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "ThrowablePrintStackTrace"
-  },
-  "hash": "958941c8ea83a2448e5623a064a30cf4264bc48c3865abb3ac59d9318f85bc6d"
+  "hash": "33732203811ed0be68bb0555bcccaae0a95062a6d89ef1ecf528ea25587827c4"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1914,11 +1606,11 @@
       "type": "file",
       "path": "src/main/java/com/jaoafa/javajaotan2/command/Cmd_Search.java",
       "language": "JAVA",
-      "line": 126,
+      "line": 111,
       "offset": 15,
       "length": 15,
       "code": {
-        "startLine": 124,
+        "startLine": 109,
         "length": 15,
         "offset": 63,
         "surroundingCode": "            );\n        } catch (IOException e) {\n            e.printStackTrace();\n            return null;\n        }"
@@ -1929,33 +1621,5 @@
     "module": "project",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "690589ad4546eb9a7293046172c3acff64f5e937252aec6494c3b471c50361e9"
-},{
-  "tool": "Code Inspection",
-  "category": "Probable bugs",
-  "type": "Unused assignment",
-  "severity": "High",
-  "comment": "The value 'new JSONObject(Objects.requireNonNull(response.body()).string())' assigned to 'obj' is never used",
-  "detailsInfo": "Reports assignment values that are not used after the assignment. If the assignment value is unused, it's better to remove the assignment to shorten the code and avoid redundant allocations.\n\nThe following cases are reported:\n\n* The variable never gets read after the assignment.\n* The variable is always overwritten with a new value before it is read.\n* The variable initializer is redundant (for one of the two reasons above).\n\nConfigure the inspection:\n\n\nUse the **Report redundant initializers** option to report redundant initializers:\n\n\n      int getI() {\n        int i = 0; // redundant initialization\n        i = 2;\n        return i;\n      }\n\n\nUse the **Report ++i when may be replaced with (i + 1)** option to report the cases when `++i` expression\nmay be replaced with `i + 1`:\n\n\n      int preInc(int i) {\n        int res = i;\n        return ++res;\n      }\n\n\nUse the **Report i++ when changed value is not used afterwards** option to report the cases when the result of `i++` expression\nis not used later:\n\n\n      int postInc(int i) {\n        int res = i;\n        return res++;\n      }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "src/main/java/com/jaoafa/javajaotan2/lib/JavajaotanLibrary.java",
-      "language": "JAVA",
-      "line": 214,
-      "offset": 17,
-      "length": 3,
-      "code": {
-        "startLine": 212,
-        "length": 3,
-        "offset": 57,
-        "surroundingCode": "                    );\n                }\n                obj = new JSONObject(Objects.requireNonNull(response.body()).string());\n            }\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "project",
-    "inspectionName": "UnusedAssignment"
-  },
-  "hash": "9ca8a863ed2200801dbcc17919cb3680e8c3a81d6fb85ada216b168aaa4403b2"
+  "hash": "d9898d4ded5fd2674f77654e8e04f2e069d052ad70f7a2a6434d9a8f889ca4c6"
 }]}

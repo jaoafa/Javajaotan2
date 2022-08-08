@@ -22,6 +22,7 @@ public class Cmd_ToZh extends Command {
         this.name = "tozh";
         this.translateTo = Translate.Language.ZH;
         this.help = "Google翻訳を用いて%sへ翻訳を行います。".formatted(this.translateTo.getName());
+        this.arguments = "<Text...>";
     }
 
     @Override

@@ -23,6 +23,7 @@ public class Cmd_ToRandJa extends Command {
     public Cmd_ToRandJa() {
         this.name = "torandja";
         this.help = "Google翻訳を用いてランダムな言語へ翻訳をしたあと、日本語へ翻訳を行います。";
+        this.arguments = "<Text...>";
     }
 
     @Override

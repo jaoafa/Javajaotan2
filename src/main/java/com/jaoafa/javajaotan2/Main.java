@@ -22,6 +22,8 @@ import com.jaoafa.javajaotan2.tasks.Task_PermSync;
 import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.json.JSONArray;
@@ -173,7 +175,92 @@ public class Main {
         }
         builder.addCommands(commands.toArray(new Command[0]));
 
-        builder.useHelpBuilder(false);
+        builder.setHelpWord("jaotanhelp");
+        /*
+        `this.arguments` の値は以下の3種類
+        - `<Arg>`: アクションが一つのときだけ使用。説明は this.help を流用
+        - `: XXXXX`: アクションが複数あるが、このアクションについては引数がない場合に使用。説明は `:` 以降を利用
+        - `<Arg1>: XXXXX\n<Arg2>: XXXXX`: アクションが複数のときに使用。説明は `:` 以降を利用
+
+        --- サンプル ---
+
+        Javajaotan2 コマンド一覧
+
+        - `/test`: テストコマンド
+          - `/test`: ルートテストコマンド
+          - `/test <Arg>`: Argをテストする
+          - `/test <Arg1> <Arg2>`: Arg1 と Arg2 をテストする
+        - `/test2 <Arg>`: テストコマンド3
+         */
+        builder.setHelpConsumer((event) -> {
+            Message message = event.getMessage();
+            StringBuilder sb = new StringBuilder();
+            sb.append("Javajaotan2 コマンド一覧 %s\n\n".formatted(event.getArgs().isEmpty() ? "" : "(フィルタリング: `" + event.getArgs() + "`)"));
+            for (Command command : commands) {
+                String arguments = command.getArguments();
+                if (!event.getArgs().isEmpty() && !String.join("\n", List.of(
+                    command.getName(),
+                    command.getHelp(),
+                    command.getArguments()
+                )).contains(event.getArgs())) {
+                    continue;
+                }
+
+                sb.append("- `")
+                    .append(prefix)
+                    .append(command.getName());
+                if (!arguments.contains("\n")) {
+                    sb.append(" ").append(arguments);
+                }
+                sb.append("`: ")
+                    .append(command.getHelp())
+                    .append("\n");
+
+                if (!event.getArgs().isEmpty() && arguments.contains("\n")) {
+                    // 複数のアクション
+
+                    // - `/test`: テストコマンド\n
+                    String[] actions = arguments.split("\n");
+                    for (String action : actions) {
+                        // - `/test <Arg>`: Argをテストする\n
+                        if (action.contains(": ")) {
+                            String[] split = action.split(": ");
+                            sb.append("  - `")
+                                .append(prefix)
+                                .append(command.getName())
+                                .append(" ")
+                                .append(split[0])
+                                .append("`: ")
+                                .append(split[1])
+                                .append("\n");
+                        } else {
+                            // 説明なしのアクション？
+                            sb.append("  - `")
+                                .append(prefix)
+                                .append(command.getName())
+                                .append(" ")
+                                .append(action)
+                                .append("\n");
+                        }
+                    }
+                }
+            }
+
+            sb.append("\n");
+            if (event.getArgs().isEmpty()) {
+                sb.append("`/jaotanhelp <テキスト>` で検索（フィルタリング）できます。\n");
+            }
+            sb.append("不具合の報告は対象メッセージに :bug: をつけるか、GitHub の jaoafa/Javajaotan2 リポジトリの Issue にてお願いします。");
+
+            event.replyInDm(
+                sb.toString(),
+                m -> {
+                    if (message.isFromType(ChannelType.TEXT))
+                        message.reply("DMにヘルプメッセージを送信しました。").queue();
+                },
+                t -> message.reply("ヘルプメッセージをDMに送信できませんでした。DM受取設定などをご確認ください。").queue()
+            );
+        });
 
         // とりあえずスラッシュコマンドはサポートしない
 

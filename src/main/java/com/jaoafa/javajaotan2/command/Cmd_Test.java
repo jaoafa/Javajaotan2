@@ -33,12 +33,13 @@ public class Cmd_Test extends CommandWithActions {
         this.guildOnly = true;
         this.hidden = true;
         this.actions = List.of(
-            new CommandAction("userid", this::getUserId),
-            new CommandAction("permsync", this::runPermSync),
-            new CommandAction("memberorganize", this::runMemberOrganize),
-            new CommandAction("checkmailverified", this::runCheckMailVerified),
-            new CommandAction("otherserverpermsync", this::runSyncOtherServerPerm)
+            new CommandAction("userid", this::getUserId, "あなたのユーザーIDを返します。"),
+            new CommandAction("permsync", this::runPermSync, "PermSyncを実行します。管理者権限が必要です。"),
+            new CommandAction("memberorganize", this::runMemberOrganize, "MemberOrganizeを実行します。管理者権限が必要です。"),
+            new CommandAction("checkmailverified", this::runCheckMailVerified, "CheckMailVerifiedを実行します。管理者権限が必要です。"),
+            new CommandAction("otherserverpermsync", this::runSyncOtherServerPerm, "SyncOtherServerPermを実行します。管理者権限が必要です。")
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override

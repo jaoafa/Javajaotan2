@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class CommandAction {
     private final String name;
@@ -27,6 +28,7 @@ public class CommandAction {
     private final BiConsumer<CommandEvent, List<String>> namedAction;
     private final List<CommandAction> subActions;
     private final List<String> argNames;
+    private final String description;
 
     /**
      * CommandAction クラスを作成します。<br>
@@ -47,12 +49,13 @@ public class CommandAction {
      *
      * @see Command#execute(CommandEvent)
      */
-    public CommandAction(String name, Consumer<CommandEvent> action) {
+    public CommandAction(String name, Consumer<CommandEvent> action, String description) {
         this.name = name;
         this.action = action;
         this.namedAction = null;
         this.subActions = null;
         this.argNames = null;
+        this.description = description;
     }
 
     /**
@@ -76,6 +79,7 @@ public class CommandAction {
         this.namedAction = null;
         this.subActions = subActions;
         this.argNames = null;
+        this.description = null;
     }
 
     /**
@@ -97,12 +101,13 @@ public class CommandAction {
      *
      * @see Command#execute(CommandEvent)
      */
-    public CommandAction(String name, BiConsumer<CommandEvent, List<String>> action, List<String> argNames) {
+    public CommandAction(String name, BiConsumer<CommandEvent, List<String>> action, List<String> argNames, String description) {
         this.name = name;
         this.action = null;
         this.namedAction = action;
         this.subActions = null;
         this.argNames = argNames;
+        this.description = description;
     }
 
     /**
@@ -155,6 +160,16 @@ public class CommandAction {
     }
 
     /**
+     * このアクションの説明を取得します。<br>
+     * このアクションに説明がない場合は null を返します。
+     *
+     * @return このアクションの説明
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
      * このアクションを実行します。<br>
      * このメソッドは、{@link Command#execute(CommandEvent)} で呼び出す必要があります。
      *
@@ -199,6 +214,32 @@ public class CommandAction {
             execute(event, index + 1, action.getSubActions());
         }
         return true;
+    }
+
+    public static String getArguments(List<CommandAction> actions) {
+        List<String> commands = actions
+            .stream()
+            .map(action -> {
+                if (action.getSubActions() != null) {
+                    return List.of(getArguments(action.getSubActions()));
+                } else if (action.getNamedAction() != null) {
+                    return List.of("%s %s: %s".formatted(
+                        action.getName(),
+                        action
+                            .getArgumentNames()
+                            .stream()
+                            .map("<%s>"::formatted)
+                            .collect(Collectors.joining(" ")),
+                        action.getDescription()
+                    ));
+                } else {
+                    return List.of("%s: %s".formatted(action.getName(), action.getDescription()));
+                }
+            })
+            .flatMap(Collection::stream)
+            .toList();
+
+        return String.join("\n", commands);
     }
 
     private static List<String> getActionNames(List<CommandAction> actions) {

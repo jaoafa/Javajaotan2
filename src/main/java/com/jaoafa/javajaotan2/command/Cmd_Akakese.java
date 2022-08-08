@@ -25,6 +25,7 @@ public class Cmd_Akakese extends Command {
     public Cmd_Akakese() {
         this.name = "akakese";
         this.help = "垢消せ。";
+        this.arguments = "";
     }
 
     @Override

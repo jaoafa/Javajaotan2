@@ -28,6 +28,7 @@ public class Cmd_ToSwJa extends Command {
             translateTo[0].getName(),
             translateTo[1].getName()
         );
+        this.arguments = "<Text...>";
     }
 
     @Override

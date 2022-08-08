@@ -28,12 +28,13 @@ public class Cmd_WatchEmoji extends CommandWithActions {
         this.name = "watchemoji";
         this.help = "絵文字を監視する設定をします。";
         this.actions = List.of(
-            new CommandAction("add", this::addWatch, List.of("log-channel", "list-channel")),
-            new CommandAction("remove", this::removeWatch),
-            new CommandAction("del", this::removeWatch),
-            new CommandAction("delete", this::removeWatch),
-            new CommandAction("regenerate", this::regenerate)
+            new CommandAction("add", this::addWatch, List.of("log-channel", "list-channel"), "サーバを絵文字監視対象に追加します。"),
+            new CommandAction("remove", this::removeWatch, "サーバを絵文字監視対象から削除します。"),
+            new CommandAction("del", this::removeWatch, "サーバを絵文字監視対象から削除します。"),
+            new CommandAction("delete", this::removeWatch, "サーバを絵文字監視対象から削除します。"),
+            new CommandAction("regenerate", this::regenerate, "絵文字一覧を再生成します。")
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override

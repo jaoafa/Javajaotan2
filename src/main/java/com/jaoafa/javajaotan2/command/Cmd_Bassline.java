@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
 public class Cmd_Bassline extends Command {
     public Cmd_Bassline() {
         this.name = "bassline";
-        this.help = "ベースラインやってる？";
+        this.help = "ベースラインやってる？ [Suspect] を指定すると Hiratake#2012 にリプライします。";
+        this.arguments = "[Suspect]";
     }
 
     @Override

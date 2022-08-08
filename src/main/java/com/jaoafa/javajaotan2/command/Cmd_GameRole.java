@@ -43,21 +43,22 @@ public class Cmd_GameRole extends CommandWithActions {
         this.name = "gamerole";
         this.help = "ゲームロール関連コマンド";
         this.actions = List.of(
-            new CommandAction("new", this::newGameRole, List.of("name...")),
-            new CommandAction("create", this::newGameRole, List.of("name...")),
-            new CommandAction("add", this::newGameRole, List.of("name...")),
-            new CommandAction("color", this::changeColor, List.of("name", "colorCode...")),
-            new CommandAction("rename", this::renameRole, List.of("name", "newName")),
-            new CommandAction("give", this::giveGameRole, List.of("name...")),
-            new CommandAction("join", this::giveGameRole, List.of("name...")),
-            new CommandAction("take", this::takeGameRole, List.of("name...")),
-            new CommandAction("leave", this::takeGameRole, List.of("name...")),
+            new CommandAction("new", this::newGameRole, List.of("name..."), "ゲームロールを作成します。"),
+            new CommandAction("create", this::newGameRole, List.of("name..."), "ゲームロールを作成します。"),
+            new CommandAction("add", this::newGameRole, List.of("name..."), "ゲームロールを作成します。"),
+            new CommandAction("color", this::changeColor, List.of("name", "colorCode..."), "ゲームロールの色を変更します。"),
+            new CommandAction("rename", this::renameRole, List.of("name", "newName"), "ゲームロールの名前を変更します。"),
+            new CommandAction("give", this::giveGameRole, List.of("name..."), "ゲームロールを付与します。"),
+            new CommandAction("join", this::giveGameRole, List.of("name..."), "ゲームロールを付与します。"),
+            new CommandAction("take", this::takeGameRole, List.of("name..."), "ゲームロールを剥奪します。"),
+            new CommandAction("leave", this::takeGameRole, List.of("name..."), "ゲームロールを剥奪します。"),
             new CommandAction("message", List.of(
-                new CommandAction("post", this::createGameRoleMessage),
-                new CommandAction("update", this::updateGameRoleMessage),
-                new CommandAction("set-emoji", this::changeGameRoleEmoji, List.of("role", "emojiId"))
+                new CommandAction("post", this::createGameRoleMessage, "ゲームロールメッセージを投稿します。"),
+                new CommandAction("update", this::updateGameRoleMessage, "ゲームロールメッセージを更新します。"),
+                new CommandAction("set-emoji", this::changeGameRoleEmoji, List.of("role", "emojiId"), "ゲームロールのメッセージに使用する絵文字を変更します。")
             ))
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override

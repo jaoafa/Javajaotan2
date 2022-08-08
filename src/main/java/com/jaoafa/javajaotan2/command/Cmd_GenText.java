@@ -30,6 +30,11 @@ public class Cmd_GenText extends Command {
     public Cmd_GenText() {
         this.name = "gentext";
         this.help = "文章を自動生成します。";
+        this.arguments = """
+            : defaultソースで1つの文章を生成します。
+            <文章数>: defaultソースで指定文章数の文章を生成します。
+            <ソース>: 指定ソースで1つの文章を生成します。
+            <ソース> <文章数>: 指定ソースで指定文章数の文章を生成します。""";
     }
 
     @Override

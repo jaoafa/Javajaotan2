@@ -23,7 +23,8 @@ import java.util.List;
 public class Cmd_Alpha extends Command {
     public Cmd_Alpha() {
         this.name = "alpha";
-        this.help = "アルファになったオレをします。";
+        this.help = "アルファになったオレをします。randomを引数のいずれかに指定すると、置換箇所がランダムになります。";
+        this.arguments = "[random] [アルファ] [ふぁぼら] [エゴサ] [人気] [クソアルファ] [エビフィレオ]";
     }
 
     @Override

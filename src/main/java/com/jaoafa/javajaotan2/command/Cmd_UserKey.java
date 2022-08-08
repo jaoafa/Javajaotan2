@@ -28,9 +28,10 @@ public class Cmd_UserKey extends CommandWithActions {
         this.name = "userkey";
         this.help = "ユーザーキーに関する処理を行います。（運営のみ利用可能）";
         this.actions = List.of(
-            new CommandAction("info", this::info, List.of("key")),
-            new CommandAction("use", this::use, List.of("key"))
+            new CommandAction("info", this::info, List.of("key"), "指定されたユーザーキーに紐づくアカウント情報を表示します。"),
+            new CommandAction("use", this::use, List.of("key"), "指定されたユーザーキーを使用します。")
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override

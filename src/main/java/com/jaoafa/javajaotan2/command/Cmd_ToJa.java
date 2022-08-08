@@ -22,6 +22,7 @@ public class Cmd_ToJa extends Command {
         this.name = "toja";
         this.translateTo = Translate.Language.JA;
         this.help = "Google翻訳を用いて%sへ翻訳を行います。".formatted(this.translateTo.getName());
+        this.arguments = "<Text...>";
     }
 
     @Override

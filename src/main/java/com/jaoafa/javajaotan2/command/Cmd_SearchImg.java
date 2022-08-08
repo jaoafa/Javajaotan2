@@ -14,7 +14,6 @@ package com.jaoafa.javajaotan2.command;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.CommandArgument;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import okhttp3.OkHttpClient;
@@ -35,13 +34,14 @@ public class Cmd_SearchImg extends Command {
     public Cmd_SearchImg() {
         this.name = "searchimg";
         this.help = "Google検索を用いて画像の検索を行います。";
+        this.arguments = "<SearchWord...>";
     }
 
     @Override
     protected void execute(CommandEvent event) {
         Message message = event.getMessage();
-        CommandArgument args = new CommandArgument(event.getArgs());
-        if (args.has(0)) {
+        String text = event.getArgs();
+        if (text.trim().isEmpty()) {
             message.reply("検索する文字列を指定してください。").queue();
             return;
         }
@@ -52,7 +52,6 @@ public class Cmd_SearchImg extends Command {
             message.reply("Google Cloud Platform Key または Custom Search 検索エンジン API が定義されていないため、このコマンドを使用できません。").queue();
             return;
         }
-        String text = args.getString(0);
         SearchResult result = customSearch(gcpKey, cx, text);
         if (result == null) {
             message.reply("検索に失敗しました。").queue();

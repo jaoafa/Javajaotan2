@@ -11,90 +11,33 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.lib.Translate;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class Cmd_ToRandJa implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "torandja",
-            List.of("torandomja"),
-            "Google翻訳を用いてランダムな言語へ翻訳をしたあと、日本語へ翻訳を行います。"
-        );
+public class Cmd_ToRandJa extends Command {
+    public Cmd_ToRandJa() {
+        this.name = "torandja";
+        this.help = "Google翻訳を用いてランダムな言語へ翻訳をしたあと、日本語へ翻訳を行います。";
+        this.arguments = "<Text...>";
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "Google翻訳を用いてランダムな言語へ翻訳をしたあと、日本語へ翻訳を行います。")
-                .argument(StringArgument.greedy("text"))
-                .handler(context -> execute(context, this::translateRandJa))
-                .build()
-        );
-    }
-
-    private void translateRandJa(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String text = context.get("text");
-        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
-
-        List<Translate.Language> ignoreAutoUnknown = Arrays.stream(Translate.Language.values())
+    protected void execute(CommandEvent event) {
+        List<Translate.Language> excluded = Arrays.stream(Translate.Language.values())
             .filter(l -> l != Translate.Language.AUTO)
             .filter(l -> l != Translate.Language.UNKNOWN)
+            .filter(l -> l != Translate.Language.JA)
             .toList();
-        Translate.Language lang1 = ignoreAutoUnknown.get(new Random().nextInt(ignoreAutoUnknown.size()));
-        Translate.Language lang2 = Translate.Language.JA;
+        Translate.Language[] translateTo = List.of(
+            excluded.get(new Random().nextInt(excluded.size())),
+            Translate.Language.JA
+        ).toArray(new Translate.Language[0]);
 
-        Translate.TranslateResult result1 = Translate.translate(
-            Translate.Language.UNKNOWN,
-            lang1,
-            displayText
-        );
-        if (result1 == null) {
-            message.reply("翻訳に失敗しました。").queue();
-            return;
-        }
-
-        Translate.TranslateResult result2 = Translate.translate(
-            lang1,
-            lang2,
-            result1.result()
-        );
-        if (result2 == null) {
-            message.reply("翻訳に失敗しました。").queue();
-            return;
-        }
-
-        EmbedBuilder embed = new EmbedBuilder()
-            .setTitle("翻訳が成功しました:clap:")
-            .addField("`%s` -> `%s`".formatted(result1.from().toString(), lang1.toString()),
-                "```%s```".formatted(result1.result()),
-                true)
-            .addField("`%s` -> `%s`".formatted(lang1.toString(), lang2.toString()),
-                "```%s```".formatted(result2.result()),
-                true)
-            .setColor(Color.PINK)
-            .setTimestamp(Instant.now());
-        message.replyEmbeds(embed.build()).queue();
+        Translate.executeTranslate(event, translateTo);
     }
 }

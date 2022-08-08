@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,59 +11,22 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.lib.Translate;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import org.jetbrains.annotations.NotNull;
 
-public class Cmd_ToJa implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "toja",
-            "Google翻訳を用いて日本語へ翻訳を行います。"
-        );
+public class Cmd_ToJa extends Command {
+    final Translate.Language translateTo;
+
+    public Cmd_ToJa() {
+        this.name = "toja";
+        this.translateTo = Translate.Language.JA;
+        this.help = "Google翻訳を用いて%sへ翻訳を行います。".formatted(this.translateTo.getName());
+        this.arguments = "<Text...>";
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "Google翻訳を用いて日本語へ翻訳を行います。")
-                .argument(StringArgument.greedy("text"))
-                .handler(context -> execute(context, this::translateJa))
-                .build()
-        );
-    }
-
-    private void translateJa(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String text = context.get("text");
-        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
-
-        Translate.TranslateResult result = Translate.translate(
-            Translate.Language.UNKNOWN,
-            Translate.Language.JA,
-            displayText
-        );
-        if (result == null) {
-            message.reply("翻訳に失敗しました。").queue();
-            return;
-        }
-
-        message.reply("```%s```\n`%s` -> `%s`".formatted(
-            result.result(),
-            result.from().toString(),
-            result.to().toString()
-        )).queue();
+    protected void execute(CommandEvent event) {
+        Translate.executeTranslate(event, translateTo);
     }
 }

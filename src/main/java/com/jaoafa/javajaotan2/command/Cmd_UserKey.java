@@ -11,57 +11,40 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
-import java.util.Arrays;
+import java.util.List;
 
-public class Cmd_UserKey implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "userKey",
-            "ユーザーキーに関する処理を行います。（運営のみ利用可能）",
-            Arrays.asList(Roles.Admin, Roles.Moderator)
+public class Cmd_UserKey extends CommandWithActions {
+    private final MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
+
+    public Cmd_UserKey() {
+        this.name = "userkey";
+        this.help = "ユーザーキーに関する処理を行います。（運営のみ利用可能）";
+        this.actions = List.of(
+            new CommandAction("info", this::info, List.of("key"), "指定されたユーザーキーに紐づくアカウント情報を表示します。"),
+            new CommandAction("use", this::use, List.of("key"), "指定されたユーザーキーを使用します。")
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ユーザーキーについての情報を表示します。")
-                .literal("info")
-                .argument(StringArgument.of("key"))
-                .handler(context -> execute(context, this::info))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ユーザーキーを利用済みにします。")
-                .literal("use")
-                .argument(StringArgument.of("key"))
-                .handler(context -> execute(context, this::use))
-                .build()
-        );
+    protected void execute(CommandEvent event) {
+        CommandAction.execute(this, event);
     }
 
-    private void info(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String key = context.get("key");
-        MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
-        if (manager == null) {
-            message.reply("データベースへの接続が確立されていません。").queue();
-            return;
-        }
+    private void info(CommandEvent event, List<String> argNames) {
+        if (checkStatusFailed(event)) return;
+
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+        String key = args.getString("key");
 
         UserKeyResult result = getUserKey(manager, key);
         if (!result.status()) {
@@ -84,13 +67,13 @@ public class Cmd_UserKey implements CommandPremise {
         message.replyEmbeds(embed.build()).queue();
     }
 
-    private void use(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String key = context.get("key");
-        MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
-        if (manager == null) {
-            message.reply("データベースへの接続が確立されていません。").queue();
-            return;
-        }
+    private void use(CommandEvent event, List<String> argNames) {
+        if (checkStatusFailed(event)) return;
+
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+        String key = args.getString("key");
+
         try {
             UserKeyResult result = getUserKey(manager, key);
             if (!result.status()) {
@@ -170,4 +153,18 @@ public class Cmd_UserKey implements CommandPremise {
         }
     }
 
+    private boolean checkStatusFailed(CommandEvent event) {
+        Message message = event.getMessage();
+        Member member = event.getMember();
+        if (!JavajaotanLibrary.isGrantedRole(member, Roles.Admin.getRole()) && !JavajaotanLibrary.isGrantedRole(member, Roles.Moderator.getRole())) {
+            message.reply("このコマンドは運営のみ使用できます。").queue();
+            return true;
+        }
+        if (manager == null) {
+            message.reply("データベースへの接続が確立されていません。").queue();
+            return true;
+        }
+
+        return false;
+    }
 }

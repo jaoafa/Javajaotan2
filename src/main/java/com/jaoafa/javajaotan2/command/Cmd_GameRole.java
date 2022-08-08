@@ -11,18 +11,12 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.jda.parsers.RoleArgument;
-import cloud.commandframework.meta.CommandMeta;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,88 +25,53 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-public class Cmd_GameRole implements CommandPremise {
+public class Cmd_GameRole extends CommandWithActions {
     final Path path = GameRole.getPath();
     final Path pathMessages = GameRole.getPathMessages();
     final Pattern emojiPattern = GameRole.getEmojiPattern();
     final long SERVER_ID = GameRole.getServerId();
     final long GAME_ROLE_BORDER_ID = GameRole.getGameRoleBorderId();
 
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "gamerole",
-            "ゲームロール関連コマンド"
+    public Cmd_GameRole() {
+        this.name = "gamerole";
+        this.help = "ゲームロール関連コマンド";
+        this.actions = List.of(
+            new CommandAction("new", this::newGameRole, List.of("name..."), "ゲームロールを作成します。"),
+            new CommandAction("create", this::newGameRole, List.of("name..."), "ゲームロールを作成します。"),
+            new CommandAction("add", this::newGameRole, List.of("name..."), "ゲームロールを作成します。"),
+            new CommandAction("color", this::changeColor, List.of("name", "colorCode..."), "ゲームロールの色を変更します。"),
+            new CommandAction("rename", this::renameRole, List.of("name", "newName"), "ゲームロールの名前を変更します。"),
+            new CommandAction("give", this::giveGameRole, List.of("name..."), "ゲームロールを付与します。"),
+            new CommandAction("join", this::giveGameRole, List.of("name..."), "ゲームロールを付与します。"),
+            new CommandAction("take", this::takeGameRole, List.of("name..."), "ゲームロールを剥奪します。"),
+            new CommandAction("leave", this::takeGameRole, List.of("name..."), "ゲームロールを剥奪します。"),
+            new CommandAction("message", List.of(
+                new CommandAction("post", this::createGameRoleMessage, "ゲームロールメッセージを投稿します。"),
+                new CommandAction("update", this::updateGameRoleMessage, "ゲームロールメッセージを更新します。"),
+                new CommandAction("set-emoji", this::changeGameRoleEmoji, List.of("role", "emojiId"), "ゲームロールのメッセージに使用する絵文字を変更します。")
+            ))
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールを新規追加します。（CommunityRegular以上のみ使用可能）")
-                .literal("new", "create", "add")
-                .argument(StringArgument.greedy("name"))
-                .handler(context -> execute(context, this::newGameRole))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールの色を変更します。名前にスペースが入る場合はダブルクォーテーションで囲む必要があります。（CommunityRegular以上のみ使用可能）")
-                .literal("color")
-                .argument(StringArgument.quoted("name"))
-                .argument(StringArgument.greedy("colorCode"))
-                .handler(context -> execute(context, this::changeColor))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールの名前を変更します。（CommunityRegular以上のみ使用可能）")
-                .literal("rename")
-                .argument(StringArgument.quoted("name"))
-                .argument(StringArgument.quoted("newName"))
-                .handler(context -> execute(context, this::renameRole))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "自分にゲームロールを付与します。")
-                .literal("give", "join")
-                .argument(StringArgument.greedy("name"))
-                .handler(context -> execute(context, this::giveGameRole))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "自分からゲームロールを剥奪します。")
-                .literal("take", "leave")
-                .argument(StringArgument.greedy("name"))
-                .handler(context -> execute(context, this::takeGameRole))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールメッセージを投稿します。")
-                .literal("message")
-                .literal("post")
-                .handler(context -> execute(context, this::createGameRoleMessage))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールメッセージを更新します。")
-                .literal("message")
-                .literal("update")
-                .handler(context -> execute(context, this::updateGameRoleMessage))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ゲームロールメッセージの絵文字を設定します。")
-                .literal("message")
-                .literal("set-emoji")
-                .argument(RoleArgument.<JDACommandSender>newBuilder("role")
-                    .withParsers(Arrays.stream(RoleArgument.ParserMode.values())
-                        .collect(Collectors.toSet())).build())
-                .argument(StringArgument.of("emojiId"))
-                .handler(context -> execute(context, this::changeGameRoleEmoji))
-                .build()
-        );
+    protected void execute(CommandEvent event) {
+        CommandAction.execute(this, event);
     }
 
-    private void newGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void newGameRole(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
@@ -128,7 +87,7 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("ゲームロールの作成は CommunityRegular から作成できます。").queue();
             return;
         }
-        String roleName = context.get("name");
+        String roleName = args.getString("name...");
         List<Role> matchRoles = guild.getRolesByName(roleName, false);
         if (!matchRoles.isEmpty()) {
             message.reply("同一名のロールがあるため、作成できません。").queue();
@@ -138,7 +97,11 @@ public class Cmd_GameRole implements CommandPremise {
         updateMessages();
     }
 
-    private void changeColor(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void changeColor(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs());
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
@@ -152,12 +115,12 @@ public class Cmd_GameRole implements CommandPremise {
         }
         Color color;
         try {
-            color = Color.decode(context.get("colorCode"));
+            color = Color.decode(args.getString("colorCode..."));
         } catch (NumberFormatException e) {
             message.reply("色コードが正しくありません。").queue();
             return;
         }
-        String roleName = context.get("name");
+        String roleName = args.getString("name");
         List<Role> matchRoles = guild.getRolesByName(roleName, false);
         if (matchRoles.isEmpty()) {
             message.reply("マッチするロールが見つかりませんでした。").queue();
@@ -176,7 +139,11 @@ public class Cmd_GameRole implements CommandPremise {
         );
     }
 
-    private void renameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void renameRole(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs());
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
@@ -188,13 +155,13 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("ゲームロールの名前変更は CommunityRegular から作成できます。").queue();
             return;
         }
-        String roleName = context.get("name");
+        String roleName = args.getString("name");
         List<Role> matchRoles = guild.getRolesByName(roleName, false);
         if (matchRoles.isEmpty()) {
             message.reply("マッチするロールが見つかりませんでした。").queue();
             return;
         }
-        String newRoleName = context.get("newName");
+        String newRoleName = args.getString("newName");
         Role role = matchRoles.get(0);
         role.getManager().setName(newRoleName).queue(
             tmp -> message.reply(
@@ -210,7 +177,11 @@ public class Cmd_GameRole implements CommandPremise {
         updateMessages();
     }
 
-    private void giveGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void giveGameRole(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs());
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
@@ -219,7 +190,7 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("ゲームロールの付与は MinecraftConnected から利用可能です。").queue();
             return;
         }
-        String roleName = context.get("name");
+        String roleName = args.getString("name");
         List<Role> matchRoles = guild.getRolesByName(roleName, false);
         if (matchRoles.isEmpty()) {
             message.reply("マッチするロールが見つかりませんでした。").queue();
@@ -244,7 +215,11 @@ public class Cmd_GameRole implements CommandPremise {
         updateMessages();
     }
 
-    private void takeGameRole(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void takeGameRole(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs());
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
@@ -253,7 +228,7 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("ゲームロールの付与は MinecraftConnected から利用可能です。").queue();
             return;
         }
-        String roleName = context.get("name");
+        String roleName = args.getString("name");
         List<Role> matchRoles = guild.getRolesByName(roleName, false);
         if (matchRoles.isEmpty()) {
             message.reply("マッチするロールが見つかりませんでした。").queue();
@@ -277,7 +252,11 @@ public class Cmd_GameRole implements CommandPremise {
         updateMessages();
     }
 
-    private void createGameRoleMessage(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void createGameRoleMessage(CommandEvent event) {
+        Guild guild = event.getGuild();
+        MessageChannel channel = event.getChannel();
+        Member member = event.getMember();
+        Message message = event.getMessage();
         JDA jda = Main.getJDA();
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
@@ -338,8 +317,10 @@ public class Cmd_GameRole implements CommandPremise {
         addMessage(postMessage);
     }
 
-    private void updateGameRoleMessage(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        JDA jda = Main.getJDA();
+    private void updateGameRoleMessage(CommandEvent event) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
             return;
@@ -352,7 +333,11 @@ public class Cmd_GameRole implements CommandPremise {
         message.reply("ゲームロールメッセージの更新を行いました。").queue();
     }
 
-    private void changeGameRoleEmoji(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void changeGameRoleEmoji(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs());
         JDA jda = Main.getJDA();
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();
@@ -362,12 +347,17 @@ public class Cmd_GameRole implements CommandPremise {
             message.reply("ゲームロール絵文字の更新は Admin のみ利用可能です。").queue();
             return;
         }
-        Role role = context.get("role");
+        String roleId = args.getString("role");
+        Role role = guild.getRoleById(roleId);
+        if (role == null) {
+            message.reply("指定されたロールが見つかりません。").queue();
+            return;
+        }
         if (!GameRole.isGameRole(role)) {
             message.reply("指定されたロール `%s` はゲームロールではありません。".formatted(role.getName())).queue();
             return;
         }
-        String emojiId = context.get("emojiId");
+        String emojiId = args.getString("emojiId");
         Matcher matcher = emojiPattern.matcher(emojiId);
         if (matcher.matches()) {
             emojiId = matcher.group(1);
@@ -544,4 +534,5 @@ public class Cmd_GameRole implements CommandPremise {
             }
         }
     }
+
 }

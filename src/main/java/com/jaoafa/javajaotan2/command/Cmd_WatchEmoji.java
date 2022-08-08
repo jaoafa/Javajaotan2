@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,64 +11,42 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.jda.parsers.ChannelArgument;
-import cloud.commandframework.meta.CommandMeta;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
+import com.jaoafa.javajaotan2.lib.CommandAction;
+import com.jaoafa.javajaotan2.lib.CommandArgument;
+import com.jaoafa.javajaotan2.lib.CommandWithActions;
 import com.jaoafa.javajaotan2.lib.WatchEmojis;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class Cmd_WatchEmoji implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "watchemoji",
-            "絵文字を監視する設定をします。"
+public class Cmd_WatchEmoji extends CommandWithActions {
+    public Cmd_WatchEmoji() {
+        this.name = "watchemoji";
+        this.help = "絵文字を監視する設定をします。";
+        this.actions = List.of(
+            new CommandAction("add", this::addWatch, List.of("log-channel", "list-channel"), "サーバを絵文字監視対象に追加します。"),
+            new CommandAction("remove", this::removeWatch, "サーバを絵文字監視対象から削除します。"),
+            new CommandAction("del", this::removeWatch, "サーバを絵文字監視対象から削除します。"),
+            new CommandAction("delete", this::removeWatch, "サーバを絵文字監視対象から削除します。"),
+            new CommandAction("regenerate", this::regenerate, "絵文字一覧を再生成します。")
         );
+        this.arguments = CommandAction.getArguments(this.actions);
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "サーバを絵文字監視対象に追加します。")
-                .literal("add")
-                .argument(ChannelArgument
-                    .<JDACommandSender>newBuilder("log_channel")
-                    .withParsers(Arrays
-                        .stream(ChannelArgument.ParserMode.values())
-                        .collect(Collectors.toSet())))
-                .argument(ChannelArgument
-                    .<JDACommandSender>newBuilder("list_channel")
-                    .withParsers(Arrays
-                        .stream(ChannelArgument.ParserMode.values())
-                        .collect(Collectors.toSet())))
-                .handler(context -> execute(context, this::addWatch))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "サーバを絵文字監視対象から削除します。")
-                .literal("remove", "del", "delete")
-                .handler(context -> execute(context, this::removeWatch))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "絵文字一覧を再生成します。")
-                .literal("regenerate")
-                .handler(context -> execute(context, this::regenerate))
-                .build()
-        );
+    protected void execute(CommandEvent event) {
+        CommandAction.execute(this, event);
     }
 
-    private void addWatch(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void addWatch(CommandEvent event, List<String> argNames) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
         if (!member.hasPermission(Permission.ADMINISTRATOR)) {
             message.reply("このコマンドを実行するには、サーバの管理者権限を持っている必要があります。").queue();
             return;
@@ -82,8 +60,8 @@ public class Cmd_WatchEmoji implements CommandPremise {
             message.reply("このコマンドを実行するには、jaotanがサーバの監査ログ閲覧権限を持っている必要があります。").queue();
             return;
         }
-        MessageChannel log_channel = context.get("log_channel");
-        MessageChannel list_channel = context.get("list_channel");
+        MessageChannel log_channel = parseChannelInput(guild, args.getString("log-channel"));
+        MessageChannel list_channel = parseChannelInput(guild, args.getString("list-channel"));
 
         GuildChannel log_guild_channel = guild.getGuildChannelById(log_channel.getIdLong());
         if (log_guild_channel == null) {
@@ -115,7 +93,10 @@ public class Cmd_WatchEmoji implements CommandPremise {
             list_channel.getId())).queue();
     }
 
-    private void removeWatch(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void removeWatch(CommandEvent event) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Message message = event.getMessage();
         if (!member.hasPermission(Permission.ADMINISTRATOR)) {
             message.reply("このコマンドを実行するには、サーバの管理者権限を持っている必要があります。").queue();
         }
@@ -129,7 +110,9 @@ public class Cmd_WatchEmoji implements CommandPremise {
         message.reply(String.format("このサーバ「%s」を絵文字監視対象から削除しました。", guild.getName())).queue();
     }
 
-    private void regenerate(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
+    private void regenerate(CommandEvent event) {
+        Guild guild = event.getGuild();
+        Message message = event.getMessage();
         WatchEmojis watchEmojis = Main.getWatchEmojis();
         Optional<WatchEmojis.EmojiGuild> emojiGuildOpt = watchEmojis.getEmojiGuild(guild);
         if (emojiGuildOpt.isEmpty()) {
@@ -138,5 +121,21 @@ public class Cmd_WatchEmoji implements CommandPremise {
         }
         emojiGuildOpt.get().generateEmojiList(Main.getJDA());
         message.reply("絵文字一覧を再生成しています…").queue();
+    }
+
+    private MessageChannel parseChannelInput(Guild guild, String str) {
+        // ID
+        if (str.matches("\\d+")) {
+            return guild.getTextChannelById(Long.parseLong(str));
+        }
+        // <#ID>
+        if (str.matches("<#\\d+>")) {
+            return guild.getTextChannelById(Long.parseLong(str.substring(2, str.length() - 1)));
+        }
+        // チャンネル名
+        return guild.getTextChannels().stream()
+            .filter(channel -> channel.getName().equals(str))
+            .findFirst()
+            .orElse(null);
     }
 }

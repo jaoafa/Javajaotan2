@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -10,6 +10,8 @@
  */
 
 package com.jaoafa.javajaotan2.lib;
+
+import com.jaoafa.javajaotan2.Main;
 
 import java.sql.*;
 
@@ -25,7 +27,7 @@ public class MySQLDBManager {
 
     public MySQLDBManager(String hostname, int port,
                           String username, String password, String database) throws ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName("com.mysql.cj.jdbc.Driver");
         this.hostname = hostname;
         this.port = port;
         this.username = username;
@@ -40,7 +42,7 @@ public class MySQLDBManager {
                 if (diff < WAIT_TIMEOUT) {
                     return conn;
                 } else {
-                    System.out.println("MySQL TIMEOUT! WAIT_TIMEOUT: " + WAIT_TIMEOUT + " / DIFF: " + diff);
+                    Main.getLogger().info("MySQL TIMEOUT! WAIT_TIMEOUT: " + WAIT_TIMEOUT + " / DIFF: " + diff);
                 }
             }
             LAST_PACKET = System.currentTimeMillis();
@@ -63,7 +65,7 @@ public class MySQLDBManager {
             ResultSet res = statement.executeQuery();
             if (res.next()) {
                 WAIT_TIMEOUT = res.getInt("Value");
-                System.out.println("MySQL WAIT_TIMEOUT: " + WAIT_TIMEOUT);
+                Main.getLogger().info("MySQL WAIT_TIMEOUT: " + WAIT_TIMEOUT);
             } else {
                 WAIT_TIMEOUT = -1;
             }

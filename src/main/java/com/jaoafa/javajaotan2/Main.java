@@ -11,16 +11,10 @@
 
 package com.jaoafa.javajaotan2;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
-import cloud.commandframework.exceptions.*;
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.jda.JDA4CommandManager;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.jda.JDAGuildSender;
-import cloud.commandframework.meta.CommandMeta;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jaoafa.javajaotan2.lib.*;
 import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
 import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
@@ -28,15 +22,15 @@ import com.jaoafa.javajaotan2.tasks.Task_PermSync;
 import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,11 +41,10 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.jar.JarEntry;
@@ -106,15 +99,25 @@ public class Main {
             return;
         }
 
+        EventWaiter waiter = new EventWaiter();
+        CommandClient client = getCommandClient();
+
         // ログイン
         try {
             JDABuilder jdabuilder = JDABuilder.createDefault(config.getToken())
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+                .enableIntents(
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_PRESENCES,
+                    GatewayIntent.MESSAGE_CONTENT,
+                    GatewayIntent.GUILD_MESSAGE_TYPING,
+                    GatewayIntent.DIRECT_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS
+                )
                 .setAutoReconnect(true)
                 .setBulkDeleteSplittingEnabled(false)
                 .setContextEnabled(false);
 
+            jdabuilder.addEventListeners(waiter, client);
             registerEvent(jdabuilder);
 
             jda = jdabuilder.build().awaitReady();
@@ -126,7 +129,6 @@ public class Main {
         defineChannelsAndRoles();
         copyExternalScripts();
 
-        registerCommand(jda);
         registerTask();
 
         watchEmojis = new WatchEmojis();
@@ -140,207 +142,147 @@ public class Main {
         }
     }
 
-    static void registerCommand(JDA jda) {
-        try {
-            final JDA4CommandManager<JDACommandSender> manager = new JDA4CommandManager<>(
-                jda,
-                message -> "/",
-                (sender, perm) -> {
-                    logger.info("Check permission: " + perm);
-                    MessageReceivedEvent event = sender.getEvent().orElse(null);
-                    if (isUserDevelopMode) {
-                        if (event == null) {
-                            return false;
-                        }
-                        if (developUserId != event.getMessage().getIdLong()) {
-                            return false;
-                        }
-                    }
-                    if (perm == null) {
-                        return true; // 対象ロール設定がされていない場合許可
-                    }
-                    if (event == null || !event.isFromGuild() || event.getMember() == null) {
-                        return false; // イベントがNULL、もしくはサーバからのメッセージ送信ではない場合不許可
-                    }
-                    Guild guild = event.getGuild();
-                    long guild_id = guild.getIdLong();
-                    if (guild_id != Main.getConfig().getGuildId()) {
-                        return true; // 設定ファイルで定義されているサーバIDと違う場合許可
-                    }
-                    Member member = event.getMember();
+    // see https://github.com/Chewbotcca/Discord/blob/main/src/main/java/pw/chew/chewbotcca/Chewbotcca.java#L153-L205
+    static CommandClient getCommandClient() {
+        CommandClientBuilder builder = new CommandClientBuilder();
 
-                    return Arrays.stream(perm.split("\\|"))
-                        .map(guild::getRoleById)
-                        .anyMatch(role -> member.getRoles().contains(role));
-                },
-                AsynchronousCommandExecutionCoordinator.simpleCoordinator(),
-                sender -> {
-                    MessageReceivedEvent event = sender.getEvent().orElse(null);
+        final String prefix = "/";
+        builder.setPrefix(prefix);
+        builder.setActivity(null);
+        builder.setOwnerId(config.getOwnerId());
 
-                    if (sender instanceof JDAGuildSender jdaGuildSender) {
-                        return new JDAGuildSender(event, jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
-                    }
+        final String commandPackage = "com.jaoafa.javajaotan2.command";
+        Reflections reflections = new Reflections(commandPackage);
+        Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
+        List<Command> commands = new ArrayList<>();
 
-                    return null;
-                },
-                user -> {
-                    MessageReceivedEvent event = user.getEvent().orElse(null);
+        for (Class<? extends Command> theClass : subTypes) {
+            if (!theClass.getName().startsWith("%s.Cmd_".formatted(commandPackage))) {
+                continue;
+            }
+            if (theClass.getName().contains("SubCommand") || theClass.getName().contains("SlashCommand")) {
+                continue;
+            }
+            String cmdName = theClass.getName().substring(("%s.Cmd_".formatted(commandPackage)).length());
 
-                    if (user instanceof JDAGuildSender guildUser) {
-                        return new JDAGuildSender(event, guildUser.getMember(), guildUser.getTextChannel());
-                    }
+            try {
+                commands.add(theClass.getDeclaredConstructor().newInstance());
+                getLogger().info("%s: コマンドの登録に成功しました".formatted(cmdName));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                getLogger().error("%s: コマンドの登録に失敗しました".formatted(cmdName));
+            }
+        }
+        builder.addCommands(commands.toArray(new Command[0]));
 
-                    return null;
-                }
-            );
+        builder.setHelpWord("jaotanhelp");
+        /*
+        `this.arguments` の値は以下の3種類
+        - `<Arg>`: アクションが一つのときだけ使用。説明は this.help を流用
+        - `: XXXXX`: アクションが複数あるが、このアクションについては引数がない場合に使用。説明は `:` 以降を利用
+        - `<Arg1>: XXXXX\n<Arg2>: XXXXX`: アクションが複数のときに使用。説明は `:` 以降を利用
 
-            manager.registerExceptionHandler(NoSuchCommandException.class, (c, e) ->
-                logger.info("NoSuchCommandException: " + e.getSuppliedCommand() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")")
-            );
+        --- サンプル ---
 
-            manager.registerExceptionHandler(InvalidSyntaxException.class,
-                (c, e) -> {
-                    logger.info("InvalidSyntaxException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
-                    if (c.getEvent().isPresent()) {
-                        if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {
-                            return;
-                        }
-                        c.getEvent().get().getMessage().reply(String.format("コマンドの構文が不正です。正しい構文: `%s`", e.getCorrectSyntax())).queue();
-                    }
-                });
+        Javajaotan2 コマンド一覧
 
-            manager.registerExceptionHandler(NoPermissionException.class, (c, e) -> {
-                logger.info("NoPermissionException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
-                if (isUserDevelopMode && developUserId != c.getUser().getIdLong()) {
-                    return;
-                }
-                if (c.getEvent().isPresent()) {
-                    if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {
-                        return;
-                    }
-                    c.getEvent().get().getMessage().reply("コマンドを使用する権限がありません。").queue();
-                }
-            });
-
-            manager.registerExceptionHandler(CommandExecutionException.class, (c, e) -> {
-                logger.info("CommandExecutionException: " + e.getMessage() + " (From " + c.getUser().getAsTag() + " in " + c.getChannel().getName() + ")");
-                e.printStackTrace();
-                if (c.getEvent().isPresent()) {
-                    if (isGuildDevelopMode && developGuildId != c.getEvent().get().getGuild().getIdLong()) {
-                        return;
-                    }
-                    c.getEvent().get().getMessage().reply(MessageFormat.format("コマンドの実行に失敗しました: {0} ({1})",
-                        e.getMessage(),
-                        e.getClass().getName())).queue();
-                }
-            });
-
-            commands = new JSONArray();
-            ClassFinder classFinder = new ClassFinder();
-            for (Class<?> clazz : classFinder.findClasses("com.jaoafa.javajaotan2.command")) {
-                if (!clazz.getName().startsWith("com.jaoafa.javajaotan2.command.Cmd_")) {
+        - `/test`: テストコマンド
+          - `/test`: ルートテストコマンド
+          - `/test <Arg>`: Argをテストする
+          - `/test <Arg1> <Arg2>`: Arg1 と Arg2 をテストする
+        - `/test2 <Arg>`: テストコマンド3
+         */
+        builder.setHelpConsumer((event) -> {
+            Message message = event.getMessage();
+            StringBuilder sb = new StringBuilder();
+            sb.append("Javajaotan2 コマンド一覧 %s\n\n".formatted(event.getArgs().isEmpty() ? "" : "(フィルタリング: `" + event.getArgs() + "`)"));
+            for (Command command : commands) {
+                String arguments = command.getArguments();
+                if (!event.getArgs().isEmpty() && !String.join("\n", List.of(
+                    command.getName(),
+                    command.getHelp(),
+                    command.getArguments()
+                )).contains(event.getArgs())) {
                     continue;
                 }
-                if (clazz.getEnclosingClass() != null) {
-                    continue;
+
+                sb.append("- `")
+                    .append(prefix)
+                    .append(command.getName());
+                if (!arguments.contains("\n")) {
+                    sb.append(" ").append(arguments);
                 }
-                if (clazz.getName().contains("$")) {
-                    continue;
-                }
-                String commandName = clazz.getName().substring("com.jaoafa.javajaotan2.command.Cmd_".length())
-                    .toLowerCase();
+                sb.append("`: ")
+                    .append(command.getHelp())
+                    .append("\n");
 
-                try {
-                    Constructor<?> construct = clazz.getConstructor();
-                    Object instance = construct.newInstance();
-                    CommandPremise cmdPremise = (CommandPremise) instance;
+                if (!event.getArgs().isEmpty() && arguments.contains("\n")) {
+                    // 複数のアクション
 
-                    Command.Builder<JDACommandSender> builder = manager.commandBuilder(
-                            commandName,
-                            ArgumentDescription.of(cmdPremise.details().getDescription()),
-                            cmdPremise.details().getAliases().toArray(new String[0])
-                        )
-                        .meta(CommandMeta.DESCRIPTION, cmdPremise.details().getDescription());
-                    if (cmdPremise.details().getAllowRoles() != null) {
-                        builder = builder.permission(
-                            JavajaotanCommand.permRoles(cmdPremise.details().getAllowRoles())
-                        );
-                    }
-                    JSONArray subcommands = new JSONArray();
-                    cmdPremise.register(builder).getCommands().forEach(cmd -> {
-                        try {
-                            manager.command(cmd);
-                            JSONObject subcommand = new JSONObject();
-                            subcommand.put("meta", cmd.getCommandMeta().getAllValues());
-                            subcommand.put("senderType", cmd.getSenderType().isPresent() ?
-                                cmd.getSenderType().get().getName() : null);
-                            subcommand.put("toString", cmd.toString());
-
-                            final Iterator<CommandComponent<JDACommandSender>> iterator = cmd.getComponents().iterator();
-                            JSONArray args = new JSONArray();
-                            cmd.getArguments().forEach(arg -> {
-                                JSONObject obj = new JSONObject();
-                                obj.put("name", arg.getName());
-                                if (arg instanceof StaticArgument) {
-                                    obj.put("alias", ((StaticArgument<?>) arg).getAlternativeAliases());
-                                }
-                                obj.put("isRequired", arg.isRequired());
-                                obj.put("defaultValue", arg.getDefaultValue());
-                                obj.put("defaultDescription", arg.getDefaultDescription());
-                                obj.put("class", arg.getClass().getName());
-
-                                if (iterator.hasNext()) {
-                                    final CommandComponent<JDACommandSender> component = iterator.next();
-                                    if (!component.getArgumentDescription().isEmpty()) {
-                                        obj.put("description", component.getArgumentDescription().getDescription());
-                                    }
-                                }
-                                args.put(obj);
-                            });
-                            subcommand.put("arguments", args);
-                            subcommands.put(subcommand);
-                        } catch (AmbiguousNodeException e) {
-                            getLogger().warn(String.format("%s: コマンドの登録に失敗したため、このコマンドは使用できません: AmbiguousNodeException", cmd.toString()));
-                            getLogger().warn("このエラーは、コマンドフレームワークがコマンドの引数を見分けられないエラーによるものです。literalを追加して固有なコマンドと見なせるように修正してください。");
+                    // - `/test`: テストコマンド\n
+                    String[] actions = arguments.split("\n");
+                    for (String action : actions) {
+                        // - `/test <Arg>`: Argをテストする\n
+                        if (action.contains(": ")) {
+                            String[] split = action.split(": ");
+                            sb.append("  - `")
+                                .append(prefix)
+                                .append(command.getName())
+                                .append(" ")
+                                .append(split[0])
+                                .append("`: ")
+                                .append(split[1])
+                                .append("\n");
+                        } else {
+                            // 説明なしのアクション？
+                            sb.append("  - `")
+                                .append(prefix)
+                                .append(command.getName())
+                                .append(" ")
+                                .append(action)
+                                .append("\n");
                         }
-                    });
-
-                    JSONObject details = new JSONObject();
-                    details.put("class", instance.getClass().getName());
-                    details.put("name", commandName);
-                    details.put("command", cmdPremise.details().getName());
-                    details.put("description", cmdPremise.details().getDescription());
-                    details.put("alias", cmdPremise.details().getAliases());
-                    details.put("permissions", JavajaotanCommand.permRoles(cmdPremise.details().getAllowRoles()));
-                    details.put("subcommands", subcommands);
-                    commands.put(details);
-
-                    getLogger().info(String.format("%s: コマンドの登録に成功しました。", commandName));
-                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                         InvocationTargetException e) {
-                    getLogger().warn(String.format("%s: コマンドの登録に失敗しました。", commandName));
-                    e.printStackTrace();
+                    }
                 }
             }
-        } catch (InterruptedException | IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+            sb.append("\n");
+            if (event.getArgs().isEmpty()) {
+                sb.append("`/jaotanhelp <テキスト>` で検索（フィルタリング）できます。\n");
+            }
+            sb.append("不具合の報告は対象メッセージに :bug: をつけるか、GitHub の jaoafa/Javajaotan2 リポジトリの Issue にてお願いします。");
+
+            event.replyInDm(
+                sb.toString(),
+                m -> {
+                    if (message.isFromType(ChannelType.TEXT))
+                        message.reply("DMにヘルプメッセージを送信しました。").queue();
+                },
+                t -> message.reply("ヘルプメッセージをDMに送信できませんでした。DM受取設定などをご確認ください。").queue()
+            );
+        });
+
+        // とりあえずスラッシュコマンドはサポートしない
+
+        return builder.build();
     }
 
     static void registerEvent(JDABuilder jdaBuilder) {
-        try {
-            ClassFinder classFinder = new ClassFinder();
-            for (Class<?> clazz : classFinder.findClasses("com.jaoafa.javajaotan2.event")) {
-                if (!clazz.getName().startsWith("com.jaoafa.javajaotan2.event.Event_")) {
-                    continue;
-                }
-                if (clazz.getEnclosingClass() != null) {
-                    continue;
-                }
-                if (clazz.getName().contains("$")) {
-                    continue;
-                }
-                String eventName = clazz.getName().substring("com.jaoafa.javajaotan2.event.Event_".length());
+        final String eventPackage = "com.jaoafa.javajaotan2.event";
+        Reflections reflections = new Reflections(eventPackage);
+        Set<Class<? extends ListenerAdapter>> subTypes = reflections.getSubTypesOf(ListenerAdapter.class);
+        for (Class<? extends ListenerAdapter> clazz : subTypes) {
+            if (!clazz.getName().startsWith("%s.Event_".formatted(eventPackage))) {
+                continue;
+            }
+            if (clazz.getEnclosingClass() != null) {
+                continue;
+            }
+            if (clazz.getName().contains("$")) {
+                continue;
+            }
+            String eventName = clazz.getName().substring(("%s.Event_".formatted(eventPackage)).length());
+            try {
                 Constructor<?> construct = clazz.getConstructor();
                 Object instance = construct.newInstance();
                 if (!(instance instanceof ListenerAdapter)) {
@@ -348,12 +290,12 @@ public class Main {
                 }
 
                 jdaBuilder.addEventListeners(instance);
-                getLogger().info(String.format("%s: イベントの登録に成功しました。", eventName));
+                getLogger().info("%s: イベントの登録に成功しました。".formatted(eventName));
+            } catch (NoSuchMethodException | InstantiationException |
+                     IllegalAccessException | InvocationTargetException e) {
+                getLogger().error("%s: イベントの登録に失敗しました。".formatted(eventName));
+                e.printStackTrace();
             }
-        } catch (ClassNotFoundException | IOException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException | InvocationTargetException e) {
-            getLogger().error("イベントの登録に失敗しました。");
-            e.printStackTrace();
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,82 +11,28 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.lib.Translate;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.time.Instant;
+public class Cmd_ToSwJa extends Command {
+    final Translate.Language[] translateTo;
 
-public class Cmd_ToSwJa implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "toswja",
-            "Google翻訳を用いてスワヒリ語へ翻訳をしたあと、日本語へ翻訳を行います。"
+    public Cmd_ToSwJa() {
+        this.name = "toswja";
+        this.translateTo = new Translate.Language[]{
+            Translate.Language.SW,
+            Translate.Language.JA
+        };
+        this.help = "Google翻訳を用いて%sへ翻訳をしたあと、%sへ翻訳を行います。".formatted(
+            translateTo[0].getName(),
+            translateTo[1].getName()
         );
+        this.arguments = "<Text...>";
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "Google翻訳を用いてスワヒリ語へ翻訳をしたあと、日本語へ翻訳を行います。")
-                .argument(StringArgument.greedy("text"))
-                .handler(context -> execute(context, this::translateSwJa))
-                .build()
-        );
-    }
-
-    private void translateSwJa(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String text = context.get("text");
-        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
-
-        Translate.Language lang1 = Translate.Language.SW;
-        Translate.Language lang2 = Translate.Language.JA;
-
-        Translate.TranslateResult result1 = Translate.translate(
-            Translate.Language.UNKNOWN,
-            lang1,
-            displayText
-        );
-        if (result1 == null) {
-            message.reply("翻訳に失敗しました。").queue();
-            return;
-        }
-
-        Translate.TranslateResult result2 = Translate.translate(
-            lang1,
-            lang2,
-            result1.result()
-        );
-        if (result2 == null) {
-            message.reply("翻訳に失敗しました。").queue();
-            return;
-        }
-
-        EmbedBuilder embed = new EmbedBuilder()
-            .setTitle("翻訳が成功しました:clap:")
-            .addField("`%s` -> `%s`".formatted(result1.from().toString(), lang1.toString()),
-                "```%s```".formatted(result1.result()),
-                true)
-            .addField("`%s` -> `%s`".formatted(lang1.toString(), lang2.toString()),
-                "```%s```".formatted(result2.result()),
-                true)
-            .setColor(Color.PINK)
-            .setTimestamp(Instant.now());
-        message.replyEmbeds(embed.build()).queue();
+    protected void execute(CommandEvent event) {
+        Translate.executeTranslate(event, translateTo);
     }
 }

@@ -24,8 +24,9 @@ import java.nio.file.Files;
 public class JavajaotanConfig {
     final Logger logger;
     String token;
-    long guild_id;
-    String gcp_key;
+    long ownerId;
+    long guildId;
+    String gcpKey;
     String customSearchCX;
     String gasTranslateAPIUrl;
     String detectLanguageAPIToken;
@@ -49,8 +50,9 @@ public class JavajaotanConfig {
 
             // - 設定項目の取得
             token = config.getString("token");
-            guild_id = config.optLong("guild_id", 597378876556967936L);
-            gcp_key = config.optString("gcp_key");
+            guildId = config.optLong("guild_id", 597378876556967936L);
+            ownerId = config.optLong("owner_id", 221991565567066112L);
+            gcpKey = config.optString("gcp_key");
             customSearchCX = config.optString("customSearchCX");
             gasTranslateAPIUrl = config.optString("gasTranslateAPIUrl");
             detectLanguageAPIToken = config.optString("detectLanguageAPIToken");
@@ -114,12 +116,16 @@ public class JavajaotanConfig {
     }
 
     public long getGuildId() {
-        return guild_id;
+        return guildId;
+    }
+
+    public long getOwnerId() {
+        return ownerId;
     }
 
     @Nullable
     public String getGCPKey() {
-        return gcp_key;
+        return gcpKey;
     }
 
     @Nullable

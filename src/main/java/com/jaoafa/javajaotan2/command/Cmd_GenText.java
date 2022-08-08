@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -11,20 +11,11 @@
 
 package com.jaoafa.javajaotan2.command;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.jda.JDACommandSender;
-import cloud.commandframework.meta.CommandMeta;
-import com.jaoafa.javajaotan2.lib.CommandPremise;
-import com.jaoafa.javajaotan2.lib.JavajaotanCommand;
-import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jaoafa.javajaotan2.lib.CommandArgument;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,51 +26,34 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class Cmd_GenText implements CommandPremise {
-    @Override
-    public JavajaotanCommand.Detail details() {
-        return new JavajaotanCommand.Detail(
-            "gentext",
-            "文章を自動生成します"
-        );
+public class Cmd_GenText extends Command {
+    public Cmd_GenText() {
+        this.name = "gentext";
+        this.help = "文章を自動生成します。";
+        this.arguments = """
+            : defaultソースで1つの文章を生成します。
+            <文章数>: defaultソースで指定文章数の文章を生成します。
+            <ソース>: 指定ソースで1つの文章を生成します。
+            <ソース> <文章数>: 指定ソースで指定文章数の文章を生成します。""";
     }
 
     @Override
-    public JavajaotanCommand.Cmd register(Command.Builder<JDACommandSender> builder) {
-        return new JavajaotanCommand.Cmd(
-            builder
-                .meta(CommandMeta.DESCRIPTION, "デフォルトソースから文章を生成します。")
-                .handler(context -> execute(context, this::generateDefault))
-                .build(),
-            builder
-                .meta(CommandMeta.DESCRIPTION, "ソースと生成回数を指定して文章を生成します。")
-                .argument(StringArgument.of("sourceOrGenCount"))
-                .argument(IntegerArgument
-                    .<JDACommandSender>newBuilder("count")
-                    .withMin(1)
-                    .asOptional())
-                .handler(context -> execute(context, this::generateSourceCount))
-                .build()
-        );
-    }
+    protected void execute(CommandEvent event) {
+        // /gentext: defaultソースで1つの文章を生成
+        // /gentext <文章数(int)>: defaultソースで指定文章数の文章を生成
+        // /gentext <ソース(String)>: 指定ソースで1つの文章を生成
+        // /gentext <ソース> <文章数>: 指定ソースで指定文章数の文章を生成
+        Message message = event.getMessage();
+        MessageChannel channel = event.getChannel();
 
-    private void generateDefault(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        message.reply("生成中です…しばらくお待ちください。").queue(
-            msg -> generate(msg, "default", 1),
-            error -> {
-                channel.sendMessage("メッセージの生成に失敗しました。再度お試しください。").queue();
-                error.printStackTrace();
-            }
-        );
-    }
-
-    private void generateSourceCount(@NotNull Guild guild, @NotNull MessageChannel channel, @NotNull Member member, @NotNull Message message, @NotNull CommandContext<JDACommandSender> context) {
-        String source = getSource(context);
-        int count = getCount(context);
-        if (count <= 0) {
-            message.reply("生成数は1以上の整数を指定してください。").queue();
+        CommandArgument args = new CommandArgument(event.getArgs());
+        GenTextParam param = new GenTextParam(args);
+        if (param.isError()) {
+            message.reply(param.getError()).queue();
             return;
         }
+        String source = param.getSource();
+        int count = param.getCount();
 
         message.reply(String.format("生成中です…しばらくお待ちください。(ソース: %s / 生成数: %d)", source, count)).queue(
             msg -> generate(msg, source, count),
@@ -88,25 +62,52 @@ public class Cmd_GenText implements CommandPremise {
                 error.printStackTrace();
             }
         );
+
     }
 
-    private String getSource(@NotNull CommandContext<JDACommandSender> context) {
-        if (context.contains("count")) {
-            return context.get("sourceOrGenCount");
-        } else if (!JavajaotanLibrary.isInt(context.get("sourceOrGenCount"))) {
-            return context.get("sourceOrGenCount");
-        } else {
-            return "default";
+    static class GenTextParam {
+        private String source = "default";
+        private int count = 1;
+        private String error = null;
+
+        public GenTextParam(CommandArgument args) {
+            if (args.size() == 1) {
+                try {
+                    count = args.getInt(0);
+                } catch (NumberFormatException e) {
+                    source = args.getString(0);
+                }
+            } else if (args.size() == 2) {
+                source = args.getString(0);
+                try {
+                    count = args.getInt(1);
+                } catch (NumberFormatException e) {
+                    error = "文章数が数字ではありません。";
+                    return;
+                }
+            } else if (args.size() != 0) {
+                error = "引数が不正です。";
+                return;
+            }
+            if (count < 1) {
+                error = "文章数は1以上の整数を指定してください。";
+            }
         }
-    }
 
-    private int getCount(@NotNull CommandContext<JDACommandSender> context) {
-        if (context.contains("count")) {
-            return context.get("count");
-        } else if (!JavajaotanLibrary.isInt(context.get("sourceOrGenCount"))) {
-            return 1;
-        } else {
-            return Integer.parseInt(context.get("sourceOrGenCount"));
+        public String getSource() {
+            return source;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public boolean isError() {
+            return error != null;
         }
     }
 

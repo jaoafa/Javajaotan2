@@ -55,39 +55,39 @@
       ]
     },
     {
-      "name": "Maven: pw.chew:jda-chewtils-command:2.0-interactions-SNAPSHOT",
+      "name": "Maven: pw.chew:jda-chewtils-command:2.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-command/2.0-interactions-SNAPSHOT/jda-chewtils-command-2.0-interactions-20220122.031938-4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-command/2.0-SNAPSHOT/jda-chewtils-command-2.0-20220719.232945-13.jar!/"
       ]
     },
     {
-      "name": "Maven: pw.chew:jda-chewtils-commons:2.0-interactions-SNAPSHOT",
+      "name": "Maven: pw.chew:jda-chewtils-commons:2.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-commons/2.0-interactions-SNAPSHOT/jda-chewtils-commons-2.0-interactions-20220122.031938-4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-commons/2.0-SNAPSHOT/jda-chewtils-commons-2.0-20220719.232945-13.jar!/"
       ]
     },
     {
-      "name": "Maven: pw.chew:jda-chewtils-doc:2.0-interactions-SNAPSHOT",
+      "name": "Maven: pw.chew:jda-chewtils-doc:2.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-doc/2.0-interactions-SNAPSHOT/jda-chewtils-doc-2.0-interactions-20220122.031938-4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-doc/2.0-SNAPSHOT/jda-chewtils-doc-2.0-20220719.232945-13.jar!/"
       ]
     },
     {
-      "name": "Maven: pw.chew:jda-chewtils-examples:2.0-interactions-SNAPSHOT",
+      "name": "Maven: pw.chew:jda-chewtils-examples:2.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-examples/2.0-interactions-SNAPSHOT/jda-chewtils-examples-2.0-interactions-20220122.031938-4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-examples/2.0-SNAPSHOT/jda-chewtils-examples-2.0-20220719.232945-13.jar!/"
       ]
     },
     {
-      "name": "Maven: pw.chew:jda-chewtils-menu:2.0-interactions-SNAPSHOT",
+      "name": "Maven: pw.chew:jda-chewtils-menu:2.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-menu/2.0-interactions-SNAPSHOT/jda-chewtils-menu-2.0-interactions-20220122.031938-4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-menu/2.0-SNAPSHOT/jda-chewtils-menu-2.0-20220719.232945-13.jar!/"
       ]
     },
     {
-      "name": "Maven: pw.chew:jda-chewtils-oauth2:2.0-interactions-SNAPSHOT",
+      "name": "Maven: pw.chew:jda-chewtils-oauth2:2.0-SNAPSHOT",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-oauth2/2.0-interactions-SNAPSHOT/jda-chewtils-oauth2-2.0-interactions-20220122.031938-4.jar!/"
+        "jar://$MAVEN_REPOSITORY$/pw/chew/jda-chewtils-oauth2/2.0-SNAPSHOT/jda-chewtils-oauth2-2.0-20220719.232945-13.jar!/"
       ]
     },
     {

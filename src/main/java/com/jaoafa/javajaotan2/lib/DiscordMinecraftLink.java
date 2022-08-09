@@ -20,6 +20,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class DiscordMinecraftLink {
     private final boolean isFound;
@@ -288,7 +289,6 @@ public class DiscordMinecraftLink {
 
     /**
      * Minecraft アカウントを基準にすべての連携データを取得します。<br>
-     * {@link #isLinked()} が False なデータはこのリストに追加されません。<br>
      * 同じ UUID を持った連携データが複数ある場合は、最後に登録されたものが返されます。
      *
      * @return 連携データ
@@ -303,27 +303,28 @@ public class DiscordMinecraftLink {
         }
         Connection conn = manager.getConnection();
         List<DiscordMinecraftLink> connections = new ArrayList<>();
-        List<UUID> inserted = new ArrayList<>();
-        String sql = "SELECT * FROM discordlink WHERE disabled = ? ORDER BY id";
+        String sql = "SELECT * FROM discordlink ORDER BY id";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setBoolean(1, false);
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
-                    UUID uuid = UUID.fromString(res.getString("uuid"));
-                    if (inserted.contains(uuid)) {
-                        continue;
-                    }
                     connections.add(new DiscordMinecraftLink(res));
-                    inserted.add(uuid);
                 }
             }
         }
+        // 被りを排除する: Minecraft UUID が重複している場合は、最後に登録されたもの以外を削除する
+        connections = connections
+            .stream()
+            .filter(c -> c.getMinecraftUUID() != null)
+            .collect(Collectors.groupingBy(DiscordMinecraftLink::getMinecraftUUID))
+            .values()
+            .stream()
+            .map(l -> l.get(l.size() - 1))
+            .toList();
         return connections;
     }
 
     /**
      * Discord アカウントを基準にすべての連携データを取得します。<br>
-     * {@link #isLinked()} が False なデータはこのリストに追加されません。<br>
      * 同じ Discord ID を持った連携データが複数ある場合は、最後に登録されたものが返されます。
      *
      * @return 連携データ
@@ -338,21 +339,23 @@ public class DiscordMinecraftLink {
         }
         Connection conn = manager.getConnection();
         List<DiscordMinecraftLink> connections = new ArrayList<>();
-        List<String> inserted = new ArrayList<>();
-        String sql = "SELECT * FROM discordlink WHERE disabled = ? ORDER BY id";
+        String sql = "SELECT * FROM discordlink ORDER BY id";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setBoolean(1, false);
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
-                    String discordId = res.getString("disid");
-                    if (inserted.contains(discordId)) {
-                        continue;
-                    }
                     connections.add(new DiscordMinecraftLink(res));
-                    inserted.add(discordId);
                 }
             }
         }
+        // 被りを排除する: Discord ID が重複している場合は、最後に登録されたもの以外を削除する
+        connections = connections
+            .stream()
+            .filter(c -> c.getDiscordId() != null)
+            .collect(Collectors.groupingBy(DiscordMinecraftLink::getDiscordId))
+            .values()
+            .stream()
+            .map(l -> l.get(l.size() - 1))
+            .toList();
         return connections;
     }
 }

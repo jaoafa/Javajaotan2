@@ -89,7 +89,7 @@
         <dependency>
             <groupId>pw.chew</groupId>
             <artifactId>jda-chewtils</artifactId>
-            <version>2.0-interactions-SNAPSHOT</version>
+            <version>2.0-20220719.232945-13</version>
             <scope>compile</scope>
             <type>pom</type>
         </dependency>

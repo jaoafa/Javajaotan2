@@ -65,27 +65,27 @@
           "type": "Library"
         },
         {
-          "name": "Maven: pw.chew:jda-chewtils-command:2.0-SNAPSHOT",
+          "name": "Maven: pw.chew:jda-chewtils-command:2.0-interactions-SNAPSHOT",
           "type": "Library"
         },
         {
-          "name": "Maven: pw.chew:jda-chewtils-commons:2.0-SNAPSHOT",
+          "name": "Maven: pw.chew:jda-chewtils-commons:2.0-interactions-SNAPSHOT",
           "type": "Library"
         },
         {
-          "name": "Maven: pw.chew:jda-chewtils-doc:2.0-SNAPSHOT",
+          "name": "Maven: pw.chew:jda-chewtils-doc:2.0-interactions-SNAPSHOT",
           "type": "Library"
         },
         {
-          "name": "Maven: pw.chew:jda-chewtils-examples:2.0-SNAPSHOT",
+          "name": "Maven: pw.chew:jda-chewtils-examples:2.0-interactions-SNAPSHOT",
           "type": "Library"
         },
         {
-          "name": "Maven: pw.chew:jda-chewtils-menu:2.0-SNAPSHOT",
+          "name": "Maven: pw.chew:jda-chewtils-menu:2.0-interactions-SNAPSHOT",
           "type": "Library"
         },
         {
-          "name": "Maven: pw.chew:jda-chewtils-oauth2:2.0-SNAPSHOT",
+          "name": "Maven: pw.chew:jda-chewtils-oauth2:2.0-interactions-SNAPSHOT",
           "type": "Library"
         },
         {

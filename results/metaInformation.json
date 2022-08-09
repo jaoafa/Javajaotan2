@@ -1,18 +1,18 @@
 {
-  "total": 3,
+  "total": 55,
   "tools inspection": {
-    "Code Inspection": 3
+    "Code Inspection": 55
   },
   "attributes": {
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/jaoafa/Javajaotan2",
-        "revisionId": "79b80ede57e2ffba50e503994f58ee4f033e4d58",
+        "revisionId": "acd356c9df4e1f00902c4dbaa90ea5a4bb48d1b0",
         "branch": "master"
       }
     },
     "deviceId": "200820300000000-b362-9f64-5532-6b94d291e06a",
-    "jobUrl": "https://github.com/jaoafa/Javajaotan2/actions/runs/2822016469",
+    "jobUrl": "https://github.com/jaoafa/Javajaotan2/actions/runs/2824970532",
     "repoUrl": "https://github.com/jaoafa/Javajaotan2"
   }
 }

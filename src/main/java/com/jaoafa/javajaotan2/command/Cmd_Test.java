@@ -61,7 +61,7 @@ public class Cmd_Test extends CommandWithActions {
             return;
         }
         CommandArgument args = new CommandArgument(event.getArgs());
-        boolean dryRun = args.getOptionalBoolean(0, true);
+        boolean dryRun = args.getOptionalBoolean(1, true);
         message.reply(":eyes:").queue();
         new Task_PermSync(dryRun).execute(null);
     }
@@ -74,7 +74,7 @@ public class Cmd_Test extends CommandWithActions {
             return;
         }
         CommandArgument args = new CommandArgument(event.getArgs());
-        boolean dryRun = args.getOptionalBoolean(0, true);
+        boolean dryRun = args.getOptionalBoolean(1, true);
         message.reply(":eyes:").queue();
         new Task_MemberOrganize(dryRun).execute(null);
     }
@@ -87,7 +87,7 @@ public class Cmd_Test extends CommandWithActions {
             return;
         }
         CommandArgument args = new CommandArgument(event.getArgs());
-        boolean dryRun = args.getOptionalBoolean(0, true);
+        boolean dryRun = args.getOptionalBoolean(1, true);
         message.reply(":eyes:").queue();
         new Task_CheckMailVerified(dryRun).execute(null);
     }
@@ -100,7 +100,7 @@ public class Cmd_Test extends CommandWithActions {
             return;
         }
         CommandArgument args = new CommandArgument(event.getArgs());
-        boolean dryRun = args.getOptionalBoolean(0, true);
+        boolean dryRun = args.getOptionalBoolean(1, true);
         message.reply(":eyes:").queue();
         new Task_SyncOtherServerPerm(dryRun).execute(null);
     }

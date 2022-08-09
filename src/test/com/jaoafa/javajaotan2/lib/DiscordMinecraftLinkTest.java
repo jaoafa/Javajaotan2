@@ -93,6 +93,19 @@ class DiscordMinecraftLinkTest {
         List<DiscordMinecraftLink> connections = DiscordMinecraftLink.getAllForMinecraft();
         DiscordMinecraftLink dml = connections
             .stream()
+            .filter(c -> c.getMinecraftUUID().equals(minecraftUUID))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(dml);
+        assertTrue(dml.isFound());
+        assertTrue(dml.isLinked());
+    }
+
+    @Test
+    void getAllForDiscord() throws SQLException {
+        List<DiscordMinecraftLink> connections = DiscordMinecraftLink.getAllForMinecraft();
+        DiscordMinecraftLink dml = connections
+            .stream()
             .filter(c -> c.getDiscordId().equals(Long.toUnsignedString(discordId)))
             .findFirst()
             .orElse(null);

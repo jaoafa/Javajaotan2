@@ -43,17 +43,18 @@ public class DiscordMinecraftLink {
         }
         Connection conn = manager.getConnection();
         String sql = "SELECT * FROM discordlink WHERE disid = ?";
+        DiscordMinecraftLink link = null;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, Long.toString(discordId));
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
-                    DiscordMinecraftLink link = new DiscordMinecraftLink(res);
+                    link = new DiscordMinecraftLink(res);
 
                     if (link.isLinked()) return link;
                 }
             }
         }
-        return null;
+        return link;
     }
 
     public static DiscordMinecraftLink get(UUID uuid) throws SQLException {
@@ -63,17 +64,18 @@ public class DiscordMinecraftLink {
         }
         Connection conn = manager.getConnection();
         String sql = "SELECT * FROM discordlink WHERE uuid = ?";
+        DiscordMinecraftLink link = null;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, uuid.toString());
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
-                    DiscordMinecraftLink link = new DiscordMinecraftLink(res);
+                    link = new DiscordMinecraftLink(res);
 
                     if (link.isLinked()) return link;
                 }
             }
         }
-        return null;
+        return link;
     }
 
     private DiscordMinecraftLink(ResultSet res) throws SQLException {
@@ -90,7 +92,7 @@ public class DiscordMinecraftLink {
         this.disconnectAt = res.getTimestamp("dead_at");
         this.connectedAt = res.getTimestamp("date");
 
-        lastLogin = getLastLogin(this.minecraftUUID);
+        this.lastLogin = getLastLogin(this.minecraftUUID);
     }
 
     /**
@@ -286,6 +288,7 @@ public class DiscordMinecraftLink {
 
     /**
      * Minecraft アカウントを基準にすべての連携データを取得します。<br>
+     * {@link #isLinked()} が False なデータはこのリストに追加されません。<br>
      * 同じ UUID を持った連携データが複数ある場合は、最後に登録されたものが返されます。
      *
      * @return 連携データ
@@ -301,8 +304,9 @@ public class DiscordMinecraftLink {
         Connection conn = manager.getConnection();
         List<DiscordMinecraftLink> connections = new ArrayList<>();
         List<UUID> inserted = new ArrayList<>();
-        String sql = "SELECT * FROM discordlink ORDER BY id";
+        String sql = "SELECT * FROM discordlink WHERE disabled = ? ORDER BY id";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, false);
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
                     UUID uuid = UUID.fromString(res.getString("uuid"));
@@ -319,6 +323,7 @@ public class DiscordMinecraftLink {
 
     /**
      * Discord アカウントを基準にすべての連携データを取得します。<br>
+     * {@link #isLinked()} が False なデータはこのリストに追加されません。<br>
      * 同じ Discord ID を持った連携データが複数ある場合は、最後に登録されたものが返されます。
      *
      * @return 連携データ
@@ -334,8 +339,9 @@ public class DiscordMinecraftLink {
         Connection conn = manager.getConnection();
         List<DiscordMinecraftLink> connections = new ArrayList<>();
         List<String> inserted = new ArrayList<>();
-        String sql = "SELECT * FROM discordlink ORDER BY id";
+        String sql = "SELECT * FROM discordlink WHERE disabled = ? ORDER BY id";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, false);
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
                     String discordId = res.getString("disid");

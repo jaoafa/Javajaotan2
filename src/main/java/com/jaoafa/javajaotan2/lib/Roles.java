@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -24,6 +24,7 @@ public enum Roles {
     MailVerified(597421078817669121L),
     NeedSupport(786110419470254102L),
     SubAccount(753047225751568474L),
+    Nitrotan(795153241385861130L),
     FruitPlayers(598135930347323396L),
     SabamisoPlayers(598136046743715846L);
 

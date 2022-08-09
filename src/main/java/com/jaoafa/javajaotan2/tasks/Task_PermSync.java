@@ -13,10 +13,7 @@ package com.jaoafa.javajaotan2.tasks;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.Channels;
-import com.jaoafa.javajaotan2.lib.JavajaotanData;
-import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
-import com.jaoafa.javajaotan2.lib.MySQLDBManager;
+import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -35,9 +32,10 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.*;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
@@ -76,22 +74,13 @@ public class Task_PermSync implements Job {
             return;
         }
 
-        MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
+        List<DiscordMinecraftLink> connections;
         try {
-            conn = manager.getConnection();
+            connections = DiscordMinecraftLink.getAllForMinecraft();
         } catch (SQLException e) {
             e.printStackTrace();
             return;
         }
-
-        List<RunPermSync.MinecraftDiscordConnection> connections = getConnections();
-
-        if (connections == null) {
-            logger.warn("connections == null");
-            return;
-        }
-
-        Roles.setGuildAndRole(guild);
 
         Channel_General = Channels.general.getChannel();
         if (Channel_General == null) {
@@ -121,35 +110,6 @@ public class Task_PermSync implements Job {
             );
     }
 
-    private List<RunPermSync.MinecraftDiscordConnection> getConnections() {
-        List<RunPermSync.MinecraftDiscordConnection> connections = new ArrayList<>();
-        List<UUID> inserted = new ArrayList<>();
-        try {
-            try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM discordlink ORDER BY id DESC")) {
-                try (ResultSet res = stmt.executeQuery()) {
-                    while (res.next()) {
-                        if (inserted.contains(UUID.fromString(res.getString("uuid")))) continue;
-                        connections.add(new RunPermSync.MinecraftDiscordConnection(
-                            res.getString("player"),
-                            UUID.fromString(res.getString("uuid")),
-                            res.getString("disid"),
-                            res.getString("discriminator"),
-                            getLeastLogin(UUID.fromString(res.getString("uuid"))),
-                            res.getTimestamp("expired_date"),
-                            res.getTimestamp("dead_at"),
-                            res.getBoolean("disabled")
-                        ));
-                        inserted.add(UUID.fromString(res.getString("uuid")));
-                    }
-                }
-            }
-            return connections;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     private Timestamp getLeastLogin(UUID uuid) {
         try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM login WHERE uuid = ? AND login_success = ? ORDER BY id DESC LIMIT 1")) {
 
@@ -166,10 +126,10 @@ public class Task_PermSync implements Job {
     }
 
     class RunPermSync implements Runnable {
-        final List<MinecraftDiscordConnection> connections;
+        final List<DiscordMinecraftLink> connections;
         final Member member;
 
-        public RunPermSync(List<MinecraftDiscordConnection> connections, Member member) {
+        public RunPermSync(List<DiscordMinecraftLink> connections, Member member) {
             this.connections = connections;
             this.member = member;
         }
@@ -188,23 +148,23 @@ public class Task_PermSync implements Job {
                 member.getUser().getAsTag(),
                 member.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "))
             ));
-            MinecraftDiscordConnection mdc = connections
+            DiscordMinecraftLink dml = connections
                 .stream()
-                .filter(c -> c.disid().equals(member.getId()))
+                .filter(c -> c.getDiscordId().equals(member.getId()))
                 .findFirst()
                 .orElse(null);
 
-            boolean isRegular = JavajaotanLibrary.isGrantedRole(member, Roles.Regular.role);
-            boolean isCommunityRegular = JavajaotanLibrary.isGrantedRole(member, Roles.CommunityRegular.role);
-            boolean isVerified = JavajaotanLibrary.isGrantedRole(member, Roles.Verified.role);
-            boolean isMinecraftConnected = JavajaotanLibrary.isGrantedRole(member, Roles.MinecraftConnected.role);
-            boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.role);
-            boolean isNitrotan = JavajaotanLibrary.isGrantedRole(member, Roles.Nitrotan.role);
+            boolean isRegular = JavajaotanLibrary.isGrantedRole(member, Roles.Regular.getRole());
+            boolean isCommunityRegular = JavajaotanLibrary.isGrantedRole(member, Roles.CommunityRegular.getRole());
+            boolean isVerified = JavajaotanLibrary.isGrantedRole(member, Roles.Verified.getRole());
+            boolean isMinecraftConnected = JavajaotanLibrary.isGrantedRole(member, Roles.MinecraftConnected.getRole());
+            boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.getRole());
+            boolean isNitrotan = JavajaotanLibrary.isGrantedRole(member, Roles.Nitrotan.getRole());
 
             // Nitroの場合(gif画像がアイコンの場合)、Nitrotanを付与する
             if (member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && !isNitrotan) {
-                notifyConnection(member, "Nitrotan役職付与", "アイコンがGIF画像だったので、Nitrotan役職を付与しました。", Color.LIGHT_GRAY, mdc);
-                if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.role).queue();
+                notifyConnection(member, "Nitrotan役職付与", "アイコンがGIF画像だったので、Nitrotan役職を付与しました。", Color.LIGHT_GRAY, dml);
+                if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.getRole()).queue();
                 isNitrotan = true;
             }
             // Nitrotan役職がついていて、GIFアイコンでなく、アニメーション/外部絵文字の最終メッセージ送信日時が1週間前の場合、Nitrotan役職を剥奪する
@@ -212,15 +172,15 @@ public class Task_PermSync implements Job {
             long lastNitroAgo = nitrotan.has(member.getId()) ? new Date().getTime() - nitrotan.getLong(member.getId()) : -1;
             // 7日 * 24時間 * 60分 * 60秒 * 1000秒
             if (isNitrotan && !member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && (lastNitroAgo == -1 || lastNitroAgo > 7 * 24 * 60 * 60 * 1000)) {
-                notifyConnection(member, "Nitrotan役職剥奪", "アイコンがGIF画像ではなく、またアニメーション/外部絵文字を使用したメッセージが1週間以上前だったためNitrotan役職を剥奪しました。", Color.LIGHT_GRAY, mdc);
-                if (!dryRun) guild.removeRoleFromMember(member, Roles.Nitrotan.role).queue();
+                notifyConnection(member, "Nitrotan役職剥奪", "アイコンがGIF画像ではなく、またアニメーション/外部絵文字を使用したメッセージが1週間以上前だったためNitrotan役職を剥奪しました。", Color.LIGHT_GRAY, dml);
+                if (!dryRun) guild.removeRoleFromMember(member, Roles.Nitrotan.getRole()).queue();
             }
 
             String minecraftId;
             UUID uuid = null;
-            if (mdc != null) {
-                minecraftId = mdc.player();
-                uuid = mdc.uuid();
+            if (dml != null) {
+                minecraftId = dml.getMinecraftName();
+                uuid = dml.getMinecraftUUID();
                 logger.info("[%s] Minecraft link: %s (%s)".formatted(
                     member.getUser().getAsTag(),
                     minecraftId,
@@ -242,22 +202,22 @@ public class Task_PermSync implements Job {
 
             //giveRole,description,isMinecraftConnected
             BiFunction<Boolean, String, Boolean> doMinecraftConnectedManage = (giveRole, description) -> {
-                notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), description, Color.BLUE, mdc);
+                notifyConnection(member, "MinecraftConnected役職" + (giveRole ? "付与" : "剥奪"), description, Color.BLUE, dml);
                 if (!dryRun) {
                     if (giveRole) {
-                        guild.addRoleToMember(member, Roles.MinecraftConnected.role).queue();
+                        guild.addRoleToMember(member, Roles.MinecraftConnected.getRole()).queue();
                     } else {
-                        guild.removeRoleFromMember(member, Roles.MinecraftConnected.role).queue();
+                        guild.removeRoleFromMember(member, Roles.MinecraftConnected.getRole()).queue();
                     }
                 }
                 return true;
             };
 
-            if (mdc != null && !mdc.disabled() && !isMinecraftConnected) {
+            if (dml != null && dml.isLinked() && !isMinecraftConnected) {
                 // Minecraft-Discord Connectがなされていて、MinecraftConnected役職か付与されていない利用者に対して、MinecraftConnected役職を付与する
                 isMinecraftConnected = doMinecraftConnectedManage.apply(true, "linkがされていたため、MinecraftConnected役職を付与しました。");
             }
-            if ((mdc == null || mdc.disabled()) && isMinecraftConnected) {
+            if ((dml == null || !dml.isLinked()) && isMinecraftConnected) {
                 // Minecraft-Discord Connectがなされておらず、MinecraftConnected役職か付与されている利用者に対して、MinecraftConnected役職を剥奪する
                 isMinecraftConnected = doMinecraftConnectedManage.apply(false, "linkがされていなかったため、MinecraftConnected役職を剥奪しました。");
             }
@@ -265,22 +225,24 @@ public class Task_PermSync implements Job {
             if (isMinecraftConnected && uuid != null) {
                 // MinecraftConnected役職がついている場合、Verified, Regularの役職に応じて役職を付与する
 
-                PermissionGroupResult result = getPermissionGroup(uuid);
-                if (result == null) {
-                    logger.info("[%s] Minecraft Group: グループの取得に失敗".formatted(
-                        member.getUser().getAsTag()));
-                    return;
+                MinecraftPermGroup group = null;
+                try {
+                    group = new MinecraftPermGroup(uuid);
+                    logger.info("[%s] Minecraft Group: %s".formatted(
+                        member.getUser().getAsTag(), group.getGroup().name()));
+                    if (!group.isFound()) {
+                        group = null;
+                    }
+                } catch (SQLException e) {
+                    logger.error("[%s] Minecraft permission group error".formatted(member.getUser().getAsTag()), e);
                 }
-                logger.info("[%s] Minecraft Group: %s".formatted(
-                    member.getUser().getAsTag(), result.permissionGroup.name()));
-
-                if (!isVerified && result.permissionGroup == PermissionGroup.VERIFIED) {
-                    notifyConnection(member, "Verified役職付与", "Minecraft鯖内の権限に基づき、Verified役職を付与しました。", Color.CYAN, mdc);
-                    if (!dryRun) guild.addRoleToMember(member, Roles.Verified.role).queue();
+                if (!isVerified && group != null && group.getGroup() == MinecraftPermGroup.Group.VERIFIED) {
+                    notifyConnection(member, "Verified役職付与", "Minecraft鯖内の権限に基づき、Verified役職を付与しました。", Color.CYAN, dml);
+                    if (!dryRun) guild.addRoleToMember(member, Roles.Verified.getRole()).queue();
                 }
-                if (!isRegular && result.permissionGroup == PermissionGroup.REGULAR) {
-                    notifyConnection(member, "Regular役職付与", "Minecraft鯖内の権限に基づき、Regular役職を付与しました。", Color.CYAN, mdc);
-                    if (!dryRun) guild.addRoleToMember(member, Roles.Regular.role).queue();
+                if (!isRegular && group != null && group.getGroup() == MinecraftPermGroup.Group.REGULAR) {
+                    notifyConnection(member, "Regular役職付与", "Minecraft鯖内の権限に基づき、Regular役職を付与しました。", Color.CYAN, dml);
+                    if (!dryRun) guild.addRoleToMember(member, Roles.Regular.getRole()).queue();
                 }
             } else {
                 // MinecraftConnected役職がついていない場合、Verified, Community Regular, Regular役職を剥奪する
@@ -291,13 +253,13 @@ public class Task_PermSync implements Job {
                 if (isRegular) roles.add(Roles.Regular);
 
                 for (Roles role : roles) {
-                    notifyConnection(member, "%s役職剥奪".formatted(role.name()), "linkが解除されているため、%s役職を剥奪しました。".formatted(role.name()), Color.GREEN, mdc);
-                    if (!dryRun) guild.removeRoleFromMember(member, role.role).queue();
+                    notifyConnection(member, "%s役職剥奪".formatted(role.name()), "linkが解除されているため、%s役職を剥奪しました。".formatted(role.name()), Color.GREEN, dml);
+                    if (!dryRun) guild.removeRoleFromMember(member, role.getRole()).queue();
                 }
             }
         }
 
-        private void notifyConnection(Member member, String title, String description, Color color, MinecraftDiscordConnection mdc) {
+        private void notifyConnection(Member member, String title, String description, Color color, DiscordMinecraftLink dml) {
             TextChannel channel = Main.getJDA().getTextChannelById(891021520099500082L);
 
             if (channel == null) return;
@@ -307,104 +269,12 @@ public class Task_PermSync implements Job {
                 .setDescription(description)
                 .setColor(color)
                 .setAuthor(member.getUser().getAsTag(), "https://discord.com/users/" + member.getId(), member.getUser().getEffectiveAvatarUrl());
-            if (mdc != null) {
-                embed.addField("MinecraftDiscordConnection", "[%s](https://users.jaoafa.com/%s)".formatted(mdc.player(), mdc.uuid().toString()), false);
+            if (dml != null) {
+                embed.addField("MinecraftDiscordConnection", "[%s](https://users.jaoafa.com/%s)".formatted(dml.getMinecraftName(), dml.getMinecraftUUID().toString()), false);
             }
             if (dryRun) embed.setFooter("DRY-RUN MODE");
 
             channel.sendMessageEmbeds(embed.build()).queue();
-        }
-
-        private PermissionGroupResult getPermissionGroup(UUID uuid) {
-            try {
-                try (PreparedStatement statement = conn.prepareStatement("SELECT * FROM permissions WHERE uuid = ?")) {
-                    statement.setString(1, uuid.toString());
-                    try (ResultSet res = statement.executeQuery()) {
-                        if (!res.next()) {
-                            return null;
-                        }
-                        String permissionGroup = res.getString("permission");
-                        return new PermissionGroupResult(Arrays
-                            .stream(PermissionGroup.values())
-                            .filter(p -> p.name().equalsIgnoreCase(permissionGroup))
-                            .findFirst()
-                            .orElse(PermissionGroup.UNKNOWN),
-                            res.getTimestamp("expire_at") != null
-                        );
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        record MinecraftDiscordConnection(String player, UUID uuid, String disid, String discriminator,
-                                          Timestamp loginDate,
-                                          Timestamp expired_date, Timestamp dead_at, boolean disabled) {
-
-        }
-
-        enum PermissionGroup {
-            ADMIN,
-            MODERATOR,
-            REGULAR,
-            VERIFIED,
-            DEFAULT,
-            UNKNOWN
-        }
-
-        record PermissionGroupResult(PermissionGroup permissionGroup, boolean isTemporary) {
-        }
-    }
-
-    public enum Roles {
-        Regular(597405176189419554L, null),
-        CommunityRegular(888150763421970492L, null),
-        Verified(597405176969560064L, null),
-        MinecraftConnected(604011598952136853L, null),
-        MailVerified(597421078817669121L, null),
-        NeedSupport(786110419470254102L, null),
-        SubAccount(753047225751568474L, null),
-        Nitrotan(795153241385861130L, null),
-        Unknown(null, null);
-
-        private final Long id;
-        private Role role;
-
-        Roles(Long id, Role role) {
-            this.id = id;
-            this.role = role;
-        }
-
-        public void setRole(Role role) {
-            this.role = role;
-        }
-
-        /**
-         * Guildからロールを取得します
-         *
-         * @param guild 対象Guild
-         */
-        public static void setGuildAndRole(Guild guild) {
-            for (Roles role : Roles.values()) {
-                if (role.equals(Unknown)) continue;
-                role.setRole(guild.getRoleById(role.id));
-            }
-        }
-
-        /**
-         * 名前からロールを取得します
-         *
-         * @param name ロールの名前
-         *
-         * @return 取得したロール
-         */
-        public static Roles get(String name) {
-            return Arrays.stream(values())
-                .filter(role -> role.name().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(Roles.Unknown);
         }
     }
 }

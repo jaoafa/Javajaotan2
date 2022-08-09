@@ -299,7 +299,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -317,7 +317,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -334,7 +334,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -355,7 +355,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -372,7 +372,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -393,7 +393,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -410,7 +410,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -431,7 +431,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -448,7 +448,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param key          キー
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -469,7 +469,7 @@ public class CommandArgument {
      * 値がない場合は指定されたデフォルト値を返します。
      *
      * @param index        取得するインデックス
-     * @param defaultValue 値がない場合に返しますデフォルト値
+     * @param defaultValue 値がない場合に返すデフォルト値
      *
      * @return 指定されたインデックスの値、またはデフォルト値
      *
@@ -478,10 +478,14 @@ public class CommandArgument {
      * @see #getOptionalBoolean(String, boolean)
      */
     public boolean getOptionalBoolean(int index, boolean defaultValue) {
-        if (args.length <= index) {
+        if (args.length < index) {
             return defaultValue;
         }
-        return getBoolean(index);
+        try {
+            return getBoolean(index);
+        } catch (IllegalArgumentException e) {
+            return defaultValue;
+        }
     }
 
     /**

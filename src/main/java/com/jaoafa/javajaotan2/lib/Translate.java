@@ -67,19 +67,7 @@ public class Translate {
     }
 
     public static void executeTranslate(CommandEvent event, Language translateTo) {
-        Message message = event.getMessage();
-        String text = event.getArgs();
-        String displayText = JavajaotanLibrary.getContentDisplay(message, text);
-        Translate.TranslateResult result = Translate.translate(Translate.Language.UNKNOWN, translateTo, displayText);
-        if (result == null) {
-            message.reply("翻訳に失敗しました。").queue();
-            return;
-        }
-        event.reply("```%s```\n`%s` -> `%s`".formatted(
-            result.result(),
-            result.from().toString(),
-            result.to().toString()
-        ));
+        executeTranslate(event, new Language[]{translateTo});
     }
 
     public static void executeTranslate(CommandEvent event, Language[] translateTo) {

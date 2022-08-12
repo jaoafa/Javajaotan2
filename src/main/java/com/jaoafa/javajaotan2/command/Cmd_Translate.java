@@ -23,6 +23,7 @@ public class Cmd_Translate extends Command {
         this.name = "translate";
         this.help = "Google翻訳を用いて翻訳を行います。";
         this.arguments = "<from> <to> <Text...>";
+        this.aliases = new String[]{"to"};
     }
 
     @Override

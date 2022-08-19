@@ -137,6 +137,14 @@ public class Task_MemberOrganize implements Job {
 
         @Override
         public void run() {
+            try {
+                organizeMember();
+            } catch (Exception e) {
+                logger.error("Error in RunMemberOrganize", e);
+            }
+        }
+
+        void organizeMember() {
             Guild guild = member.getGuild();
             if (member.getUser().isBot()) {
                 logger.info("[%s] Bot".formatted(

@@ -136,6 +136,14 @@ public class Task_PermSync implements Job {
 
         @Override
         public void run() {
+            try {
+                runPermSync();
+            } catch (Exception e) {
+                logger.error("Error in RunPermSync", e);
+            }
+        }
+
+        void runPermSync() {
             Guild guild = member.getGuild();
             if (member.getUser().isBot()) {
                 logger.info("[%s] Bot".formatted(

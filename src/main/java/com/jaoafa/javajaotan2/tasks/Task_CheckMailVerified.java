@@ -1,7 +1,7 @@
 /*
  * jaoLicense
  *
- * Copyright (c) 2021 jao Minecraft Server
+ * Copyright (c) 2022 jao Minecraft Server
  *
  * The following license applies to this project: jaoLicense
  *
@@ -87,6 +87,14 @@ public class Task_CheckMailVerified implements Job {
 
         @Override
         public void run() {
+            try {
+                checkMailVerified();
+            } catch (Exception e) {
+                logger.error("Error in RunCheckMailVerified", e);
+            }
+        }
+
+        void checkMailVerified() {
             if (member.getUser().isBot()) {
                 logger.info("[%s] Bot".formatted(
                     member.getUser().getAsTag()

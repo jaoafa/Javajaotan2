@@ -15,6 +15,7 @@ import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -216,7 +217,11 @@ public class DiscordMinecraftLink {
         if (guild == null) {
             throw new IllegalStateException("Guild is null.");
         }
-        return guild.getMemberById(discordId);
+        Member member = guild.getMemberById(discordId);
+        if (member != null) {
+            return member;
+        }
+        return guild.retrieveMember(UserSnowflake.fromId(discordId)).complete();
     }
 
     /**

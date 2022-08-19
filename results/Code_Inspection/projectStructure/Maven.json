@@ -265,23 +265,23 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: ch.qos.logback:logback-classic:1.3.0-alpha16",
+      "ideaName": "Maven: ch.qos.logback:logback-classic:1.3.0-beta0",
       "unresolved": false,
       "groupId": "ch.qos.logback",
       "artifactId": "logback-classic",
-      "version": "1.3.0-alpha16",
-      "baseVersion": "1.3.0-alpha16",
+      "version": "1.3.0-beta0",
+      "baseVersion": "1.3.0-beta0",
       "type": "jar",
       "optional": false,
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: ch.qos.logback:logback-core:1.3.0-alpha16",
+      "ideaName": "Maven: ch.qos.logback:logback-core:1.3.0-beta0",
       "unresolved": false,
       "groupId": "ch.qos.logback",
       "artifactId": "logback-core",
-      "version": "1.3.0-alpha16",
-      "baseVersion": "1.3.0-alpha16",
+      "version": "1.3.0-beta0",
+      "baseVersion": "1.3.0-beta0",
       "type": "jar",
       "optional": false,
       "scope": "compile"

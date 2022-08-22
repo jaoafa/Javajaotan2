@@ -14,6 +14,7 @@ package com.jaoafa.javajaotan2;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.ContextMenu;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jaoafa.javajaotan2.lib.*;
 import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
@@ -115,7 +116,8 @@ public class Main {
                     GatewayIntent.MESSAGE_CONTENT,
                     GatewayIntent.GUILD_MESSAGE_TYPING,
                     GatewayIntent.DIRECT_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS
+                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                    GatewayIntent.GUILD_MESSAGE_REACTIONS
                 )
                 .setAutoReconnect(true)
                 .setBulkDeleteSplittingEnabled(false)
@@ -155,6 +157,7 @@ public class Main {
         builder.setOwnerId(config.getOwnerId());
 
         registerCommand(builder);
+        registerMenu(builder);
 
         // とりあえずスラッシュコマンドはサポートしない
 
@@ -302,6 +305,22 @@ public class Main {
                      IllegalAccessException | InvocationTargetException e) {
                 getLogger().error("%s: イベントの登録に失敗しました。".formatted(eventName));
                 e.printStackTrace();
+            }
+        }
+    }
+
+    static void registerMenu(CommandClientBuilder builder) {
+        final String commandPackage = "com.jaoafa.javajaotan2.menu";
+        Reflections reflections = new Reflections(commandPackage);
+        Set<Class<? extends ContextMenu>> subTypes = reflections.getSubTypesOf(ContextMenu.class);
+
+        for (Class<? extends ContextMenu> theClass : subTypes) {
+            try {
+                builder.addContextMenu(theClass.getDeclaredConstructor().newInstance());
+                getLogger().info("%s: メニューの登録に成功しました".formatted(theClass.getSimpleName()));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                getLogger().error("%s: メニューの登録に失敗しました".formatted(theClass.getSimpleName()));
             }
         }
     }

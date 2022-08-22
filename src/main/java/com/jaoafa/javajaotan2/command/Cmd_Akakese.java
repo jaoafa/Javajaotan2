@@ -16,7 +16,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.io.InputStream;
 
@@ -42,10 +43,10 @@ public class Cmd_Akakese extends Command {
         }
 
         MessageChannel channel = event.getChannel();
-        MessageAction action = channel.sendMessage(user.getAsMention() + ", なンだおまえ!!!!帰れこのやろう!!!!!!!!人間の分際で!!!!!!!!寄るな触るな近づくな!!!!!!!!垢消せ!!!!垢消せ!!!!!!!! ┗(‘o’≡’o’)┛!!!!!!!!!!!!!!!! https://twitter.com/settings/accounts/confirm_deactivation");
+        MessageCreateAction action = channel.sendMessage(user.getAsMention() + ", なンだおまえ!!!!帰れこのやろう!!!!!!!!人間の分際で!!!!!!!!寄るな触るな近づくな!!!!!!!!垢消せ!!!!垢消せ!!!!!!!! ┗(‘o’≡’o’)┛!!!!!!!!!!!!!!!! https://twitter.com/settings/accounts/confirm_deactivation");
         InputStream akakeseStream = Main.class.getResourceAsStream("/images/akakese1_slow.gif");
         if (akakeseStream != null) {
-            action = action.addFile(akakeseStream, "akakese.gif");
+            action = action.addFiles(FileUpload.fromData(akakeseStream, "akakese.gif"));
         }
         action.queue();
     }

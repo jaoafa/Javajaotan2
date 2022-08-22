@@ -18,7 +18,6 @@ import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import com.jaoafa.javajaotan2.lib.MySQLDBManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -27,6 +26,8 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -168,7 +169,7 @@ public class Event_MeetingVote extends ListenerAdapter {
         embed.addField("決議ボーダー", "この投票の決議ボーダーは %d です。".formatted(getVoteBorderFromContent(content, 0)), false);
         channel
             .sendMessageEmbeds(embed.build())
-            .reference(message)
+            .setMessageReference(message)
             .mentionRepliedUser(false)
             .queue();
     }
@@ -194,7 +195,7 @@ public class Event_MeetingVote extends ListenerAdapter {
         Message message = event.retrieveMessage().complete();
         if (VoteReaction.multipleVote(message, user)) {
             event.getReaction().removeReaction(user).queue();
-            Message replyMessage = new MessageBuilder()
+            MessageCreateData replyMessage = new MessageCreateBuilder()
                 .setContent(user.getAsMention())
                 .setEmbeds(new EmbedBuilder()
                     .setDescription("賛成・反対・白票はいずれか一つのみリアクションしてください！変更する場合はすでにつけているリアクションを外してからリアクションしてください。")
@@ -204,7 +205,7 @@ public class Event_MeetingVote extends ListenerAdapter {
             event
                 .getChannel()
                 .sendMessage(replyMessage)
-                .reference(message)
+                .setMessageReference(message)
                 .mentionRepliedUser(false)
                 .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
                 .flatMap(Message::delete)
@@ -645,8 +646,8 @@ public class Event_MeetingVote extends ListenerAdapter {
             .setTimestamp(Instant.now());
         message
             .getChannel()
-            .sendMessage(new MessageBuilder().setContent(non_voters_mention).setEmbeds(embed.build()).build())
-            .reference(message)
+            .sendMessage(new MessageCreateBuilder().setContent(non_voters_mention).setEmbeds(embed.build()).build())
+            .setMessageReference(message)
             .mentionRepliedUser(false)
             .queue();
         VoteReaction.REMIND.addReaction(message);

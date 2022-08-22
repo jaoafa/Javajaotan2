@@ -51,6 +51,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class Main {
+    static final String PREFIX = "/";
+
     static boolean isUserDevelopMode = false;
     static boolean isGuildDevelopMode = false;
     static long developUserId;
@@ -61,6 +63,8 @@ public class Main {
     static JSONArray commands;
     static WatchEmojis watchEmojis;
     static ScheduledExecutorService scheduler;
+    private static CommandClientBuilder builder;
+    private static String prefix;
 
     public static void main(String[] args) {
         logger.info("Starting Javajaotan2...");
@@ -146,11 +150,18 @@ public class Main {
     static CommandClient getCommandClient() {
         CommandClientBuilder builder = new CommandClientBuilder();
 
-        final String prefix = "/";
-        builder.setPrefix(prefix);
+        builder.setPrefix(PREFIX);
         builder.setActivity(null);
         builder.setOwnerId(config.getOwnerId());
 
+        registerCommand(builder);
+
+        // とりあえずスラッシュコマンドはサポートしない
+
+        return builder.build();
+    }
+
+    static void registerCommand(CommandClientBuilder builder) {
         final String commandPackage = "com.jaoafa.javajaotan2.command";
         Reflections reflections = new Reflections(commandPackage);
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
@@ -207,7 +218,7 @@ public class Main {
                 }
 
                 sb.append("- `")
-                    .append(prefix)
+                    .append(PREFIX)
                     .append(command.getName());
                 if (!arguments.contains("\n")) {
                     sb.append(" ").append(arguments);
@@ -226,7 +237,7 @@ public class Main {
                         if (action.contains(": ")) {
                             String[] split = action.split(": ");
                             sb.append("  - `")
-                                .append(prefix)
+                                .append(PREFIX)
                                 .append(command.getName())
                                 .append(" ")
                                 .append(split[0])
@@ -236,7 +247,7 @@ public class Main {
                         } else {
                             // 説明なしのアクション？
                             sb.append("  - `")
-                                .append(prefix)
+                                .append(PREFIX)
                                 .append(command.getName())
                                 .append(" ")
                                 .append(action)
@@ -261,10 +272,6 @@ public class Main {
                 t -> message.reply("ヘルプメッセージをDMに送信できませんでした。DM受取設定などをご確認ください。").queue()
             );
         });
-
-        // とりあえずスラッシュコマンドはサポートしない
-
-        return builder.build();
     }
 
     static void registerEvent(JDABuilder jdaBuilder) {

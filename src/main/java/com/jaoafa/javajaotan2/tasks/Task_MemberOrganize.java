@@ -15,11 +15,11 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
@@ -199,7 +199,7 @@ public class Task_MemberOrganize implements Job {
                         .setDescription(description)
                         .setColor(Color.RED)
                         .setFooter("サーバ参加日時: %s".formatted(joinedTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                    Channel_General.sendMessage(new MessageBuilder()
+                    Channel_General.sendMessage(new MessageCreateBuilder()
                         .setEmbeds(embed.build())
                         .setContent("<@%s> (%s)".formatted(member.getId(), member.getUser().getAsTag()))
                         .build()
@@ -299,7 +299,7 @@ public class Task_MemberOrganize implements Job {
                             ))
                             .setColor(Color.YELLOW)
                             .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                        Channel_General.sendMessage(new MessageBuilder()
+                        Channel_General.sendMessage(new MessageCreateBuilder()
                             .setEmbeds(embed.build())
                             .setContent("<@%s>".formatted(member.getId()))
                             .build()
@@ -321,7 +321,7 @@ public class Task_MemberOrganize implements Job {
                             ))
                             .setColor(Color.RED)
                             .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                        Channel_General.sendMessage(new MessageBuilder()
+                        Channel_General.sendMessage(new MessageCreateBuilder()
                             .setEmbeds(embed.build())
                             .setContent("<@%s>".formatted(member.getId()))
                             .build()

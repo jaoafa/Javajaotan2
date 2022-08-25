@@ -210,12 +210,12 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: org.xerial:sqlite-jdbc:3.39.2.0",
+      "ideaName": "Maven: org.xerial:sqlite-jdbc:3.39.2.1",
       "unresolved": false,
       "groupId": "org.xerial",
       "artifactId": "sqlite-jdbc",
-      "version": "3.39.2.0",
-      "baseVersion": "3.39.2.0",
+      "version": "3.39.2.1",
+      "baseVersion": "3.39.2.1",
       "type": "jar",
       "optional": false,
       "scope": "compile"

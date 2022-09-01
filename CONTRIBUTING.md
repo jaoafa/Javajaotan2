@@ -68,7 +68,7 @@ Eclipse などでも開発できますが、開発のサポートは IntelliJ ID
 
 - コマンド・機能の開発を始める前に、次の作業を実施してください。
   - **`upstream/master` からリベースプルを行い、最新の状態に更新する**
-  - **[Projects](https://github.com/jaoafa/Javajaotan2/projects/1) で、該当する看板があれば `In Progress` に移動する**
+  - **[Projects](https://github.com/jaoafa/Javajaotan2/projects/1) で、該当する看板があれば `🚧 作業中` に移動する**
   - 必要に応じて、ブランチを分ける  
     （ブランチを分けることで同時に複数のコマンド・機能を開発できます。この際 `upstream/master` を元としてブランチを作成してください）
   - 必要に応じて、該当する Issue の `Assignees` に自分を追加する

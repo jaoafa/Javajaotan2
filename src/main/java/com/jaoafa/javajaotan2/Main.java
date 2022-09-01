@@ -189,6 +189,13 @@ public class Main {
         }
         builder.addCommands(commands.toArray(new Command[0]));
 
+        // localhost:31002 でホストされるコマンド一覧APIへのコマンド登録
+        // Javajaotan無印で実装済みコマンドを取得する関係上、暫定的にコマンド名のみを返す
+        Main.commands = new JSONArray();
+        for (Command command : commands) {
+            Main.commands.put(new JSONObject().put("name", command.getName()));
+        }
+
         builder.setHelpWord("jaotanhelp");
         /*
         `this.arguments` の値は以下の3種類

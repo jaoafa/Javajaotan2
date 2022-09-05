@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class Event_AntiEnEn extends ListenerAdapter {
-    List<String> targetEmojis = List.of(
-        "1016289682763558972", // :enen:
-        "1016289682763558972" // :hin:
+    List<Long> targetEmojis = List.of(
+        1016289682763558972L, // :enen:
+        1016289682763558972L // :hin:
     );
     long cryingRoomId = 858282427746877440L;
 
@@ -42,7 +42,7 @@ public class Event_AntiEnEn extends ListenerAdapter {
         Mentions mentions = event.getMessage().getMentions(); // getMentionsでカスタム絵文字を取得できる
         List<CustomEmoji> customEmojis = mentions.getCustomEmojis();
 
-        if (customEmojis.stream().noneMatch(e -> targetEmojis.contains(e.getId()))) {
+        if (customEmojis.stream().noneMatch(e -> targetEmojis.contains(e.getIdLong()))) {
             return;
         }
 

@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Event_VCSpeechLogLink extends ListenerAdapter {
-    final Pattern messageUrlPattern = Pattern.compile("^https://.*?discord\\.com/channels/(\\d+)/(\\d+)/(\\d+)\\??(.*)$", Pattern.CASE_INSENSITIVE);
+    final Pattern messageUrlPattern = Pattern.compile("^https://.*?discord(?:app)?\\.com/channels/(\\d+)/(\\d+)/(\\d+)\\??(.*)$", Pattern.CASE_INSENSITIVE);
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {

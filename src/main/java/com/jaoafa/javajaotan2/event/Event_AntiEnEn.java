@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Event_AntiEnEn extends ListenerAdapter {
     List<Long> targetEmojis = List.of(
@@ -44,8 +43,6 @@ public class Event_AntiEnEn extends ListenerAdapter {
         Mentions mentions = event.getMessage().getMentions(); // getMentionsでカスタム絵文字を取得できる
         List<CustomEmoji> customEmojis = mentions.getCustomEmojis();
         String content = event.getMessage().getContentRaw();
-
-        System.out.println(customEmojis.stream().map(CustomEmoji::getIdLong).collect(Collectors.toList()));
 
         if (customEmojis.stream().noneMatch(e -> targetEmojis.contains(e.getIdLong())) && !content.equals("えんえん") && !content.equals("ひーん")) {
             return;

@@ -21,11 +21,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Event_AntiEnEn extends ListenerAdapter {
     List<Long> targetEmojis = List.of(
-        1016289682763558972L, // :enen:
-        1016289682763558972L // :hin:
+        1001788329756475433L, // :enen:
+        1001788332939939901L // :hin:
     );
     long cryingRoomId = 858282427746877440L;
 
@@ -39,10 +40,14 @@ public class Event_AntiEnEn extends ListenerAdapter {
         if (member == null) return;
 
         // メッセージ内に該当絵文字が存在するか
+        // または「えんえん」「ひーん」単独で打ち込んだか
         Mentions mentions = event.getMessage().getMentions(); // getMentionsでカスタム絵文字を取得できる
         List<CustomEmoji> customEmojis = mentions.getCustomEmojis();
+        String content = event.getMessage().getContentRaw();
 
-        if (customEmojis.stream().noneMatch(e -> targetEmojis.contains(e.getIdLong()))) {
+        System.out.println(customEmojis.stream().map(CustomEmoji::getIdLong).collect(Collectors.toList()));
+
+        if (customEmojis.stream().noneMatch(e -> targetEmojis.contains(e.getIdLong())) && !content.equals("えんえん") && !content.equals("ひーん")) {
             return;
         }
 

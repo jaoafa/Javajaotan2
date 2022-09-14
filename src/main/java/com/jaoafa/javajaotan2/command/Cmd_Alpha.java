@@ -14,7 +14,7 @@ package com.jaoafa.javajaotan2.command;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.lib.CommandArgument;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.util.Arrays;
 import java.util.Collections;

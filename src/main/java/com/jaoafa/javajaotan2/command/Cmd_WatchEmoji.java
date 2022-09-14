@@ -19,6 +19,10 @@ import com.jaoafa.javajaotan2.lib.CommandWithActions;
 import com.jaoafa.javajaotan2.lib.WatchEmojis;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.*;
+import net.dv8tion.jda.api.entities.channel.attribute.*;
+import net.dv8tion.jda.api.entities.channel.middleman.*;
+import net.dv8tion.jda.api.entities.channel.concrete.*;
 
 import java.util.List;
 import java.util.Optional;

@@ -121,11 +121,11 @@
           "type": "Library"
         },
         {
-          "name": "Maven: ch.qos.logback:logback-classic:1.4.0",
+          "name": "Maven: ch.qos.logback:logback-classic:1.4.1",
           "type": "Library"
         },
         {
-          "name": "Maven: ch.qos.logback:logback-core:1.4.0",
+          "name": "Maven: ch.qos.logback:logback-core:1.4.1",
           "type": "Library"
         },
         {

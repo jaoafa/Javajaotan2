@@ -139,15 +139,15 @@
       ]
     },
     {
-      "name": "Maven: ch.qos.logback:logback-classic:1.4.0",
+      "name": "Maven: ch.qos.logback:logback-classic:1.4.1",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-classic/1.4.0/logback-classic-1.4.0.jar!/"
+        "jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-classic/1.4.1/logback-classic-1.4.1.jar!/"
       ]
     },
     {
-      "name": "Maven: ch.qos.logback:logback-core:1.4.0",
+      "name": "Maven: ch.qos.logback:logback-core:1.4.1",
       "roots": [
-        "jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-core/1.4.0/logback-core-1.4.0.jar!/"
+        "jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-core/1.4.1/logback-core-1.4.1.jar!/"
       ]
     },
     {

@@ -265,23 +265,23 @@
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: ch.qos.logback:logback-classic:1.4.0",
+      "ideaName": "Maven: ch.qos.logback:logback-classic:1.4.1",
       "unresolved": false,
       "groupId": "ch.qos.logback",
       "artifactId": "logback-classic",
-      "version": "1.4.0",
-      "baseVersion": "1.4.0",
+      "version": "1.4.1",
+      "baseVersion": "1.4.1",
       "type": "jar",
       "optional": false,
       "scope": "compile"
     },
     {
-      "ideaName": "Maven: ch.qos.logback:logback-core:1.4.0",
+      "ideaName": "Maven: ch.qos.logback:logback-core:1.4.1",
       "unresolved": false,
       "groupId": "ch.qos.logback",
       "artifactId": "logback-core",
-      "version": "1.4.0",
-      "baseVersion": "1.4.0",
+      "version": "1.4.1",
+      "baseVersion": "1.4.1",
       "type": "jar",
       "optional": false,
       "scope": "compile"

@@ -12,7 +12,7 @@
 package com.jaoafa.javajaotan2.lib;
 
 import com.jaoafa.javajaotan2.Main;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.Nullable;
 
 public enum Channels {

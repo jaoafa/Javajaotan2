@@ -17,7 +17,7 @@ import com.jaoafa.javajaotan2.Main;
 import com.jaoafa.javajaotan2.lib.CommandArgument;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.regex.Matcher;

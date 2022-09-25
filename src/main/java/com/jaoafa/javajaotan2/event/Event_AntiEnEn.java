@@ -14,7 +14,7 @@ package com.jaoafa.javajaotan2.event;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Mentions;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -23,11 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class Event_AntiEnEn extends ListenerAdapter {
-    List<Long> targetEmojis = List.of(
+    final List<Long> targetEmojis = List.of(
         1001788329756475433L, // :enen:
         1001788332939939901L // :hin:
     );
-    long cryingRoomId = 858282427746877440L;
+    final long cryingRoomId = 858282427746877440L;
 
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;

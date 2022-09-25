@@ -12,6 +12,7 @@
 package com.jaoafa.javajaotan2.lib;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 
 import java.util.regex.Matcher;

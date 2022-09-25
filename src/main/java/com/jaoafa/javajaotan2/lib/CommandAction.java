@@ -175,8 +175,6 @@ public class CommandAction {
      *
      * @param cmd   呼び出し元のコマンド定義（this）
      * @param event CommandEvent
-     *
-     * @return 実行できたかどうか
      */
     public static void execute(CommandWithActions cmd, CommandEvent event) {
         Message message = event.getMessage();

@@ -1,1 +1,187 @@
-{"version":"3","listProblem":[]}
+{"version":"3","listProblem":[{
+  "tool": "Code Inspection",
+  "category": "Python",
+  "type": "An invalid interpreter",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "No Python interpreter configured for the project",
+  "detailsInfo": "Reports problems if there is no Python interpreter configured for the project or if the interpreter is invalid. Without a properly\nconfigured interpreter, you cannot execute your Python scripts and benefit from some Python code insight features.\n\nThe IDE provides quick access to the interpreter settings.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/resources/external_scripts/gentext/main.py",
+      "language": "Python",
+      "line": 1,
+      "offset": 1,
+      "length": 3003,
+      "code": {
+        "startLine": 1,
+        "length": 3003,
+        "offset": 0,
+        "surroundingCode": "import argparse\nimport os\nimport time\nfrom concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed\n\nimport markovify\n\nparser = argparse.ArgumentParser(description='gentextコマンドで使用するマルコフ連鎖による文章生成スクリプト')\nparser.add_argument(\n    \"--source\",\n    default=\"default.json\",\n    help='文章ソースとするJSONファイル'\n)\nparser.add_argument(\n    \"--count\",\n    type=int,\n    default=1,\n    help='いくつ文章を生成するか',\n)\nparser.add_argument(\n    \"--long-generate\",\n    action='store_false',\n    help='文章生成時に文字数制限をしないか',\n)\n\n\ndef generate(model, long_generate=False):\n    if long_generate:\n        sentence = model.make_sentence()\n    else:\n        sentence = model.make_short_sentence(140)\n\n    if sentence is None:\n        if long_generate:\n            sentence = model.make_sentence()\n        else:\n            sentence = model.make_short_sentence(140)\n\n    if sentence is None:\n        return None\n\n    return \"\".join(sentence.split())\n\n\nif __name__ == '__main__':\n    before_time = time.time()\n\n    args = parser.parse_args()\n    filename = args.source\n    generate_count = args.count\n    if generate_count > 100:\n        print(\"[ERROR] CANNOT SET GENERATE COUNT MORE THAN 100.\")\n        exit(1)\n\n    if not filename.endswith(\".json\"):\n        filename = filename + \".json\"\n\n    if \"/\" in filename:\n        print(\"[ERROR] SOURCE FILE NAME IS NOT VALID.\")\n        exit(1)\n\n    path = os.path.dirname(os.path.abspath(__file__)) + \"/sources/\" + filename\n\n    if not os.path.exists(path):\n        print(\"[ERROR] SOURCE FILE ({}) IS NOT FOUND.\".format(filename))\n        exit(1)\n\n    with open(path, \"r\") as f:\n        text_model = markovify.NewlineText.from_json(f.read())\n\n    if generate_count == 1:\n        text = None\n        while text is None:\n            if args.long_generate:\n                text = text_model.make_sentence()\n            else:\n                text = text_model.make_short_sentence(140)\n        texts = [\"\".join(text.split())]\n    else:\n        with ProcessPoolExecutor() as executor:\n            futures = []\n            for i in range(generate_count):\n                futures.append(executor.submit(generate, text_model, args.long_generate))\n\n            texts = [f.result() for f in as_completed(futures)]\n\n    countFailed = len(list(filter(lambda x: x is None, texts)))\n    countDuplicated = len(list(set(filter(lambda x: x is not None, texts)))) - len(list(filter(lambda x: x is not None, texts)))\n\n    texts = set(filter(lambda x: x is not None, texts))\n\n    print(\"```\")\n    if len(\"\\n\".join(texts)) <= 1900:\n        print(\"\\n\".join(texts))\n    else:\n        print(\"\\n\".join(texts)[:1900])\n\n    print(\"\")\n\n    if len(\"\\n\".join(texts)) >= 1900:\n        print(\"※Discordの文字数制限回避のため、一部の結果が削られています。\")\n\n    if countFailed > 0:\n        print(\"※\" + str(countFailed) + \"回、生成に失敗しました。\")\n\n    if countDuplicated > 0:\n        print(\"※\" + str(countDuplicated) + \"回、被りました。\")\n\n    after_time = time.time()\n    print(\"※処理時間: \" + str(format(after_time - before_time, '.3f')) + \"秒\")\n\n    print(\"```\")\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "PyInterpreterInspection"
+  },
+  "hash": "c142fb0e3d50e1213483b41128804cef7a5c0036dc45d73093310fdc01610f47"
+},{
+  "tool": "Code Inspection",
+  "category": "Python",
+  "type": "An invalid interpreter",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "No Python interpreter configured for the project",
+  "detailsInfo": "Reports problems if there is no Python interpreter configured for the project or if the interpreter is invalid. Without a properly\nconfigured interpreter, you cannot execute your Python scripts and benefit from some Python code insight features.\n\nThe IDE provides quick access to the interpreter settings.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/resources/external_scripts/getguildmembers/main.py",
+      "language": "Python",
+      "line": 1,
+      "offset": 1,
+      "length": 1067,
+      "code": {
+        "startLine": 1,
+        "length": 1067,
+        "offset": 0,
+        "surroundingCode": "import argparse\nimport json\nimport os\n\nimport requests\n\nparser = argparse.ArgumentParser(description='Guildメンバーを取得します')\nparser.add_argument(\n    \"--guild-id\",\n    required=True,\n    help='メンバーを取得する対象のGuild Id'\n)\nparser.add_argument(\n    \"--output\",\n    required=True,\n    help='出力先のファイルパス'\n)\n\ndef load_config():\n    if not os.path.exists(\"config.json\"):\n        return False\n    with open(\"config.json\") as f:\n        return json.load(f)\n\n\ndef get_guild_members(config, guild_id: str):\n    response = requests.get(\"https://discord.com/api/guilds/%s/members?limit=1000\" % guild_id, headers={\n        \"Authorization\": \"Bot %s\" % config[\"token\"]\n    })\n    return response.json()\n\n\ndef main(args: argparse.Namespace):\n    config = load_config()\n    if config is False:\n        print(\"[ERROR] config.json is not found\")\n        exit(1)\n\n    guildId = args.guild_id\n    output_path = args.output\n    members = get_guild_members(config, guildId)\n    with open(output_path, \"w\") as f:\n        json.dump(members, f)\n\n\nif __name__ == '__main__':\n    main(parser.parse_args())\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "PyInterpreterInspection"
+  },
+  "hash": "a75355b7d4651c13860d0fe560bc441f1caf88b6efd0d8fc458cafad71cbf9cb"
+},{
+  "tool": "Code Inspection",
+  "category": "Python",
+  "type": "Unresolved references",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "No module named 'argparse'",
+  "detailsInfo": "Reports references in your code that cannot be resolved.\n\nIn a dynamically typed language, this is possible in a limited number of cases.\n\nIf a reference type is unknown, then its attributes are not highlighted as unresolved even if you know that they should be:\n\n```\ndef print_string(s):\n  print(s.abc())\n```\n\nIn this code fragment `s` is always a string and `abc` should be highlighted as unresolved. However, `s`\ntype is inferred as `Any` and no warning is reported.\n\nThe IDE provides quick-fix actions to add missing references on-the-fly.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/resources/external_scripts/gentext/main.py",
+      "language": "Python",
+      "line": 1,
+      "offset": 8,
+      "length": 8,
+      "code": {
+        "startLine": 1,
+        "length": 8,
+        "offset": 7,
+        "surroundingCode": "import argparse\nimport os\nimport time"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "PyUnresolvedReferencesInspection"
+  },
+  "hash": "22f524215ece421605153ec08303e94b80abf8ea40026af8e9c9baf7711f8a05"
+},{
+  "tool": "Code Inspection",
+  "category": "Python",
+  "type": "Unresolved references",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "No module named 'os'",
+  "detailsInfo": "Reports references in your code that cannot be resolved.\n\nIn a dynamically typed language, this is possible in a limited number of cases.\n\nIf a reference type is unknown, then its attributes are not highlighted as unresolved even if you know that they should be:\n\n```\ndef print_string(s):\n  print(s.abc())\n```\n\nIn this code fragment `s` is always a string and `abc` should be highlighted as unresolved. However, `s`\ntype is inferred as `Any` and no warning is reported.\n\nThe IDE provides quick-fix actions to add missing references on-the-fly.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/resources/external_scripts/gentext/main.py",
+      "language": "Python",
+      "line": 2,
+      "offset": 8,
+      "length": 2,
+      "code": {
+        "startLine": 1,
+        "length": 2,
+        "offset": 23,
+        "surroundingCode": "import argparse\nimport os\nimport time\nfrom concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "PyUnresolvedReferencesInspection"
+  },
+  "hash": "712849abc0ef514786a2edfa02ff8f3a7915512bf59cb9c429c56ace32fa59d6"
+},{
+  "tool": "Code Inspection",
+  "category": "Python",
+  "type": "Unresolved references",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "No module named 'time'",
+  "detailsInfo": "Reports references in your code that cannot be resolved.\n\nIn a dynamically typed language, this is possible in a limited number of cases.\n\nIf a reference type is unknown, then its attributes are not highlighted as unresolved even if you know that they should be:\n\n```\ndef print_string(s):\n  print(s.abc())\n```\n\nIn this code fragment `s` is always a string and `abc` should be highlighted as unresolved. However, `s`\ntype is inferred as `Any` and no warning is reported.\n\nThe IDE provides quick-fix actions to add missing references on-the-fly.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/resources/external_scripts/gentext/main.py",
+      "language": "Python",
+      "line": 3,
+      "offset": 8,
+      "length": 4,
+      "code": {
+        "startLine": 1,
+        "length": 4,
+        "offset": 33,
+        "surroundingCode": "import argparse\nimport os\nimport time\nfrom concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "PyUnresolvedReferencesInspection"
+  },
+  "hash": "e583c51883bacfda3d2cfabf5dedbd2827aadafc9c7efc2d7af6d2ccd6b81419"
+},{
+  "tool": "Code Inspection",
+  "category": "Python",
+  "type": "Unresolved references",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "Unresolved reference 'concurrent'",
+  "detailsInfo": "Reports references in your code that cannot be resolved.\n\nIn a dynamically typed language, this is possible in a limited number of cases.\n\nIf a reference type is unknown, then its attributes are not highlighted as unresolved even if you know that they should be:\n\n```\ndef print_string(s):\n  print(s.abc())\n```\n\nIn this code fragment `s` is always a string and `abc` should be highlighted as unresolved. However, `s`\ntype is inferred as `Any` and no warning is reported.\n\nThe IDE provides quick-fix actions to add missing references on-the-fly.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "src/main/resources/external_scripts/gentext/main.py",
+      "language": "Python",
+      "line": 4,
+      "offset": 6,
+      "length": 10,
+      "code": {
+        "startLine": 2,
+        "length": 10,
+        "offset": 27,
+        "surroundingCode": "import os\nimport time\nfrom concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed\n\nimport markovify"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "project",
+    "inspectionName": "PyUnresolvedReferencesInspection"
+  },
+  "hash": "487212c16c386fd14b3dd0fe07fbb17ba713afea1d5ac8a3c34387e2dc21de82"
+}]}

@@ -214,6 +214,31 @@ public class CommandAction {
         return true;
     }
 
+    public static int getStartArgumentIndex(CommandWithActions cmd, CommandEvent event) {
+        return getStartArgumentIndex(event, 0, cmd.getActions());
+    }
+
+    private static int getStartArgumentIndex(CommandEvent event, int index, List<CommandAction> actions) {
+        CommandArgument args = new CommandArgument(event.getArgs());
+        if (!args.has(index)) {
+            return index;
+        }
+        String name = args.getString(index);
+        Optional<CommandAction> match = actions
+            .stream()
+            .filter(action -> action.getName().equalsIgnoreCase(name))
+            .findFirst();
+        if (match.isEmpty()) {
+            return index;
+        }
+        CommandAction action = match.get();
+        if (action.getAction() != null || action.getNamedAction() != null) {
+            return index + 1;
+        } else {
+            return getStartArgumentIndex(event, index + 1, action.getSubActions());
+        }
+    }
+
     public static String getArguments(List<CommandAction> actions) {
         List<String> commands = actions
             .stream()

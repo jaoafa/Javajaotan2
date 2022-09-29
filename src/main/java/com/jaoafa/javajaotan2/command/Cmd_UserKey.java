@@ -43,7 +43,7 @@ public class Cmd_UserKey extends CommandWithActions {
         if (checkStatusFailed(event)) return;
 
         Message message = event.getMessage();
-        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames, CommandAction.getStartArgumentIndex(this, event));
         String key = args.getString("key");
 
         UserKeyResult result = getUserKey(manager, key);
@@ -71,7 +71,7 @@ public class Cmd_UserKey extends CommandWithActions {
         if (checkStatusFailed(event)) return;
 
         Message message = event.getMessage();
-        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames, CommandAction.getStartArgumentIndex(this, event));
         String key = args.getString("key");
 
         try {

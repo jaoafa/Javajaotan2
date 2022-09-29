@@ -50,7 +50,7 @@ public class Cmd_WatchEmoji extends CommandWithActions {
         Guild guild = event.getGuild();
         Member member = event.getMember();
         Message message = event.getMessage();
-        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames, CommandAction.getStartArgumentIndex(this, event));
         if (!member.hasPermission(Permission.ADMINISTRATOR)) {
             message.reply("このコマンドを実行するには、サーバの管理者権限を持っている必要があります。").queue();
             return;

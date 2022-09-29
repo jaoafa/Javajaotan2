@@ -75,7 +75,7 @@ public class Cmd_GameRole extends CommandWithActions {
         Guild guild = event.getGuild();
         Member member = event.getMember();
         Message message = event.getMessage();
-        CommandArgument args = new CommandArgument(event.getArgs(), argNames);
+        CommandArgument args = new CommandArgument(event.getArgs(), argNames, CommandAction.getStartArgumentIndex(this, event));
 
         if (guild.getIdLong() != SERVER_ID) {
             message.reply("このサーバではこのコマンドは使用できません。").queue();

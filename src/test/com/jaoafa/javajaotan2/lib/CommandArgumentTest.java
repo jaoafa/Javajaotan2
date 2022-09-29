@@ -41,6 +41,41 @@ public class CommandArgumentTest {
     }
 
     /**
+     * Literal引数のあるシンプルな引数の解析テスト（読み飛ばしテスト）<br>
+     * <br>
+     * <code>test</code>と<code>info</code>がLiteral引数としてあるコマンドの際、<code>test info arg1 arg2 arg3</code>という引数が与えられた場合、以下の条件が満たされることを確認する。
+     *
+     * <ul>
+     *     <li>{@link CommandArgument#getArrayArgs()} が適切な配列を返すこと</li>
+     *     <li>{@link CommandArgument#getListArgs()} が適切なリストを返すこと</li>
+     *     <li>{@link CommandArgument#getStreamArgs()} が適切なストリームを返すこと</li>
+     *     <li>{@link CommandArgument#has(int)} が適切な値を返すこと</li>
+     *     <li>{@link CommandArgument#size()} が適切な値を返すこと</li>
+     *     <li>各引数において {@link CommandArgument#getString(int)} が適切な値を返すこと</li>
+     *     <li>引数範囲外のインデックスが指定された場合にIllegalArgumentExceptionが発生すること</li>
+     * </ul>
+     */
+    @Test
+    void simpleLiteralParseTest() {
+        int skipCount = 2; // Literal引数の数
+        CommandArgument args = new CommandArgument("test info arg1 arg2 arg3", skipCount);
+        Assertions.assertArrayEquals(new String[]{"arg1", "arg2", "arg3"}, args.getArrayArgs());
+        Assertions.assertLinesMatch(List.of("arg1", "arg2", "arg3"), args.getListArgs());
+        Assertions.assertLinesMatch(List.of("arg1", "arg2", "arg3"), args.getStreamArgs().toList());
+        Assertions.assertTrue(args.has(0));
+        Assertions.assertTrue(args.has(1));
+        Assertions.assertTrue(args.has(2));
+        Assertions.assertFalse(args.has(3));
+        Assertions.assertEquals(3, args.size());
+        Assertions.assertEquals("arg1", args.getString(0));
+        Assertions.assertEquals("arg2", args.getString(1));
+        Assertions.assertEquals("arg3", args.getString(2));
+
+        // 引数の範囲外インデックスを指定した場合はIllegalArgumentExceptionが発生しなければならない
+        Assertions.assertThrows(IllegalArgumentException.class, () -> args.getString(3));
+    }
+
+    /**
      * 一部がクォートされた引数の解析テスト<br>
      * <br>
      * <code>arg1 "a r g 2" arg3</code>という引数が与えられた場合、以下の条件が満たされることを確認する。
@@ -119,7 +154,7 @@ public class CommandArgumentTest {
      */
     @Test
     void simpleNamedTest() {
-        CommandArgument args = new CommandArgument("arg1 arg2 arg3", List.of("a", "b", "c"));
+        CommandArgument args = new CommandArgument("arg1 arg2 arg3", List.of("a", "b", "c"), 0);
         Assertions.assertArrayEquals(new String[]{"arg1", "arg2", "arg3"}, args.getArrayArgs());
         Assertions.assertEquals(3, args.size());
         Assertions.assertEquals("arg1", args.getString("a"));
@@ -141,7 +176,7 @@ public class CommandArgumentTest {
      */
     @Test
     void greedyNamedTest() {
-        CommandArgument args = new CommandArgument("a r g u m e n t", List.of("a", "b..."));
+        CommandArgument args = new CommandArgument("a r g u m e n t", List.of("a", "b..."), 0);
         Assertions.assertEquals("r g u m e n t", args.getString("b..."));
     }
 
@@ -215,7 +250,7 @@ public class CommandArgumentTest {
      */
     @Test
     void specifiedTypeNamedTest() {
-        CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2"));
+        CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2"), 0);
         Assertions.assertEquals("string", args.getString("string"));
         Assertions.assertEquals(0, args.getInt("int"));
         Assertions.assertEquals(2147483648L, args.getLong("long"));
@@ -323,7 +358,7 @@ public class CommandArgumentTest {
      */
     @Test
     void optionalNamedArgumentTest() {
-        CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2", "nothing"));
+        CommandArgument args = new CommandArgument("string 0 2147483648 1.0 true false", List.of("string", "int", "long", "double", "boolean1", "boolean2", "nothing"), 0);
 
         // 存在するインデックスの値を取得
         Assertions.assertEquals("string", args.getOptionalString("string", "default"));

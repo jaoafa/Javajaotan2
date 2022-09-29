@@ -13,7 +13,6 @@ class TranslateTest {
         try {
             Main.setConfig(new JavajaotanConfig());
         } catch (RuntimeException e) {
-            e.printStackTrace();
             return;
         }
         Translate.TranslateResult result = Translate.translate(
@@ -32,7 +31,6 @@ class TranslateTest {
         try {
             Main.setConfig(new JavajaotanConfig());
         } catch (RuntimeException e) {
-            e.printStackTrace();
             return;
         }
         Translate.TranslateResult result = Translate.translate(

@@ -20,13 +20,22 @@ import java.util.stream.Stream;
 public class CommandArgument {
     private final String[] args;
     private final List<String> argNames;
+    private final int argSkipCount;
 
     public CommandArgument(String command) {
+        this.argSkipCount = 0;
         this.args = parseArgument(command);
         this.argNames = Collections.emptyList();
     }
 
-    public CommandArgument(String command, List<String> argNames) {
+    public CommandArgument(String command, int argSkipCount) {
+        this.argSkipCount = argSkipCount;
+        this.args = parseArgument(command);
+        this.argNames = Collections.emptyList();
+    }
+
+    public CommandArgument(String command, List<String> argNames, int argSkipCount) {
+        this.argSkipCount = argSkipCount;
         this.args = parseArgument(command);
         this.argNames = argNames;
     }
@@ -38,7 +47,8 @@ public class CommandArgument {
         List<String> rawArgs = Arrays.stream(str.split(" "))
             .filter(s -> !s.isEmpty())
             .toList();
-        for (int i = 0; i < rawArgs.size(); i++) {
+        // Literal引数分をスキップする。
+        for (int i = argSkipCount; i < rawArgs.size(); i++) {
             String arg = rawArgs.get(i);
             if (!isQuoting && arg.startsWith("\"")) {
                 if (arg.endsWith("\"")) {

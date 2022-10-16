@@ -17,14 +17,11 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.ContextMenu;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jaoafa.javajaotan2.lib.*;
-import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
-import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
-import com.jaoafa.javajaotan2.tasks.Task_PermSync;
-import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
+import com.jaoafa.javajaotan2.tasks.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.json.JSONArray;
@@ -64,8 +61,6 @@ public class Main {
     static JSONArray commands;
     static WatchEmojis watchEmojis;
     static ScheduledExecutorService scheduler;
-    private static CommandClientBuilder builder;
-    private static String prefix;
 
     public static void main(String[] args) {
         logger.info("Starting Javajaotan2...");
@@ -362,6 +357,14 @@ public class Main {
             new TaskConfig(
                 Task_SyncOtherServerPerm.class,
                 "otherServerPermSync",
+                "javajaotan2",
+                DailyTimeIntervalScheduleBuilder
+                    .dailyTimeIntervalSchedule()
+                    .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
+                    .withInterval(30, DateBuilder.IntervalUnit.MINUTE)),
+            new TaskConfig(
+                Task_MeetingVote.class,
+                "meetingVote",
                 "javajaotan2",
                 DailyTimeIntervalScheduleBuilder
                     .dailyTimeIntervalSchedule()

@@ -224,7 +224,7 @@ public class Event_MeetingVote extends ListenerAdapter {
     /**
      * 全投票(ピン止めされているメッセージ)を処理する
      */
-    void processVotes() {
+    public void processVotes() {
         logger.info("processVote()");
         TextChannel channel = Channels.meeting_vote.getChannel();
         if (channel == null) {

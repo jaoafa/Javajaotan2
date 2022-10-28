@@ -60,6 +60,7 @@ public class Main {
     static JDA jda;
     static JSONArray commands;
     static WatchEmojis watchEmojis;
+    static WatchStickers watchStickers;
     static ScheduledExecutorService scheduler;
 
     public static void main(String[] args) {
@@ -133,6 +134,8 @@ public class Main {
         registerTask();
 
         watchEmojis = new WatchEmojis();
+
+        watchStickers = new WatchStickers();
 
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -494,6 +497,10 @@ public class Main {
 
     public static WatchEmojis getWatchEmojis() {
         return watchEmojis;
+    }
+
+    public static WatchStickers getWatchStickers() {
+        return watchStickers;
     }
 
     public static ScheduledExecutorService getScheduler() {

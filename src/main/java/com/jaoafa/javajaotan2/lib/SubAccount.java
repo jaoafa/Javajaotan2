@@ -44,6 +44,10 @@ public class SubAccount {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             exists = false;
         }
     }
@@ -58,6 +62,10 @@ public class SubAccount {
             this.user = member.getUser();
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             exists = false;
         }
     }
@@ -80,6 +88,9 @@ public class SubAccount {
             stmt.setLong(6, mainAccount.getUser().getIdLong());
             stmt.executeUpdate();
         } catch (SQLException e) {
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return false;
         }
         jMSGuild.addRoleToMember(UserSnowflake.fromId(user.getId()), SubAccountRole).queue();
@@ -99,6 +110,9 @@ public class SubAccount {
             stmt.setLong(1, user.getIdLong());
             stmt.executeUpdate();
         } catch (SQLException e) {
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return false;
         }
         jMSGuild.removeRoleFromMember(UserSnowflake.fromId(user.getId()), SubAccountRole).queue();
@@ -138,6 +152,9 @@ public class SubAccount {
             }
             return main;
         } catch (SQLException e) {
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     }
@@ -157,6 +174,9 @@ public class SubAccount {
             stmt_sub.close();
             return subAccounts;
         } catch (SQLException e) {
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     }

@@ -79,6 +79,10 @@ public class Task_PermSync implements Job {
             connections = DiscordMinecraftLink.getAllForMinecraft();
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
 
@@ -95,6 +99,10 @@ public class Task_PermSync implements Job {
             }
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
 
         ExecutorService service = Executors.newFixedThreadPool(10,
@@ -121,6 +129,10 @@ public class Task_PermSync implements Job {
             if (!result.next()) return null;
             else return result.getTimestamp("date");
         } catch (SQLException e) {
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     }
@@ -140,6 +152,10 @@ public class Task_PermSync implements Job {
                 runPermSync();
             } catch (Exception e) {
                 logger.error("Error in RunPermSync", e);
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(e);
+                }
             }
         }
 
@@ -243,6 +259,10 @@ public class Task_PermSync implements Job {
                     }
                 } catch (SQLException e) {
                     logger.error("[%s] Minecraft permission group error".formatted(member.getUser().getAsTag()), e);
+
+                    if (JavajaotanData.getRollbar() != null) {
+                        JavajaotanData.getRollbar().error(e);
+                    }
                 }
                 if (!isVerified && group != null && group.getGroup() == MinecraftPermGroup.Group.VERIFIED) {
                     notifyConnection(member, "Verified役職付与", "Minecraft鯖内の権限に基づき、Verified役職を付与しました。", Color.CYAN, dml);

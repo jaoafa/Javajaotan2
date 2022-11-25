@@ -31,6 +31,7 @@ public class JavajaotanConfig {
     String gasTranslateAPIUrl;
     String detectLanguageAPIToken;
     String githubAPIToken;
+    String rollbarAccessToken;
 
     public JavajaotanConfig() throws RuntimeException {
         logger = Main.getLogger();
@@ -57,6 +58,7 @@ public class JavajaotanConfig {
             gasTranslateAPIUrl = config.optString("gasTranslateAPIUrl");
             detectLanguageAPIToken = config.optString("detectLanguageAPIToken");
             githubAPIToken = config.optString("githubAPIToken");
+            rollbarAccessToken = config.optString("rollbarAccessToken");
 
             // -- データベース関連
             if (config.has("main_database")) {
@@ -146,5 +148,10 @@ public class JavajaotanConfig {
     @Nullable
     public String getGitHubAPIToken() {
         return githubAPIToken;
+    }
+
+    @Nullable
+    public String getRollbarAccessToken() {
+        return rollbarAccessToken;
     }
 }

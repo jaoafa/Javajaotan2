@@ -54,6 +54,10 @@ public class Event_UserDedDB extends ListenerAdapter {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 }

@@ -12,6 +12,7 @@
 package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -93,6 +94,10 @@ public class Event_CheckNitroEmoji extends ListenerAdapter {
             Files.writeString(path, object.toString());
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 

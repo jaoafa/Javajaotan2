@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.tasks;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -173,11 +174,19 @@ public class Task_SyncOtherServerPerm implements Job {
                     members.add(new GuildMember(array.getJSONObject(i)));
                 } catch (JSONException e) {
                     logger.warn(array.getJSONObject(i).toString(), e);
+
+                    if (JavajaotanData.getRollbar() != null) {
+                        JavajaotanData.getRollbar().error(e);
+                    }
                 }
             }
             return members;
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     }

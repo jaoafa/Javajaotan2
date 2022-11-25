@@ -95,6 +95,10 @@ public class Task_MemberOrganize implements Job {
             conn = manager.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
 
@@ -103,6 +107,10 @@ public class Task_MemberOrganize implements Job {
             connections = DiscordMinecraftLink.getAllForDiscord();
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
 
@@ -141,6 +149,10 @@ public class Task_MemberOrganize implements Job {
                 organizeMember();
             } catch (Exception e) {
                 logger.error("Error in RunMemberOrganize", e);
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(e);
+                }
             }
         }
 
@@ -330,6 +342,10 @@ public class Task_MemberOrganize implements Job {
                             dml.disconnect();
                         } catch (SQLException e) {
                             logger.warn("Failed to disconnect member: " + dml.getMinecraftUUID().toString(), e);
+
+                            if (JavajaotanData.getRollbar() != null) {
+                                JavajaotanData.getRollbar().error(e);
+                            }
                         }
                         guild.removeRoleFromMember(member, Roles.MinecraftConnected.getRole()).queue();
                         notified.resetNotified();
@@ -384,6 +400,10 @@ public class Task_MemberOrganize implements Job {
                     object = new JSONObject(Files.readString(path));
                 } catch (IOException e) {
                     logger.warn("grantDiscordPerm json load failed.", e);
+
+                    if (JavajaotanData.getRollbar() != null) {
+                        JavajaotanData.getRollbar().error(e);
+                    }
                     return false;
                 }
             }
@@ -410,6 +430,10 @@ public class Task_MemberOrganize implements Job {
                 Files.writeString(path, object.toString());
             } catch (IOException e) {
                 logger.warn("grantDiscordPerm json save failed.", e);
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(e);
+                }
             }
             return kicked;
         }
@@ -438,6 +462,10 @@ public class Task_MemberOrganize implements Job {
                     Files.writeString(path, object.toString());
                 } catch (IOException e) {
                     logger.warn("Notified.setNotified is failed.", e);
+
+                    if (JavajaotanData.getRollbar() != null) {
+                        JavajaotanData.getRollbar().error(e);
+                    }
                 }
             }
 
@@ -448,6 +476,10 @@ public class Task_MemberOrganize implements Job {
                     Files.writeString(path, object.toString());
                 } catch (IOException e) {
                     logger.warn("Notified.setNotified is failed.", e);
+
+                    if (JavajaotanData.getRollbar() != null) {
+                        JavajaotanData.getRollbar().error(e);
+                    }
                 }
             }
 
@@ -458,6 +490,10 @@ public class Task_MemberOrganize implements Job {
                         object = new JSONObject(Files.readString(path));
                     } catch (IOException e) {
                         e.printStackTrace();
+
+                        if (JavajaotanData.getRollbar() != null) {
+                            JavajaotanData.getRollbar().error(e);
+                        }
                     }
                 }
                 return object;

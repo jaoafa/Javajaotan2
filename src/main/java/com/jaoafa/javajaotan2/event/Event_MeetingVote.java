@@ -421,6 +421,10 @@ public class Event_MeetingVote extends ListenerAdapter {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -483,6 +487,10 @@ public class Event_MeetingVote extends ListenerAdapter {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -568,6 +576,10 @@ public class Event_MeetingVote extends ListenerAdapter {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -590,6 +602,10 @@ public class Event_MeetingVote extends ListenerAdapter {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     };

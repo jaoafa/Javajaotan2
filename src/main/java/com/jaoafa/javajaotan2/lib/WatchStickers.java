@@ -62,6 +62,10 @@ public class WatchStickers {
             }
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -72,6 +76,10 @@ public class WatchStickers {
             Files.writeString(file.toPath(), array.toString());
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 

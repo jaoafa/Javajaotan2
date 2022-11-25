@@ -18,12 +18,15 @@ import com.jagrosh.jdautilities.command.ContextMenu;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jaoafa.javajaotan2.lib.*;
 import com.jaoafa.javajaotan2.tasks.*;
+import com.rollbar.notifier.Rollbar;
+import com.rollbar.notifier.config.ConfigBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.internal.requests.RestActionImpl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.*;
@@ -38,6 +41,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -45,6 +50,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -100,6 +106,39 @@ public class Main {
             return;
         }
 
+        if (config.getRollbarAccessToken() != null) {
+            JavajaotanData.setRollbar(Rollbar.init(ConfigBuilder
+                .withAccessToken(config.getRollbarAccessToken())
+                .environment(getLocalHostName())
+                .codeVersion(Main.class.getPackage().getImplementationVersion())
+                .build()));
+
+            final Thread.UncaughtExceptionHandler prevHandler =
+                Thread.getDefaultUncaughtExceptionHandler();
+            Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+                e.printStackTrace();
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().critical(e);
+                }
+
+                if (prevHandler != null)
+                    prevHandler.uncaughtException(t, e);
+            });
+
+            final Consumer<? super Throwable> prevDefaultFailure = RestActionImpl.getDefaultFailure();
+            RestActionImpl.setDefaultFailure((e) -> {
+                e.printStackTrace();
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().critical(e);
+                }
+
+                if (prevDefaultFailure != null)
+                    prevDefaultFailure.accept(e);
+            });
+        }
+
         EventWaiter waiter = new EventWaiter();
         CommandClient client = getCommandClient();
 
@@ -125,6 +164,10 @@ public class Main {
             jda = jdabuilder.build().awaitReady();
         } catch (Exception e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().critical(e);
+            }
             return;
         }
 
@@ -183,6 +226,10 @@ public class Main {
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
                 getLogger().error("%s: コマンドの登録に失敗しました".formatted(cmdName));
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(throwable);
+                }
             }
         }
         builder.addCommands(commands.toArray(new Command[0]));
@@ -310,6 +357,10 @@ public class Main {
                      IllegalAccessException | InvocationTargetException e) {
                 getLogger().error("%s: イベントの登録に失敗しました。".formatted(eventName));
                 e.printStackTrace();
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(e);
+                }
             }
         }
     }
@@ -326,6 +377,10 @@ public class Main {
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
                 getLogger().error("%s: メニューの登録に失敗しました".formatted(theClass.getSimpleName()));
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(throwable);
+                }
             }
         }
     }
@@ -393,6 +448,10 @@ public class Main {
             }
         } catch (SchedulerException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -460,6 +519,14 @@ public class Main {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static String getLocalHostName() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            return "Unknown";
         }
     }
 

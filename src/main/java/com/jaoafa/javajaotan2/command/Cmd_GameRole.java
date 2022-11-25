@@ -387,6 +387,10 @@ public class Cmd_GameRole extends CommandWithActions {
             message.reply(
                 "ロールの作成に失敗しました: `%s`".formatted(e.getMessage())
             ).queue();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
         guild
@@ -412,6 +416,10 @@ public class Cmd_GameRole extends CommandWithActions {
                         Files.writeString(path, roles.toString());
                     } catch (IOException e) {
                         e.printStackTrace();
+
+                        if (JavajaotanData.getRollbar() != null) {
+                            JavajaotanData.getRollbar().error(e);
+                        }
                     }
                 },
                 e -> {
@@ -429,6 +437,10 @@ public class Cmd_GameRole extends CommandWithActions {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
         if (!games.has("emojis")) {
@@ -440,6 +452,10 @@ public class Cmd_GameRole extends CommandWithActions {
             Files.writeString(pathMessages, games.toString());
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -449,6 +465,10 @@ public class Cmd_GameRole extends CommandWithActions {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
         if (!games.has("messages")) {
@@ -462,6 +482,10 @@ public class Cmd_GameRole extends CommandWithActions {
             Files.writeString(pathMessages, games.toString());
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 
@@ -471,6 +495,10 @@ public class Cmd_GameRole extends CommandWithActions {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return;
         }
         if (!games.has("messages")) {

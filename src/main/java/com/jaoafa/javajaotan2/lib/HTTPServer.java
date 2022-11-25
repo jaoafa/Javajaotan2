@@ -44,6 +44,10 @@ public class HTTPServer extends Thread {
             server.start();
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 

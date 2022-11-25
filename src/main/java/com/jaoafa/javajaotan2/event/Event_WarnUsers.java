@@ -12,9 +12,10 @@
 package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.lib.Channels;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.json.JSONObject;
@@ -56,6 +57,10 @@ public class Event_WarnUsers extends ListenerAdapter {
             channel.sendMessageEmbeds(builder.build()).queue();
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 }

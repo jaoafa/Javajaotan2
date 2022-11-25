@@ -14,6 +14,7 @@ package com.jaoafa.javajaotan2.command;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import okhttp3.OkHttpClient;
@@ -111,6 +112,10 @@ public class Cmd_SearchImg extends Command {
             );
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     }

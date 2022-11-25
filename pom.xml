@@ -160,5 +160,10 @@
             <version>0.10.2</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.rollbar</groupId>
+            <artifactId>rollbar-java</artifactId>
+            <version>1.9.0</version>
+        </dependency>
     </dependencies>
 </project>

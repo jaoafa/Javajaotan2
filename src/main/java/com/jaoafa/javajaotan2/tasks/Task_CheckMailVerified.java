@@ -13,6 +13,7 @@ package com.jaoafa.javajaotan2.tasks;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import com.jaoafa.javajaotan2.lib.JavajaotanLibrary;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -91,6 +92,10 @@ public class Task_CheckMailVerified implements Job {
                 checkMailVerified();
             } catch (Exception e) {
                 logger.error("Error in RunCheckMailVerified", e);
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(e);
+                }
             }
         }
 
@@ -135,6 +140,10 @@ public class Task_CheckMailVerified implements Job {
                 object = new JSONObject(Files.readString(path));
             } catch (IOException e) {
                 logger.warn("grantDiscordPerm json load failed.", e);
+
+                if (JavajaotanData.getRollbar() != null) {
+                    JavajaotanData.getRollbar().error(e);
+                }
                 return;
             }
         }
@@ -159,6 +168,10 @@ public class Task_CheckMailVerified implements Job {
             Files.writeString(path, object.toString());
         } catch (IOException e) {
             logger.warn("grantDiscordPerm json save failed.", e);
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 

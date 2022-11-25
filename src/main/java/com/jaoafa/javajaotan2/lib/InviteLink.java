@@ -46,6 +46,9 @@ public record InviteLink(Guild guild) {
             Main.getLogger().info("Fetched Invite Links: %s -> %d count".formatted(guild.getName(), newInvites.size()));
             return true;
         } catch (Exception e) {
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return false;
         }
     }

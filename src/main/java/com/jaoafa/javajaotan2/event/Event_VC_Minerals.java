@@ -12,6 +12,7 @@
 package com.jaoafa.javajaotan2.event;
 
 import com.jaoafa.javajaotan2.Main;
+import com.jaoafa.javajaotan2.lib.JavajaotanData;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -65,6 +66,10 @@ public class Event_VC_Minerals extends ListenerAdapter {
             lastWarn = System.currentTimeMillis();
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 }

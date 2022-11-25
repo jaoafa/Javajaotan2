@@ -62,6 +62,10 @@ public class Translate {
             );
         } catch (IOException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
     }
@@ -134,6 +138,10 @@ public class Translate {
             return getLanguage(language);
         } catch (APIError e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return Language.UNKNOWN;
         }
     }

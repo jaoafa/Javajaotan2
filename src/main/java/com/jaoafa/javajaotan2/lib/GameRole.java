@@ -59,6 +59,10 @@ public class GameRole {
             roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return false;
         }
         return roles.toList().contains(role.getIdLong());
@@ -70,6 +74,10 @@ public class GameRole {
             roles = Files.exists(path) ? new JSONArray(Files.readString(path)) : new JSONArray();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
         return roles.toList().stream().map(Object::toString).collect(Collectors.toList());
@@ -82,6 +90,10 @@ public class GameRole {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return new ArrayList<>();
         }
         if (!games.has("emojis")) {
@@ -101,6 +113,10 @@ public class GameRole {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
         if (!games.has("emojis")) {
@@ -119,6 +135,10 @@ public class GameRole {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return null;
         }
         if (!games.has("emojis")) {
@@ -139,6 +159,10 @@ public class GameRole {
             games = Files.exists(pathMessages) ? new JSONObject(Files.readString(pathMessages)) : new JSONObject();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
             return false;
         }
         if (!games.has("messages")) {

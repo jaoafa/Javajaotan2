@@ -107,6 +107,10 @@ public class Cmd_UserKey extends CommandWithActions {
         } catch (SQLException e) {
             e.printStackTrace();
             message.reply("SQLException: " + e.getMessage()).queue();
+
+            if (JavajaotanData.getRollbar() != null) {
+                JavajaotanData.getRollbar().error(e);
+            }
         }
     }
 

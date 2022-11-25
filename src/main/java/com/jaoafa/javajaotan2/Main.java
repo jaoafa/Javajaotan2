@@ -22,6 +22,8 @@ import com.rollbar.notifier.Rollbar;
 import com.rollbar.notifier.config.ConfigBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -182,7 +184,12 @@ public class Main {
 
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
-        jda.getGuilds().forEach(g -> new InviteLink(g).fetchInvites());
+        jda.getGuilds().stream()
+            .filter(guild -> {
+                Member self = guild.getMember(jda.getSelfUser());
+                if (self == null) return false; // 自分がいないサーバは無視
+                return self.hasPermission(Permission.MANAGE_SERVER); // サーバ管理権限がないサーバは無視
+            }).forEach(g -> new InviteLink(g).fetchInvites());
 
         if (!isUserDevelopMode && !isGuildDevelopMode) {
             new HTTPServer().start();

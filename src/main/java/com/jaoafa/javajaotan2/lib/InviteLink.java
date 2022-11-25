@@ -31,7 +31,8 @@ public record InviteLink(Guild guild) {
     }
 
     public boolean fetchInvites() {
-        Main.getLogger().info("Fetching Invite Links...");
+        Main.getLogger().info("Fetching Invite Links...: " + guild.getName());
+
         List<GuildInvite> newInvites = new ArrayList<>();
         try {
             guild

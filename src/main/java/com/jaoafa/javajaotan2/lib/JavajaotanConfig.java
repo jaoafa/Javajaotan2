@@ -53,12 +53,12 @@ public class JavajaotanConfig {
             token = config.getString("token");
             guildId = config.optLong("guild_id", 597378876556967936L);
             ownerId = config.optLong("owner_id", 221991565567066112L);
-            gcpKey = config.optString("gcp_key");
-            customSearchCX = config.optString("customSearchCX");
-            gasTranslateAPIUrl = config.optString("gasTranslateAPIUrl");
-            detectLanguageAPIToken = config.optString("detectLanguageAPIToken");
-            githubAPIToken = config.optString("githubAPIToken");
-            rollbarAccessToken = config.optString("rollbarAccessToken");
+            gcpKey = config.optString("gcp_key", null);
+            customSearchCX = config.optString("customSearchCX", null);
+            gasTranslateAPIUrl = config.optString("gasTranslateAPIUrl", null);
+            detectLanguageAPIToken = config.optString("detectLanguageAPIToken", null);
+            githubAPIToken = config.optString("githubAPIToken", null);
+            rollbarAccessToken = config.optString("rollbarAccessToken", null);
 
             // -- データベース関連
             if (config.has("main_database")) {

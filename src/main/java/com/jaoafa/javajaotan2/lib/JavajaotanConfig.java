@@ -32,6 +32,7 @@ public class JavajaotanConfig {
     String detectLanguageAPIToken;
     String githubAPIToken;
     String rollbarAccessToken;
+    String twitterBearerToken;
 
     public JavajaotanConfig() throws RuntimeException {
         logger = Main.getLogger();
@@ -59,6 +60,7 @@ public class JavajaotanConfig {
             detectLanguageAPIToken = config.optString("detectLanguageAPIToken", null);
             githubAPIToken = config.optString("githubAPIToken", null);
             rollbarAccessToken = config.optString("rollbarAccessToken", null);
+            twitterBearerToken = config.optString("twitterBearerToken", null);
 
             // -- データベース関連
             if (config.has("main_database")) {
@@ -153,5 +155,10 @@ public class JavajaotanConfig {
     @Nullable
     public String getRollbarAccessToken() {
         return rollbarAccessToken;
+    }
+
+    @Nullable
+    public String getTwitterBearerToken() {
+        return twitterBearerToken;
     }
 }

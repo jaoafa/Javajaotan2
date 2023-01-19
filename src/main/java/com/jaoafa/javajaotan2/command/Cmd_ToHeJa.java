@@ -33,6 +33,6 @@ public class Cmd_ToHeJa extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        Translate.executeTranslate(event, translateTo);
+        Translate.executeTranslate(event, null, translateTo);
     }
 }

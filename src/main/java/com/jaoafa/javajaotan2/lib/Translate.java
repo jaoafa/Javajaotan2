@@ -18,6 +18,8 @@ import com.jaoafa.javajaotan2.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -30,11 +32,6 @@ public class Translate {
         String url = Main.getConfig().getGASTranslateAPIUrl();
         if (url == null) {
             throw new UndefinedTranslateAPIUrl();
-        }
-        if (before == Language.UNKNOWN) {
-            // 言語検出
-            before = detectLanguage(text);
-            if (before == Language.UNKNOWN) before = Language.AUTO;
         }
         try {
             OkHttpClient client = new OkHttpClient();
@@ -50,9 +47,6 @@ public class Translate {
             JSONObject object;
             try (Response response = client.newCall(request).execute()) {
                 ResponseBody body = response.body();
-                if (body == null) {
-                    return null;
-                }
                 object = new JSONObject(body.string());
             }
             return new TranslateResult(
@@ -70,11 +64,48 @@ public class Translate {
         }
     }
 
-    public static void executeTranslate(CommandEvent event, Language translateTo) {
-        executeTranslate(event, new Language[]{translateTo});
+    /**
+     * @deprecated 翻訳元言語を明示的に指定することを推奨します {@link #executeTranslate(CommandEvent, Language, Language)}
+     */
+    @Deprecated(forRemoval = true)
+    public static void executeTranslate(CommandEvent event, @NotNull Language translateTo) {
+        String displayText = JavajaotanLibrary.getContentDisplay(event.getMessage(), event.getArgs());
+        Translate.Language translateFrom = Translate.detectLanguage(displayText);
+        if (translateFrom == translateTo) {
+            event.reply("翻訳元言語と翻訳先言語が同じなため、翻訳できませんでした。");
+            return;
+        }
+        executeTranslate(event, translateFrom, new Language[]{translateTo});
     }
 
-    public static void executeTranslate(CommandEvent event, Language[] translateTo) {
+    public static void executeTranslate(CommandEvent event, @Nullable Language translateFrom, @NotNull Language translateTo) {
+        if (translateFrom == null) {
+            String displayText = JavajaotanLibrary.getContentDisplay(event.getMessage(), event.getArgs());
+            Translate.Language detectTranslateFrom = Translate.detectLanguage(displayText);
+            if (detectTranslateFrom == translateTo) {
+                event.reply("翻訳元言語と翻訳先言語が同じなため、翻訳できませんでした。");
+                return;
+            }
+            translateFrom = detectTranslateFrom;
+        }
+        executeTranslate(event, translateFrom, new Language[]{translateTo});
+    }
+
+    /**
+     * @deprecated 翻訳元言語を明示的に指定することを推奨します {@link #executeTranslate(CommandEvent, Language, Language[])}
+     */
+    @Deprecated(forRemoval = true)
+    public static void executeTranslate(CommandEvent event, @NotNull Language[] translateTo) {
+        String displayText = JavajaotanLibrary.getContentDisplay(event.getMessage(), event.getArgs());
+        Translate.Language translateFrom = Translate.detectLanguage(displayText);
+        if (translateFrom == translateTo[0]) {
+            event.reply("翻訳元言語と翻訳先言語が同じなため、翻訳できませんでした。");
+            return;
+        }
+        executeTranslate(event, translateFrom, translateTo);
+    }
+
+    public static void executeTranslate(CommandEvent event, @Nullable Language translateFrom, @NotNull Language[] translateTo) {
         Message message = event.getMessage();
         String text = event.getArgs();
         String displayText = JavajaotanLibrary.getContentDisplay(message, text);
@@ -85,10 +116,24 @@ public class Translate {
             .setTimestamp(Instant.now());
         Message sentMessage = message.replyEmbeds(builder.build()).complete();
 
-        Translate.Language prevLanguage = Translate.Language.UNKNOWN;
+        Language prevLanguage = translateFrom;
+        if (prevLanguage == null) {
+            prevLanguage = Translate.detectLanguage(displayText);
+        }
+        if (prevLanguage == translateTo[0]) {
+            sentMessage.editMessageEmbeds(
+                new EmbedBuilder()
+                    .setTitle("翻訳に失敗しました。")
+                    .setDescription("翻訳元言語と翻訳先言語が同じなため、翻訳できませんでした。")
+                    .setColor(Color.RED)
+                    .setTimestamp(Instant.now())
+                    .build()
+            ).queue();
+            return;
+        }
         String prevResult = displayText;
-        for (Translate.Language language : translateTo) {
-            Translate.TranslateResult result = Translate.translate(
+        for (Language language : translateTo) {
+            TranslateResult result = translate(
                 prevLanguage,
                 language,
                 prevResult
@@ -126,7 +171,8 @@ public class Translate {
         ).queue();
     }
 
-    static Language detectLanguage(String text) {
+    @Nullable
+    public static Language detectLanguage(String text) {
         DetectLanguage.apiKey = Main.getConfig().getDetectLanguageAPIToken();
         DetectLanguage.ssl = true;
         try {
@@ -142,7 +188,7 @@ public class Translate {
             if (JavajaotanData.getRollbar() != null) {
                 JavajaotanData.getRollbar().error(e);
             }
-            return Language.UNKNOWN;
+            return null;
         }
     }
 
@@ -152,12 +198,13 @@ public class Translate {
         }
     }
 
+    @Nullable
     public static Language getLanguage(String language) {
         try {
             return Language.valueOf(language.replace("-", "_").toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            return Language.UNKNOWN;
+            return null;
         }
     }
 
@@ -280,7 +327,8 @@ public class Translate {
         YI("イディッシュ語"),
         YO("ヨルバ語"),
         ZU("ズールー語"),
-        UNKNOWN(null);
+        // UNKNOWN(null),
+        ;
 
         final String language_name;
 

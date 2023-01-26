@@ -26,7 +26,7 @@ jobs:
           distribution: adopt
 
       - name: Qodana Scan
-        uses: JetBrains/qodana-action@v2022.3.0
+        uses: JetBrains/qodana-action@v2022.3.2
         with:
           upload-result: true
 

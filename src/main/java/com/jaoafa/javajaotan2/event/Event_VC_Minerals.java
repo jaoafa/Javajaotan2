@@ -59,7 +59,7 @@ public class Event_VC_Minerals extends ListenerAdapter {
             }
             event
                 .getMessage()
-                .reply(":warning: <#774232617624797214> <#597790849249574933>")
+                .reply(":arrow_right: <#774232617624797214>")
                 .delay(1, TimeUnit.MINUTES, Main.getScheduler()) // delete 1 minute later
                 .flatMap(Message::delete)
                 .queue();

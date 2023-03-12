@@ -21,7 +21,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class DiscordMinecraftLink {
     private final boolean isFound;
@@ -99,8 +98,6 @@ public class DiscordMinecraftLink {
 
     /**
      * この連携を解除します。
-     *
-     * @return
      *
      * @throws IllegalStateException 対象の連携が見つからない、または既に解除済みの場合
      */
@@ -308,23 +305,18 @@ public class DiscordMinecraftLink {
         }
         Connection conn = manager.getConnection();
         List<DiscordMinecraftLink> connections = new ArrayList<>();
-        String sql = "SELECT * FROM discordlink ORDER BY id";
+        String sql = "SELECT * FROM discordlink ORDER BY id DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
-                    connections.add(new DiscordMinecraftLink(res));
+                    DiscordMinecraftLink link = new DiscordMinecraftLink(res);
+                    if (connections.stream().anyMatch(c -> c.getMinecraftUUID().equals(link.getMinecraftUUID()))) {
+                        continue;
+                    }
+                    connections.add(link);
                 }
             }
         }
-        // 被りを排除する: Minecraft UUID が重複している場合は、最後に登録されたもの以外を削除する
-        connections = connections
-            .stream()
-            .filter(c -> c.getMinecraftUUID() != null)
-            .collect(Collectors.groupingBy(DiscordMinecraftLink::getMinecraftUUID))
-            .values()
-            .stream()
-            .map(l -> l.get(l.size() - 1))
-            .toList();
         return connections;
     }
 
@@ -344,23 +336,18 @@ public class DiscordMinecraftLink {
         }
         Connection conn = manager.getConnection();
         List<DiscordMinecraftLink> connections = new ArrayList<>();
-        String sql = "SELECT * FROM discordlink ORDER BY id";
+        String sql = "SELECT * FROM discordlink ORDER BY id DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet res = stmt.executeQuery()) {
                 while (res.next()) {
-                    connections.add(new DiscordMinecraftLink(res));
+                    DiscordMinecraftLink link = new DiscordMinecraftLink(res);
+                    if (connections.stream().anyMatch(c -> c.getDiscordId().equals(link.getDiscordId()))) {
+                        continue;
+                    }
+                    connections.add(link);
                 }
             }
         }
-        // 被りを排除する: Discord ID が重複している場合は、最後に登録されたもの以外を削除する
-        connections = connections
-            .stream()
-            .filter(c -> c.getDiscordId() != null)
-            .collect(Collectors.groupingBy(DiscordMinecraftLink::getDiscordId))
-            .values()
-            .stream()
-            .map(l -> l.get(l.size() - 1))
-            .toList();
         return connections;
     }
 }

@@ -76,7 +76,7 @@ public class Event_Greeting extends ListenerAdapter {
             return;
         }
         if (!jaoPlayers.contains(member.getIdLong())) {
-            message.addReaction(Emoji.fromUnicode("\u274C")).queue(); // x
+            message.addReaction(Emoji.fromUnicode("\u27A1")).queue(); // ->
             return;
         }
         guild.addRoleToMember(member, role).queue();

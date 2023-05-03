@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -53,13 +52,9 @@ import java.util.stream.Collectors;
  * - 参加してから1週間以内にlink・サブアカウント登録・サポートへの問い合わせがない場合はキックする
  * - 参加してから3週間後にサポート問い合わせのみの場合はキックする
  * - linkされているのに、Guildにいない利用者のlinkを解除する
- * - 最終ログインから2ヶ月が経過している場合、警告リプライを#generalで送信する
- * - 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する
  * - メインアカウントが1か月以上前に退出しているのにも関わらず、SubAccount役職がついている利用者から本役職を外す。
  * - SubAccount役職がついているのにサブアカウントではない場合、SubAccount役職を剥奪する
  * - サブアカウントなのにSubAccount役職がついていない場合、SubAccount役職を付与する
- * <p>
- * - 解除関連処理時、ExpiredDateが設定されている場合は、期限日は最終ログインから3ヶ月後かExpiredDateのいずれか遅い方を使用する
  * <p>
  */
 public class Task_MemberOrganize implements Job {
@@ -169,7 +164,6 @@ public class Task_MemberOrganize implements Job {
                 member.getUser().getAsTag(),
                 member.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "))
             ));
-            Notified notified = new Notified(member);
             DiscordMinecraftLink dml = connections
                 .stream()
                 .filter(c -> c.getDiscordId().equals(member.getId()))
@@ -198,7 +192,6 @@ public class Task_MemberOrganize implements Job {
 
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime joinedTime = member.getTimeJoined().atZoneSameInstant(ZoneId.of("Asia/Tokyo")).toLocalDateTime();
-            LocalDateTime loginDate = dml != null ? dml.getLastLogin().toLocalDateTime() : null;
             long joinDays = ChronoUnit.DAYS.between(joinedTime, now);
             logger.info("[%s] joinDays: %s days".formatted(member.getUser().getAsTag(), joinDays));
 
@@ -280,98 +273,9 @@ public class Task_MemberOrganize implements Job {
             // サブアカウントの場合、10分チェックとかのみ (Minecraft linkされている場合は除外)
             if (isSubAccount && !isMinecraftConnected) return;
 
-            if (isMinecraftConnected && uuid != null) {
-                Timestamp expired_date = dml.getExpiredAt();
-                if (expired_date != null) {
-                    expired_date.setTime(expired_date.getTime() - (1000L * 60 * 60 * 24 * 90)); // 最終ログイン日時が期限日の90日前と仮定
-                }
-                logger.info("[%s] loginDate: %s".formatted(member.getUser().getAsTag(), loginDate));
-                logger.info("[%s] expired_date: %s".formatted(member.getUser().getAsTag(), expired_date));
-                Timestamp checkTS = getMaxTimestamp(dml.getLastLogin(), expired_date);
-                boolean isExpiredDate = expired_date != null && checkTS.equals(expired_date);
-                long checkDays = loginDate != null ? ChronoUnit.DAYS.between(checkTS.toLocalDateTime(), now) : -1;
-                logger.info("[%s] checkDays: %s".formatted(member.getUser().getAsTag(), checkDays));
-
-                if (checkDays < 60 && notified.is2MonthNotified()) {
-                    notified.resetNotified();
-                }
-
-                // 最終ログインから2ヶ月(60日)が経過している場合、警告リプライを#generalで送信する
-                if (checkDays >= 60 && checkDays < 90 && !notified.is2MonthNotified()) {
-                    notifyConnection(member, "2か月経過", "最終ログインから2か月が経過したため、#generalで通知します。(isExpiredDate: " + isExpiredDate + ")", Color.MAGENTA, dml);
-                    if (!dryRun) {
-                        EmbedBuilder embed = new EmbedBuilder()
-                            .setTitle(":exclamation:最終ログインから2か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(dml.getMinecraftUUID().toString()))
-                            .setDescription("""
-                                あなたのDiscordアカウントに接続されているMinecraftアカウント「`%s`」が**最終ログインから2ヶ月経過**致しました。
-                                **サーバルール及び個別規約により、3ヶ月を経過すると建築物や自治体の所有権がなくなり、運営によって撤去・移動ができる**ようになり、またMinecraftアカウントとの連携が自動的に解除されます。
-                                本日から1ヶ月以内にjao Minecraft Serverにログインがなされない場合、上記のような対応がなされる場合がございますのでご注意ください。
-                                （自動連携解除延期措置が実施されている場合、このメッセージは期限日の1か月前をお知らせするものです）""".formatted(
-                                dml.getMinecraftName()
-                            ))
-                            .setColor(Color.YELLOW)
-                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                        Channel_General.sendMessage(new MessageCreateBuilder()
-                            .setEmbeds(embed.build())
-                            .setContent("<@%s>".formatted(member.getId()))
-                            .build()
-                        ).queue();
-                        notified.set2MonthNotified();
-                    }
-                }
-
-                // 最終ログインから3ヶ月が経過している場合、linkをdisabledにし、MinecraftConnected権限を剥奪する
-                if (checkDays >= 90) {
-                    notifyConnection(member, "3monthリンク切断", "最終ログインから3か月が経過したため、linkを切断し、役職を剥奪します。(isExpiredDate: " + isExpiredDate + ")", Color.ORANGE, dml);
-                    if (!dryRun) {
-                        EmbedBuilder embed = new EmbedBuilder()
-                            .setTitle(":bangbang:最終ログインから3か月経過のお知らせ", "https://users.jaoafa.com/%s".formatted(dml.getMinecraftUUID().toString()))
-                            .setDescription("""
-                                あなたのDiscordアカウントに接続されていたMinecraftアカウント「`%s`」が最終ログインから3ヶ月経過致しました。
-                                サーバルール及び個別規約により、建築物や自治体の所有権がなくなり、Minecraftアカウントとの接続が自動的に切断されました。""".formatted(
-                                dml.getMinecraftName()
-                            ))
-                            .setColor(Color.RED)
-                            .setFooter("最終ログイン日時: %s".formatted(checkTS.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                        Channel_General.sendMessage(new MessageCreateBuilder()
-                            .setEmbeds(embed.build())
-                            .setContent("<@%s>".formatted(member.getId()))
-                            .build()
-                        ).queue();
-                        try {
-                            dml.disconnect();
-                        } catch (SQLException e) {
-                            logger.warn("Failed to disconnect member: " + dml.getMinecraftUUID().toString(), e);
-
-                            if (JavajaotanData.getRollbar() != null) {
-                                JavajaotanData.getRollbar().error(e);
-                            }
-                        }
-                        guild.removeRoleFromMember(member, Roles.MinecraftConnected.getRole()).queue();
-                        notified.resetNotified();
-                    }
-                    isMinecraftConnected = false;
-                }
-                if (isMinecraftConnected && isSubAccount) {
-                    if (!dryRun) {
-                        guild.removeRoleFromMember(member, Roles.SubAccount.getRole()).queue();
-                    }
-                }
+            if (isMinecraftConnected && uuid != null & isSubAccount && !dryRun) {
+                guild.removeRoleFromMember(member, Roles.SubAccount.getRole()).queue();
             }
-        }
-
-        Timestamp getMaxTimestamp(Timestamp a, Timestamp b) {
-            if (a == null && b != null) return b;
-            if (a != null && b == null) return a;
-            if (a == null) return null;
-            if (a.before(b)) {
-                return b;
-            } else if (b.before(a)) {
-                return a;
-            } else if (a.equals(b)) {
-                return a;
-            }
-            return null;
         }
 
         private void notifyConnection(Member member, String title, String description, Color color, DiscordMinecraftLink mdc) {
@@ -436,72 +340,6 @@ public class Task_MemberOrganize implements Job {
                 }
             }
             return kicked;
-        }
-
-        class Notified {
-            final Path path = Path.of("permsync-notified.json");
-            final Member member;
-            final String memberId;
-
-            Notified(Member member) {
-                this.member = member;
-                this.memberId = member.getId();
-            }
-
-            private boolean is2MonthNotified() {
-                JSONObject object = load();
-                return object.has(memberId) && object.getJSONArray(memberId).toList().contains(NotifiedType.MONTH2.name());
-            }
-
-            private void set2MonthNotified() {
-                JSONObject object = load();
-                JSONArray userObject = object.has(memberId) ? object.getJSONArray(memberId) : new JSONArray();
-                userObject.put(NotifiedType.MONTH2.name());
-                object.put(memberId, userObject);
-                try {
-                    Files.writeString(path, object.toString());
-                } catch (IOException e) {
-                    logger.warn("Notified.setNotified is failed.", e);
-
-                    if (JavajaotanData.getRollbar() != null) {
-                        JavajaotanData.getRollbar().error(e);
-                    }
-                }
-            }
-
-            private void resetNotified() {
-                JSONObject object = load();
-                object.remove(memberId);
-                try {
-                    Files.writeString(path, object.toString());
-                } catch (IOException e) {
-                    logger.warn("Notified.setNotified is failed.", e);
-
-                    if (JavajaotanData.getRollbar() != null) {
-                        JavajaotanData.getRollbar().error(e);
-                    }
-                }
-            }
-
-            private JSONObject load() {
-                JSONObject object = new JSONObject();
-                if (Files.exists(path)) {
-                    try {
-                        object = new JSONObject(Files.readString(path));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-
-                        if (JavajaotanData.getRollbar() != null) {
-                            JavajaotanData.getRollbar().error(e);
-                        }
-                    }
-                }
-                return object;
-            }
-
-            enum NotifiedType {
-                MONTH2
-            }
         }
     }
 }

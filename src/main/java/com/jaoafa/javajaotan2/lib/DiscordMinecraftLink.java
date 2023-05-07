@@ -31,11 +31,8 @@ public class DiscordMinecraftLink {
     private final String discordId;
     private final String discordName;
     private final String discordDiscriminator;
-    private final Timestamp expiredAt;
     private final String disconnectPermGroup;
     private final Timestamp disconnectAt;
-    private final Timestamp connectedAt;
-    private final Timestamp lastLogin;
 
     public static DiscordMinecraftLink get(long discordId) throws SQLException {
         MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
@@ -88,12 +85,8 @@ public class DiscordMinecraftLink {
         this.discordId = res.getString("disid");
         this.discordName = res.getString("name");
         this.discordDiscriminator = res.getString("discriminator");
-        this.expiredAt = res.getTimestamp("expired_date");
         this.disconnectPermGroup = res.getString("dead_perm");
         this.disconnectAt = res.getTimestamp("dead_at");
-        this.connectedAt = res.getTimestamp("date");
-
-        this.lastLogin = getLastLogin(this.minecraftUUID);
     }
 
     /**
@@ -222,16 +215,6 @@ public class DiscordMinecraftLink {
     }
 
     /**
-     * 「期限付きリンク継続期限日時」を返します。<br>
-     * この値が NULL ではない場合、この値か最終ログインから3か月後のうち、最も遅い日に自動的に連携が解除されます。
-     *
-     * @return 期限付きリンク継続期限日時
-     */
-    public Timestamp getExpiredAt() {
-        return expiredAt;
-    }
-
-    /**
      * 連携が解除されたときの権限グループを返します。
      *
      * @return 連携が解除されたときの権限グループ
@@ -247,46 +230,6 @@ public class DiscordMinecraftLink {
      */
     public Timestamp getDisconnectAt() {
         return disconnectAt;
-    }
-
-    /**
-     * 連携日時を返します。
-     *
-     * @return 連携日時
-     */
-    public Timestamp getConnectedAt() {
-        return connectedAt;
-    }
-
-    /**
-     * 最終ログイン日時を返します
-     *
-     * @return 最終ログイン日時
-     */
-    public Timestamp getLastLogin() {
-        return lastLogin;
-    }
-
-    /**
-     * 指定した UUID の最終ログイン日時を返します。
-     *
-     * @return 最終ログイン日時
-     */
-    public static Timestamp getLastLogin(UUID uuid) throws SQLException {
-        MySQLDBManager manager = JavajaotanData.getMainMySQLDBManager();
-        if (manager == null) {
-            throw new IllegalStateException("MySQLDBManager is null.");
-        }
-        Connection conn = manager.getConnection();
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM login WHERE uuid = ? AND login_success = ? ORDER BY id DESC LIMIT 1")) {
-
-            stmt.setString(1, uuid.toString());
-            stmt.setBoolean(2, true);
-
-            try (ResultSet result = stmt.executeQuery()) {
-                return result.next() ? result.getTimestamp("date") : null;
-            }
-        }
     }
 
     /**

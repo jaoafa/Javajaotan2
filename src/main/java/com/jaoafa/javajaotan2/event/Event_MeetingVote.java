@@ -86,7 +86,7 @@ import java.util.stream.Collectors;
  * 　　・否認の場合は該当DB行の status に -1 を入れ、#city_request で否認されたことを知らせる
  */
 public class Event_MeetingVote extends ListenerAdapter {
-    Logger logger = null;
+    Logger logger;
     TextChannel meeting;
     TextChannel cityRequest;
 
@@ -113,8 +113,11 @@ public class Event_MeetingVote extends ListenerAdapter {
     /** 自治体情報変更リクエスト管理テキストパターン */
     static final Pattern CITIES_CHANGE_OTHER_WAITING_PATTERN = Pattern.compile("\\[API-CITIES-CHANGE-OTHER-WAITING:(\\d+)]");
 
-    public void initChannels(JDA jda) {
+    public Event_MeetingVote() {
         this.logger = Main.getLogger();
+    }
+
+    public void initChannels(JDA jda) {
         this.meeting = jda.getTextChannelById(597423467796758529L);
         this.cityRequest = jda.getTextChannelById(709008822043148340L);
     }

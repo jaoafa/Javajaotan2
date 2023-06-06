@@ -43,15 +43,22 @@ public class Event_VCSpeechLogLink extends ListenerAdapter {
         String messageId = match.group(3);
 
         GuildMessageChannel logChannel = null;
-        if (channelId.equals("927666435336056862")) {
-            // #vc-speech-log
-            logChannel = Main.getJDA().getTextChannelById(927666435336056862L);
-            if (logChannel == null) {
-                return;
-            }
-        } else if (channelId.equals("927685488821829653")) {
-            // #vc -> スレッド#発言ログ
-            logChannel = Main.getJDA().getThreadChannelById(927685488821829653L);
+        switch (channelId) {
+            case "927666435336056862" -> // #vc-speech-log-google
+                logChannel = Main.getJDA().getTextChannelById(927666435336056862L);
+            case "1008655448007782410" -> // #vc-speech-log-vosk
+                logChannel = Main.getJDA().getTextChannelById(1008655448007782410L);
+            case "1114949703700848671" -> // #vc-speech-log-whisper
+                logChannel = Main.getJDA().getTextChannelById(1114949703700848671L);
+            case "927685488821829653" ->
+                // #vc -> スレッド#発言ログ (Google)
+                logChannel = Main.getJDA().getThreadChannelById(927685488821829653L);
+            case "1114961269036945479" ->
+                // #vc -> スレッド#発言ログ (Vosk)
+                logChannel = Main.getJDA().getThreadChannelById(1114961269036945479L);
+            case "1114961384736821389" ->
+                // #vc -> スレッド#発言ログ (Whisper)
+                logChannel = Main.getJDA().getThreadChannelById(1114961384736821389L);
         }
         if (logChannel == null) {
             return;

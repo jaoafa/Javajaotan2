@@ -50,14 +50,11 @@ public class Event_VCSpeechLogLink extends ListenerAdapter {
                 logChannel = Main.getJDA().getTextChannelById(1008655448007782410L);
             case "1114949703700848671" -> // #vc-speech-log-whisper
                 logChannel = Main.getJDA().getTextChannelById(1114949703700848671L);
-            case "927685488821829653" ->
-                // #vc -> スレッド#発言ログ (Google)
+            case "927685488821829653" -> // #vc -> スレッド#発言ログ (Google)
                 logChannel = Main.getJDA().getThreadChannelById(927685488821829653L);
-            case "1114961269036945479" ->
-                // #vc -> スレッド#発言ログ (Vosk)
+            case "1114961269036945479" -> // #vc -> スレッド#発言ログ (Vosk)
                 logChannel = Main.getJDA().getThreadChannelById(1114961269036945479L);
-            case "1114961384736821389" ->
-                // #vc -> スレッド#発言ログ (Whisper)
+            case "1114961384736821389" -> // #vc -> スレッド#発言ログ (Whisper)
                 logChannel = Main.getJDA().getThreadChannelById(1114961384736821389L);
         }
         if (logChannel == null) {

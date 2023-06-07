@@ -185,18 +185,34 @@ public class Task_PermSync implements Job {
             boolean isSubAccount = JavajaotanLibrary.isGrantedRole(member, Roles.SubAccount.getRole());
             boolean isNitrotan = JavajaotanLibrary.isGrantedRole(member, Roles.Nitrotan.getRole());
 
-            // Nitroの場合(gif画像がアイコンの場合)、Nitrotanを付与する
-            if (member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && !isNitrotan) {
+            // Nitrotanの条件 (OR)
+            // - ユーザアイコンがGIFアイコンである
+            // - メンバーアイコンを持っている（ユーザアイコンとメンバーアイコンが異なる）
+            // - GIF絵文字を7日以内に利用している
+            // - 他サーバの絵文字を7日以内に利用している
+
+            // アニメーション/外部絵文字の最終メッセージ送信日時が何ミリ秒前か？
+            long lastNitroAgo = nitrotan.has(member.getId()) ? new Date().getTime() - nitrotan.getLong(member.getId()) : -1;
+            // Nitroで利用できる絵文字の検出がいままでにあったかどうか
+            boolean isDetectedNitroEmoji = lastNitroAgo != -1;
+            // 7日以内にNitroで利用できる絵文字の投稿があったか
+            boolean isUsed7DayNitroEmoji = lastNitroAgo < 7 * 24 * 60 * 60 * 1000;
+            // ユーザアイコンがGIFアイコンであるか
+            // サーバのメンバーアイコンについては、設定されている時点でNitro契約済みである
+            boolean isGifAvatar = member.getUser().getEffectiveAvatarUrl().endsWith(".gif");
+            // サーバのメンバーアイコンを持っているか
+            boolean isGuildOnlyAvatar = member.getEffectiveAvatarUrl().equals(member.getUser().getEffectiveAvatarUrl());
+
+            // Nitroとして断定できる場合、Nitrotanを付与する
+            if (!isNitrotan && (isUsed7DayNitroEmoji || isGifAvatar || isGuildOnlyAvatar)) {
                 notifyConnection(member, "Nitrotan役職付与", "アイコンがGIF画像だったので、Nitrotan役職を付与しました。", Color.LIGHT_GRAY, dml);
                 if (!dryRun) guild.addRoleToMember(member, Roles.Nitrotan.getRole()).queue();
                 isNitrotan = true;
             }
-            // Nitrotan役職がついていて、GIFアイコンでなく、アニメーション/外部絵文字の最終メッセージ送信日時が1週間前の場合、Nitrotan役職を剥奪する
-            // アニメーション/外部絵文字の最終メッセージ送信日時が何ミリ秒前か？
-            long lastNitroAgo = nitrotan.has(member.getId()) ? new Date().getTime() - nitrotan.getLong(member.getId()) : -1;
-            // 7日 * 24時間 * 60分 * 60秒 * 1000秒
-            if (isNitrotan && !member.getUser().getEffectiveAvatarUrl().endsWith(".gif") && (lastNitroAgo == -1 || lastNitroAgo > 7 * 24 * 60 * 60 * 1000)) {
-                notifyConnection(member, "Nitrotan役職剥奪", "アイコンがGIF画像ではなく、またアニメーション/外部絵文字を使用したメッセージが1週間以上前だったためNitrotan役職を剥奪しました。", Color.LIGHT_GRAY, dml);
+
+            // Nitrotan役職がついていて、Nitroとして断定できない状態となった場合、Nitrotan役職を剥奪する
+            if (isNitrotan && (!isDetectedNitroEmoji || !isUsed7DayNitroEmoji) && !isGifAvatar && !isGuildOnlyAvatar) {
+                notifyConnection(member, "Nitrotan役職剥奪", "Nitroとして断定できない状態となったため、Nitrotan役職を剥奪しました。\n\nNitroとして断定できる条件\n・ユーザアイコンがGIFアイコンである\n・メンバーアイコンを持っている（ユーザアイコンとメンバーアイコンが異なる)\n・GIF絵文字を7日以内に利用している\n・他サーバの絵文字を7日以内に利用している", Color.LIGHT_GRAY, dml);
                 if (!dryRun) guild.removeRoleFromMember(member, Roles.Nitrotan.getRole()).queue();
             }
 

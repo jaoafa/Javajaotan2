@@ -48,7 +48,8 @@ public class Cmd_Socials extends CommandWithActions {
 
     @Override
     protected void execute(CommandEvent event) {
-        CommandAction.execute(this, event);
+        event.getMessage().reply("当機能は一時的または恒久的に停止しています。").queue();
+        // CommandAction.execute(this, event);
     }
 
     private void setTwitterAccount(CommandEvent event, List<String> argNames) {

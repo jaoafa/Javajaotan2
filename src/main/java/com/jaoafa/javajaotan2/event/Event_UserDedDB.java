@@ -11,21 +11,10 @@
 
 package com.jaoafa.javajaotan2.event;
 
-import com.jaoafa.javajaotan2.Main;
-import com.jaoafa.javajaotan2.lib.DiscordMinecraftLink;
-import com.jaoafa.javajaotan2.lib.JavajaotanData;
-import com.jaoafa.javajaotan2.lib.MinecraftPermGroup;
-import com.jaoafa.javajaotan2.lib.MySQLDBManager;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class Event_UserDedDB extends ListenerAdapter {
+    /*
     @Override
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
         User user = event.getUser();
@@ -60,4 +49,5 @@ public class Event_UserDedDB extends ListenerAdapter {
             }
         }
     }
+     */
 }

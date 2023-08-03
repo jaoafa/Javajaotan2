@@ -17,7 +17,10 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.ContextMenu;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jaoafa.javajaotan2.lib.*;
-import com.jaoafa.javajaotan2.tasks.*;
+import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
+import com.jaoafa.javajaotan2.tasks.Task_MeetingVote;
+import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
+import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
 import com.rollbar.notifier.Rollbar;
 import com.rollbar.notifier.config.ConfigBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -405,6 +408,7 @@ public class Main {
                     .dailyTimeIntervalSchedule()
                     .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
                     .withInterval(5, DateBuilder.IntervalUnit.MINUTE)),
+            /*
             new TaskConfig(
                 Task_PermSync.class,
                 "permSync",
@@ -413,6 +417,7 @@ public class Main {
                     .dailyTimeIntervalSchedule()
                     .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
                     .withInterval(30, DateBuilder.IntervalUnit.MINUTE)),
+             */
             new TaskConfig(
                 Task_SyncOtherServerPerm.class,
                 "otherServerPermSync",

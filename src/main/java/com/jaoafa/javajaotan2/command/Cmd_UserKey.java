@@ -36,7 +36,8 @@ public class Cmd_UserKey extends CommandWithActions {
 
     @Override
     protected void execute(CommandEvent event) {
-        CommandAction.execute(this, event);
+        event.getMessage().reply("当機能は一時的または恒久的に停止しています。").queue();
+        // CommandAction.execute(this, event);
     }
 
     private void info(CommandEvent event, List<String> argNames) {

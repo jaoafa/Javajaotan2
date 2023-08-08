@@ -17,10 +17,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.ContextMenu;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jaoafa.javajaotan2.lib.*;
-import com.jaoafa.javajaotan2.tasks.Task_CheckMailVerified;
-import com.jaoafa.javajaotan2.tasks.Task_MeetingVote;
-import com.jaoafa.javajaotan2.tasks.Task_MemberOrganize;
-import com.jaoafa.javajaotan2.tasks.Task_SyncOtherServerPerm;
+import com.jaoafa.javajaotan2.tasks.*;
 import com.rollbar.notifier.Rollbar;
 import com.rollbar.notifier.config.ConfigBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -392,6 +389,7 @@ public class Main {
     static void registerTask() {
         SchedulerFactory factory = new StdSchedulerFactory();
         List<TaskConfig> tasks = List.of(
+            /*
             new TaskConfig(
                 Task_MemberOrganize.class,
                 "memberOrganize",
@@ -400,6 +398,7 @@ public class Main {
                     .dailyTimeIntervalSchedule()
                     .startingDailyAt(TimeOfDay.hourMinuteAndSecondOfDay(0, 0, 0))
                     .endingDailyAfterCount(1)),
+             */
             new TaskConfig(
                 Task_CheckMailVerified.class,
                 "checkMailVerified",

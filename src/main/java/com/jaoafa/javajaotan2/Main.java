@@ -49,6 +49,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -210,6 +211,13 @@ public class Main {
     }
 
     static void registerCommand(CommandClientBuilder builder) {
+        JSONArray implemented;
+        try {
+            implemented = new JSONArray(Files.readString(Path.of("implemented.json")));
+        } catch (IOException e) {
+            implemented = new JSONArray();
+        }
+
         final String commandPackage = "com.jaoafa.javajaotan2.command";
         Reflections reflections = new Reflections(commandPackage);
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
@@ -223,6 +231,10 @@ public class Main {
                 continue;
             }
             String cmdName = theClass.getName().substring(("%s.Cmd_".formatted(commandPackage)).length());
+            if (implemented.toList().contains(cmdName)) {
+                getLogger().info("%s: 実装済みコマンドのため、登録をスキップします".formatted(cmdName));
+                continue;
+            }
 
             try {
                 commands.add(theClass.getDeclaredConstructor().newInstance());
@@ -334,6 +346,13 @@ public class Main {
     }
 
     static void registerEvent(JDABuilder jdaBuilder) {
+        JSONArray implemented;
+        try {
+            implemented = new JSONArray(Files.readString(Path.of("implemented.json")));
+        } catch (IOException e) {
+            implemented = new JSONArray();
+        }
+
         final String eventPackage = "com.jaoafa.javajaotan2.event";
         Reflections reflections = new Reflections(eventPackage);
         Set<Class<? extends ListenerAdapter>> subTypes = reflections.getSubTypesOf(ListenerAdapter.class);
@@ -348,6 +367,11 @@ public class Main {
                 continue;
             }
             String eventName = clazz.getName().substring(("%s.Event_".formatted(eventPackage)).length());
+            if (implemented.toList().contains(eventName)) {
+                getLogger().info("%s: イベントの登録をスキップしました。".formatted(eventName));
+                continue;
+            }
+
             try {
                 Constructor<?> construct = clazz.getConstructor();
                 Object instance = construct.newInstance();
